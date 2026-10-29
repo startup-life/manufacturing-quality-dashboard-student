@@ -5,7 +5,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { AppService } from './app.service';
 import { FactoryUserGuard } from './factory-user.guard';
-import { InputError, inspectionInput, recordInput, listInput } from './validation';
+import { InputError, inspectionInput, updateInput, recordInput, listInput } from './validation';
 import { GEMINI_OFF_MESSAGE } from './integrations';
 import { normalizePhoto } from './photo';
 import { errorEvent } from './log';
@@ -62,7 +62,7 @@ export class InspectionsController {
   @Patch(':id')
   @UseGuards(FactoryUserGuard)
   update(@Param('id') id: string, @Body() body: any) {
-    return this.app.repo.update(id, body || {});
+    return this.app.repo.update(id, updateInput(body));
   }
 
   @Post()
@@ -93,7 +93,9 @@ export class InspectionsController {
               body.images.push(stored.image_url);
               continue;
             }
-            const id = crypto.randomUUID();
+            // Named from the request ID, the photo's place and its bytes, so resending the same request repeats the same
+            // registration (the mock store answers it from its requests list); another photo under that ID still conflicts.
+            const id = crypto.createHash('sha256').update(requestId + ':photo:' + photoIndex + ':').update(bytes).digest('hex').slice(0, 32);
             const uploadsDir = path.join(root, 'runtime/uploads');
             await fs.promises.mkdir(uploadsDir, { recursive: true });
             await fs.promises.writeFile(path.join(uploadsDir, `${id}.jpg`), normalized);
