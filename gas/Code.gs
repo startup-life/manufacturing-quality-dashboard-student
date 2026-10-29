@@ -11,8 +11,6 @@ const TABS = [
   'products',
   'inspections',
   'inspection_images',
-  'defect_codes',
-  'inspection_defects',
   'inspection_records',
   'record_defects',
   'standards',
@@ -335,8 +333,6 @@ function initHeadersIfEmpty(ss) {
     products: ['product_id', 'product_name', 'color', 'capacity_ml'],
     inspections: ['inspection_id', 'product_id', 'inspected_at', 'initial_weight_g', 'initial_decision', 'content_version', 'created_at'],
     inspection_images: ['image_id', 'inspection_id', 'image_url', 'drive_file_id', 'sha256', 'active', 'created_at'],
-    defect_codes: ['defect_code', 'defect_name', 'severity'],
-    inspection_defects: ['inspection_id', 'defect_code'],
     inspection_records: ['record_id', 'inspection_id', 'user_id', 'recorded_at', 'decision', 'weight_g', 'notes', 'content_version', 'change_reason'],
     record_defects: ['record_id', 'defect_code'],
     standards: ['standard_id', 'revision', 'standard_text', 'sha256', 'created_at'],
@@ -570,18 +566,17 @@ function handleInspectionsGet(ss, payload) {
 // Every inspection as the detail shows it. Each tab is read once; the rows are grouped per inspection in memory.
 function readInspections(ss) {
   const tabs = {};
-  for (const tab of ['products', 'inspection_images', 'inspection_defects', 'inspection_updates']) tabs[tab] = getRows(ss, tab);
+  for (const tab of ['products', 'inspection_images', 'inspection_updates']) tabs[tab] = getRows(ss, tab);
   return getRows(ss, 'inspections').map(insp => inspectionView(insp, tabs));
 }
 
-// One inspection: its current product, time and weight (the latest edit), judgment, memo, photos and defects.
+// One inspection: its current product, time and weight (the latest edit), judgment, memo and photos.
 function inspectionView(insp, tabs) {
   const id = insp.inspection_id;
   const products = tabs.products;
   const prod = products.find(p => p.product_id === insp.product_id) || { product_name: '텀블러', color: '은색', capacity_ml: 500 };
 
   const images = tabs.inspection_images.filter(img => img.inspection_id === id && img.active != 0);
-  const defects = tabs.inspection_defects.filter(d => d.inspection_id === id);
   const updates = tabs.inspection_updates.filter(u => u.inspection_id === id);
   const update = updates[updates.length - 1];
   const effective = update || insp;
@@ -611,7 +606,7 @@ function inspectionView(insp, tabs) {
       drive_file_id: img.drive_file_id,
       sha256: img.sha256
     })),
-    defects: defects.map(d => ({ defect_code: d.defect_code })),
+    defects: [],
     created_at: insp.created_at
   };
 }

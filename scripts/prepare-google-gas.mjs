@@ -1,5 +1,5 @@
 // GAS web app preparation from the local side. The web app itself is made in the editor or with clasp (docs/LOCAL_SETUP.md).
-//   npm run gas:init    makes the spreadsheet and the Drive photo folder, then sends the products and defect codes
+//   npm run gas:init    makes the spreadsheet and the Drive photo folder, then sends the products
 import { realpathSync } from 'node:fs';
 import crypto from 'node:crypto';
 import path from 'node:path';
@@ -16,16 +16,9 @@ const PRODUCTS = [
   { product_id: 'P-WHITE', product_name: '텀블러 화이트', color: '흰색', capacity_ml: 500 },
   { product_id: 'P-BLACK', product_name: '텀블러 블랙', color: '검정', capacity_ml: 500 }
 ];
-// Must equal the local mock.
-const DEFECT_CODES = [
-  { defect_code: 'D01', defect_name: '스크래치', severity: '경미' },
-  { defect_code: 'D02', defect_name: '찍힘', severity: '중대' },
-  { defect_code: 'D03', defect_name: '라벨 오류', severity: '치명' },
-  { defect_code: 'D04', defect_name: '뚜껑 조립 오류', severity: '중대' }
-];
 
 export function initializeRequests() {
-  return { configure: { products: PRODUCTS, defect_codes: DEFECT_CODES } };
+  return { configure: { products: PRODUCTS } };
 }
 
 export async function initialize({ env = process.env, root = repoRoot, transport, log = console.log, warn = console.warn } = {}) {
@@ -38,7 +31,7 @@ export async function initialize({ env = process.env, root = repoRoot, transport
   // The spreadsheet and the Drive photo folder first; an existing one is reused.
   await transport.dispatch('setup.resources', {}, { request_id: crypto.randomUUID() });
   const status = await transport.dispatch('init.configure', requests.configure, { request_id: crypto.randomUUID() });
-  log('Sheets와 Drive 사진 폴더를 준비하고 제품·불량 코드를 보냈습니다.');
+  log('Sheets와 Drive 사진 폴더를 준비하고 제품을 보냈습니다.');
   return { status };
 }
 

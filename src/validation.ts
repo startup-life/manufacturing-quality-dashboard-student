@@ -11,8 +11,6 @@ export function gasHttpError(err: any) {
   if (err instanceof InputError || !Object.hasOwn(GAS_STATUS, err?.code)) return err;
   return Object.assign(new InputError(err.message, GAS_STATUS[err.code]), { code: err.code }, err.cause ? { cause: err.cause } : {});
 }
-const DEFECT_CODES = ['D01', 'D02', 'D03', 'D04'];
-const badDefects = (defects: unknown) => !Array.isArray(defects) || defects.length > 4 || new Set(defects).size !== defects.length || defects.some(x => !DEFECT_CODES.includes(x));
 const badWeight = (weight_g: unknown) => weight_g !== null && (typeof weight_g !== 'number' || !Number.isFinite(weight_g) || weight_g < 0 || weight_g > 9999999);
 export function inspectionInput(body: any, imageIds: Set<string>) {
   if (!body || typeof body !== 'object' || Array.isArray(body)) throw new InputError('입력 객체가 필요합니다.');
@@ -24,10 +22,9 @@ export function inspectionInput(body: any, imageIds: Set<string>) {
   if (decision !== null && decision !== undefined && decision !== '' && !['OK', 'NG', 'HOLD'].includes(decision)) throw new InputError('판정은 OK/NG/HOLD입니다.');
   const weight_g = body.weight_g;
   if (badWeight(weight_g)) throw new InputError('중량은 수치 또는 NULL입니다.');
-  const images = body.images ?? [], defects = body.defects ?? [];
+  const images = body.images ?? [];
   if (!Array.isArray(images) || images.length > 8 || new Set(images).size !== images.length || images.some(x => typeof x !== 'string' || !imageIds.has(x))) throw new InputError('제공된 학습 이미지 URL을 선택하세요.');
-  if (badDefects(defects)) throw new InputError('불량코드 형식 오류');
-  return { inspection_id, product_id, inspected_at, weight_g, decision: weight_g === null && decision === 'OK' ? 'HOLD' : (decision || null), images, defects };
+  return { inspection_id, product_id, inspected_at, weight_g, decision: weight_g === null && decision === 'OK' ? 'HOLD' : (decision || null), images };
 }
 export function dateInput(date: unknown) {
   if (date === undefined || date === '') return '';

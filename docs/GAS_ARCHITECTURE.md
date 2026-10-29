@@ -28,14 +28,13 @@
 
 ## 저장 구조
 
-전용 스프레드시트의 관계별 탭은 다음과 같습니다. 초기화가 탭을 한꺼번에 만들어 두며, 지금 서버가 쓰는 탭은 products, inspections, inspection_images, defect_codes, inspection_defects, requests, photos, inspection_updates입니다. 나머지는 이후 단계에서 씁니다. UUID 계열 문자열 키, ISO-8601 시간, 명시적 enum/수치 검증을 사용합니다. 기존 API 응답의 필드·집계 의미는 유지하거나 브라우저 호출과 함께 호환합니다.
+전용 스프레드시트의 관계별 탭은 다음과 같습니다. 초기화가 탭을 한꺼번에 만들어 두며, 지금 서버가 쓰는 탭은 products, inspections, inspection_images, requests, photos, inspection_updates입니다. 나머지는 이후 단계에서 씁니다. UUID 계열 문자열 키, ISO-8601 시간, 명시적 enum/수치 검증을 사용합니다. 기존 API 응답의 필드·집계 의미는 유지하거나 브라우저 호출과 함께 호환합니다.
 
 | 탭 | 목적 |
 |---|---|
 | products | 제품ID·제품명·색상·용량 |
 | inspections | 검사ID·제품ID·검사일시·최초 측정·최초 판단·내용 버전 |
 | inspection_images | 이미지ID·검사ID·인증된 image_url·Drive file_id·SHA-256·활성 상태 |
-| defect_codes / inspection_defects | 불량 사전 및 검사와 불량의 관계 |
 | inspection_records / record_defects | 사용자가 남긴 판단·측정·메모·조치의 변경 이력 |
 | standards | 기준ID·버전·기준 원문·rules_json·해시 |
 | ai_runs | 실행ID·요청ID·검사ID·내용/기준 버전·상태·오류 종류·시간 |
