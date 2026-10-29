@@ -37,7 +37,6 @@
 | products | 제품ID·제품명·색상·용량 |
 | inspections | 검사ID·제품ID·검사일시·최초 측정·최초 판단·내용 버전 |
 | inspection_images | 이미지ID·검사ID·인증된 image_url·Drive file_id·SHA-256·활성 상태 |
-| defect_codes / inspection_defects | 불량 사전 및 검사와 불량의 관계 |
 | standards | 기준ID·버전·기준 원문·rules_json·해시 |
 | ai_runs | 실행ID·요청ID·검사ID·내용/기준 버전·상태·오류 종류·시간 |
 | ai_drafts | 실행ID·입력 스냅샷·6항목 결과·기준ID/해시·모델·생성 시각 |

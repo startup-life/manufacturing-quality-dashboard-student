@@ -78,13 +78,6 @@ export class GasTransport {
       ],
       inspections: [],
       inspection_images: [],
-      defect_codes: [
-        { defect_code: 'D01', defect_name: '스크래치', severity: '경미' },
-        { defect_code: 'D02', defect_name: '찍힘', severity: '중대' },
-        { defect_code: 'D03', defect_name: '라벨 오류', severity: '치명' },
-        { defect_code: 'D04', defect_name: '뚜껑 조립 오류', severity: '중대' }
-      ],
-      inspection_defects: [],
       inspection_updates: [],
       // Not read: standards.get serves the repository files. Saved local state files still carry this old placeholder copy.
       standards: [
@@ -361,18 +354,6 @@ export class GasTransport {
             });
           }
 
-          const defects = Array.isArray(item.defects) ? item.defects : [];
-          for (const d of defects) {
-            const code = typeof d === 'string' ? d : d.defect_code;
-            const defCodeObj = this.mockDb.defect_codes.find(c => c.defect_code === code);
-            this.mockDb.inspection_defects.push({
-              inspection_id: inspectionId,
-              defect_code: code,
-              defect_name: defCodeObj?.defect_name || (code === 'D01' ? '스크래치' : code === 'D02' ? '찍힘' : code === 'D03' ? '라벨 오류' : '뚜껑 조립 오류'),
-              observation_note: '작성자가 등록한 관찰'
-            });
-          }
-
           created.push({
             inspection_id: inspectionId,
             product_id: insp.product_id,
@@ -482,12 +463,6 @@ export class GasTransport {
         // The current product (after an edit), as the list uses.
         const prod = this.mockDb.products.find(p => p.product_id === (insp.current_product_id || insp.initial_product_id || insp.product_id)) || { product_name: '텀블러', color: '은색' };
         const imgs = this.mockDb.inspection_images.filter(img => img.inspection_id === id && img.active);
-        const origDefects = this.mockDb.inspection_defects.filter(d => d.inspection_id === id);
-
-        const currentDefects = origDefects.map(d => {
-          const codeObj = this.mockDb.defect_codes.find(c => c.defect_code === d.defect_code);
-          return { defect_code: d.defect_code, defect_name: codeObj?.defect_name || d.defect_name };
-        });
 
         result = {
           inspection_id: insp.inspection_id,
@@ -504,15 +479,14 @@ export class GasTransport {
             product_id: insp.initial_product_id || insp.product_id,
             inspected_at: insp.initial_inspected_at || insp.inspected_at,
             weight_g: insp.initial_weight_g,
-            decision: insp.initial_decision,
-            defects: origDefects.map(d => ({ defect_code: d.defect_code, defect_name: d.defect_name }))
+            decision: insp.initial_decision
           },
           images: imgs.map(img => ({
             image_id: img.image_id,
             image_url: img.image_url,
             drive_file_id: img.drive_file_id
           })),
-          defects: currentDefects,
+          defects: [],
           drafts: this.mockDb.ai_drafts.filter(d => d.inspection_id === id).slice().reverse().map(d => ({
             draft_id: d.draft_id,
             run_id: d.run_id,

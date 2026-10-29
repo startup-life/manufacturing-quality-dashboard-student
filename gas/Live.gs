@@ -19,8 +19,6 @@ function configureLiveResources(ss,payload) {
   if(apiKey)props.setProperty('GEMINI_API_KEY',apiKey);
   if(!props.getProperty('DRIVE_FOLDER_ID'))props.setProperty('DRIVE_FOLDER_ID',DriveApp.createFolder('텀블러 공장 품질검사 사진').getId());
   for(const product of (payload.products||[]))if(!getRows(ss,'products').some(p=>p.product_id===product.product_id))appendRow(ss,'products',product);
-  // Judgments are checked against this tab; only missing codes are added, so an existing sheet is filled on the next initialize.
-  for(const defect of (payload.defect_codes||[]))if(!getRows(ss,'defect_codes').some(d=>d.defect_code===defect.defect_code))appendRow(ss,'defect_codes',defect);
   for(const standard of (payload.standards||[])) {
     if(!standard.revision || !standard.standard_text || standard.sha256!==hashString(standard.standard_text))throw Object.assign(Error('기준 원문 해시 오류'),{code:'VALIDATION'});
     const old=getRows(ss,'standards').find(s=>s.revision===standard.revision);

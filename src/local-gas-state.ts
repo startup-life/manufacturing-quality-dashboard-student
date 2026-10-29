@@ -20,7 +20,6 @@ export function restoreApiSnapshot(snapshot: Row) {
       content_version: d.content_version, created_at: d.created_at
     });
     db.inspection_images.push(...d.images.map((img: Row) => ({ ...img, inspection_id: d.inspection_id, active: 1 })));
-    db.inspection_defects.push(...(o.defects || []).map((def: Row) => ({ ...def, inspection_id: d.inspection_id })));
     db.ai_drafts.push(...[...(item.drafts || [])].reverse());
   }
   db.evidence_links = snapshot.evidence_links || [];
