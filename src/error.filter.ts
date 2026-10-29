@@ -1,8 +1,8 @@
-import { ArgumentsHost, Catch, ExceptionFilter, HttpException, NotFoundException } from '@nestjs/common';
+import { ArgumentsHost, BadRequestException, Catch, ExceptionFilter, HttpException, NotFoundException } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import { InputError } from './validation';
 import { errorEvent } from './log';
-import { routeName } from './pages.controller';
+import { indexPath, routeName } from './pages.controller';
 
 // encodeurl 2: characters a URL may not carry are percent-encoded, an existing %XX is kept.
 const encodeUrl = (url: string) => url.replace(/(?:[^\x21\x23-\x3B\x3D\x3F-\x5F\x61-\x7A\x7C\x7E]|%(?:[^0-9A-Fa-f]|[0-9A-Fa-f][^0-9A-Fa-f]|$))+/g, encodeURI);
@@ -21,6 +21,8 @@ function notFoundPage(req: Request, res: Response) {
   res.end(req.method === 'HEAD' ? undefined : body);
 }
 
+const undecodable = (urlPath: string) => { try { decodeURIComponent(urlPath); return false; } catch { return true; } };
+
 // Every failure answers { error } with its status. Only InputError carries setup, sign-in or connection guidance
 // written for the user; any other 500 says 서버 처리 실패 and goes to the log.
 @Catch()
@@ -29,6 +31,9 @@ export class ErrorFilter implements ExceptionFilter {
     const req = host.switchToHttp().getRequest<Request>(), res = host.switchToHttp().getResponse<Response>();
     if (res.headersSent) { req.socket.destroy(); return; }
     if (err instanceof NotFoundException) return notFoundPage(req, res);
+    // A screen address that cannot be decoded (e.g. /inspections/%E0%A4%A) gets the screen, which shows its not-found page.
+    // Nest turns Express's URIError into a BadRequestException, so the path itself is checked.
+    if (err instanceof BadRequestException && req.method === 'GET' && !/^\/api(\/|$)/.test(req.path) && req.accepts('html') && undecodable(req.path)) return res.sendFile(indexPath);
     const status = err instanceof HttpException ? err.getStatus() : err?.status || 500;
     if (status >= 500) console.error(errorEvent(err, { route: routeName(req, req.path), method: req.method, status, request_id: res.get('X-Request-Id') }));
     res.status(status).json({ error: status >= 500 ? (err instanceof InputError ? err.message : '서버 처리 실패') : err.message });

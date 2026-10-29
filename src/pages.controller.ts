@@ -5,7 +5,7 @@ import path from 'node:path';
 import { requireLogin } from './security';
 
 const root = path.join(__dirname, '..');
-const indexPath = path.join(root, 'public/index.html');
+export const indexPath = path.join(root, 'public/index.html');
 // The route below matches every request no API route took.
 const PAGES_ROUTE = '{*path}';
 // How the logs name a request's route: Express's route path, or 'static' (fallback) for the pages and the middleware.
