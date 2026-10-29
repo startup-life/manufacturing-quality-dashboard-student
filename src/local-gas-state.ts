@@ -33,6 +33,8 @@ export function openLocalTransport(stateFile: string, bootstrapFile?: string) {
     const saved = JSON.parse(fs.readFileSync(stateFile, 'utf8'));
     if (saved.schema_version !== 1 || !Array.isArray(saved.db?.inspections)) throw new Error('로컬 저장 파일 형식 오류');
     transport = new GasTransport({ mode: 'mock' });
+    // A file saved on an earlier step can lack lists this store uses; those start as in a new store, saved rows stay.
+    for (const [key, rows] of Object.entries(transport.mockDb)) if (!Array.isArray(saved.db[key])) saved.db[key] = rows;
     transport.mockDb = saved.db;
   } else if (bootstrapFile) {
     transport = restoreApiSnapshot(JSON.parse(fs.readFileSync(bootstrapFile, 'utf8')));
