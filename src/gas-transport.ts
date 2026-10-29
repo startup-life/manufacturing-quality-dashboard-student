@@ -334,6 +334,7 @@ export class GasTransport {
             initial_decision: initialDecision,
             current_decision: initialDecision,
             memo: item.memo || '',
+            revision: item.revision || 'Rev.A',
             content_version: 0,
             created_at: now.toISOString()
           };
@@ -473,6 +474,7 @@ export class GasTransport {
           weight_g: this._currentWeight(insp),
           decision: 'current_decision' in insp ? insp.current_decision : insp.initial_decision,
           memo: 'current_memo' in insp ? insp.current_memo : (insp.memo || ''),
+          revision: insp.revision || null,
           content_version: insp.content_version,
           original: {
             inspection_id: insp.inspection_id,
@@ -530,8 +532,8 @@ export class GasTransport {
 
         if (payload.product_id) insp.current_product_id = payload.product_id;
         if (payload.inspected_at) insp.current_inspected_at = payload.inspected_at;
-        // Every edit records its memo, an empty one when none is sent, as GAS updateLiveInspection does.
-        insp.current_memo = payload.memo || '';
+        // An edit without a memo keeps the current one, as GAS updateLiveInspection does.
+        if (payload.memo !== undefined) insp.current_memo = payload.memo || '';
         if (payload.weight_g !== undefined) {
           insp.current_weight_g = payload.weight_g !== null && payload.weight_g !== '' ? Number(payload.weight_g) : null;
         }

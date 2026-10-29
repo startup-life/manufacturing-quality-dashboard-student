@@ -16,7 +16,7 @@ export function restoreApiSnapshot(snapshot: Row) {
       inspected_at: o.inspected_at, initial_inspected_at: o.inspected_at,
       current_inspected_at: d.inspected_at, initial_weight_g: o.weight_g,
       current_weight_g: d.weight_g, initial_decision: o.decision,
-      current_decision: d.decision, memo: d.memo,
+      current_decision: d.decision, memo: d.memo, revision: d.revision,
       content_version: d.content_version, created_at: d.created_at
     });
     db.inspection_images.push(...d.images.map((img: Row) => ({ ...img, inspection_id: d.inspection_id, active: 1 })));
