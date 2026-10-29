@@ -227,7 +227,7 @@ export function parseRoute() {
 
 function updateNav(view) {
   if (typeof document === 'undefined' || !document.querySelectorAll) return;
-  const links = document.querySelectorAll('nav a, .mobile-nav-menu a');
+  const links = document.querySelectorAll('nav a, .mobile-nav-menu a, a.nav-settings-link');
   for (const a of links) {
     if (!a || !a.classList) continue;
     const href = a.getAttribute ? (a.getAttribute('data-path') || a.getAttribute('href')) : '';
