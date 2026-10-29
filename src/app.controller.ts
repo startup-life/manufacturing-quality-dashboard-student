@@ -1,10 +1,9 @@
 import { Controller, Get, Param, Query, Res } from '@nestjs/common';
 import type { Response } from 'express';
 import { AppService } from './app.service';
-import { InputError, dateInput, gasHttpError } from './validation';
+import { InputError, dateInput } from './validation';
 import { standardFor } from './reports';
 import { integrationStatus } from './integrations';
-import { promptCore } from './prompt-core';
 
 @Controller('api')
 export class AppController {
@@ -38,41 +37,12 @@ export class AppController {
   }
 
   @Get('standards/:revision')
-  async standard(@Param('revision') revision: string) {
-    try {
-      const standard = await standardFor(revision);
-      // The criteria text built from the source document, the same text the GAS sends to Gemini.
-      const source = await this.app.readStandardSource(revision);
-      if (!source) throw new InputError('적용 기준 원문이 없습니다.', 503);
-      return { ...standard, natural_text: promptCore.sourceStandard(source.standard_text, standard) };
-    } catch (err) {
-      throw gasHttpError(err);
-    }
-  }
-
-  // Read-only draft history.
-  @Get('drafts/:id/reviews')
-  draftReviews(@Param('id') id: string) {
-    return this.app.repo.transport.dispatch('drafts.reviews.list', { draft_id: id });
-  }
-
-  @Get('drafts/:id/evidence')
-  draftEvidence(@Param('id') id: string) {
-    return this.app.repo.transport.dispatch('drafts.evidence.list', { draft_id: id });
+  standard(@Param('revision') revision: string) {
+    return standardFor(revision);
   }
 
   @Get('operations')
   operations() {
-    const { repo, geminiMode, integrations, mcpClient, options } = this.app;
-    return {
-      // Older fields, kept by name; with GEMINI_MODE off or mock they no longer claim the GAS Gemini call.
-      ai_mode: repo.live && geminiMode === 'live' ? 'gas-gemini-free-api' : 'not-configured',
-      external_api_enabled: repo.live && geminiMode === 'live' && options.geminiReady === true,
-      notebooklm: '별도 로컬 MCP 연결; 웹 자동 동기화 아님',
-      revisions: ['Rev.A', 'Rev.B'],
-      scope: '교육용·출하 승인 없음',
-      storage_provider: repo.live ? 'gas' : 'local-simulation',
-      integrations: integrationStatus(integrations, { geminiReady: options.geminiReady, mcpClient, geminiModels: options.geminiModels })
-    };
+    return { integrations: integrationStatus(this.app.repo.live ? 'live' : 'mock') };
   }
 }

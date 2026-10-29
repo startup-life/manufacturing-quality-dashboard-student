@@ -7,7 +7,6 @@
   <title>텀블러 공장 · 제조품질관리</title>
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="/styles.css">
-  <link rel="stylesheet" href="/reports.css">
   <link rel="stylesheet" href="/home.css">
 </head>
 <body>
@@ -207,10 +206,10 @@
           <div class="form-actions">
             <h3>등록할 내용</h3>
             <p id="reg-save-summary" class="registration-summary" aria-live="polite"></p>
-            <p id="reg-storage-notice" class="form-help">등록한 뒤 상세 화면에서 AI 결과 확인 → 검사기준 비교 → 내 판단 기록 순서로 진행합니다.</p>
+            <p id="reg-storage-notice" class="form-help">등록한 뒤 상세 화면에서 사진과 측정값을 확인합니다.</p>
             <p id="reg-status-message" role="status" aria-live="polite"></p>
             <div class="registration-actions">
-              <button type="submit" id="reg-submit-btn" class="btn-action primary btn-lg">검사 등록하고 결과 확인</button>
+              <button type="submit" id="reg-submit-btn" class="btn-action primary btn-lg">검사 등록</button>
               <a href="/" class="registration-cancel">취소하고 품질 현황으로</a>
             </div>
           </div>
@@ -222,12 +221,11 @@
 
       <!-- 5. Settings Panel -->
       <section class="panel" id="settings-panel" hidden>
-        <div id="prompt-settings" class="prompt-settings" aria-label="자연어 지시문 설정"></div>
         <div class="section-head">
           <h2>시스템 및 외부 연동 설정</h2>
           <span class="badge">설정 및 상태 점검</span>
         </div>
-        <p class="muted">Google Apps Script, Google Sheets, Drive 및 로컬 NotebookLM MCP 서버 연동 상태를 확인합니다.</p>
+        <p class="muted">Google Apps Script, Google Sheets, Drive 연동 상태를 확인합니다.</p>
 
         <div class="settings-grid">
           <article class="setting-card">
@@ -239,20 +237,6 @@
               <li>보안: 수식 주입 방어 (=, +, -, @ 차단) 및 bcrypt 인증 검증</li>
               <li>무결성: 멱등성 키 기반 중복 등록 방지</li>
             </ul>
-          </article>
-
-          <article class="setting-card">
-            <h3>NotebookLM MCP 로컬 연동 상태</h3>
-            <p>연결 상태: <strong id="settings-mcp-status" class="status-badge warning">연결 준비 필요</strong></p>
-            <p class="muted">바이너리: <code>notebooklm-mcp</code> (MCP 설정 파일의 command 경로, 로컬 stdio 전송)</p>
-            <p class="muted">NOTEBOOKLM_MODE=live이면 이 서버에서 실제 질의가 한 번 성공한 뒤 '정상 연결'로 바뀌고, 서버를 다시 시작하면 다음 질의가 성공할 때까지 '연결 준비 필요'로 보입니다. 표준서(Rev.A/B) 근거는 검사 상세에서 대조·저장합니다.</p>
-          </article>
-
-          <article class="setting-card">
-            <h3>Gemini 연결 상태</h3>
-            <p id="settings-ai-mode">판독 연결: <strong>연결 상태 조회 중…</strong></p>
-            <p id="settings-ai-model" hidden></p>
-            <p class="muted">기본 모델이 붐비거나 API 한도에 걸리면 대체 모델로 한 번 다시 판독합니다(GEMINI_FALLBACK_MODEL=off이면 하지 않습니다). 한도 초과는 판독 실패로 표시하며, 근거 부족에 따른 제품 보류와 구분합니다. 출하 승인은 지원하지 않습니다.</p>
           </article>
         </div>
       </section>

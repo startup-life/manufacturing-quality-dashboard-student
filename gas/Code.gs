@@ -92,11 +92,6 @@ function dispatch(request) {
   if (!action || typeof action !== 'string') {
     return errorResponse('VALIDATION', 'action이 지정되지 않았습니다.', false);
   }
-  // Inference claims/finalizes under a lock but never holds it during the remote call.
-  if (action === 'ai.execute') {
-    try { return successResponse(executeLiveAi(payload), request_id); }
-    catch (_) { return errorResponse('UPSTREAM_FAILED', '판독 실행 조회가 필요합니다. 자동 재호출하지 않습니다.', false); }
-  }
   // Reading a stored photo writes nothing (getLivePhoto reads the photos tab and Drive), so the home's card photos
   // do not wait in line for the lock. doPost has checked the spreadsheet ID, so the open below never creates one.
   if (action === 'photos.get') {
@@ -127,15 +122,9 @@ function dispatch(request) {
 
     let result;
     switch (action) {
-      case 'prompts.list': result=getRows(ss,'prompt_versions').filter(p=>!payload.kind||p.kind===payload.kind);break;
-      case 'prompts.save': result=savePromptVersion(ss,payload);break;
-      case 'prompts.seed':
-        for(const row of payload.versions||[])savePromptVersion(ss,row);
-        result={count:getRows(ss,'prompt_versions').length};break;
       case 'connection.status': result = liveConnectionStatus(ss); break;
       case 'init.configure': result = configureLiveResources(ss,payload); break;
       case 'photos.store': result = storeLivePhoto(ss, payload, request_id); break;
-      case 'ai.runs': result = liveAiRuns(ss, payload); break;
       // gas:init's first call: under this lock getOrCreateSpreadsheet above has made or opened the spreadsheet.
       case 'setup.resources': result = prepareTumblerResources(ss); break;
       case 'init.resources':
@@ -151,39 +140,12 @@ function dispatch(request) {
         result = handleInspectionsList(ss, payload);
         break;
       case 'inspections.get':
-        // The detail carries its drafts, newest first, as in the mock store: the screen draws them before /drafts answers
-        // and keeps them when that request fails (public/app.js renderDetailView, loadDrafts).
         result = handleInspectionsGet(ss, payload);
-        result.drafts = handleDraftsGet(ss, {id: result.inspection_id}) || [];
         break;
       case 'inspections.createBatch':
         result = handleInspectionsCreateBatch(ss, payload, request_id);
         break;
-      case 'inspections.saveRecord':
-        result = handleInspectionsSaveRecord(ss, payload, expected_version);
-        break;
-      case 'inspections.history':
-        result = handleInspectionsHistory(ss, payload);
-        break;
       case 'inspections.update': result=updateLiveInspection(ss,payload,expected_version);break;
-      case 'ai.runQueue':
-        result = queueLiveAi(ss, payload, request_id, expected_version);
-        break;
-      case 'drafts.get':
-        result = handleDraftsGet(ss, payload);
-        break;
-      case 'drafts.reviews.list': result=getRows(ss,'review_events').filter(r=>String(r.draft_id)===String(payload.draft_id));break;
-      case 'drafts.evidence.list': result=getRows(ss,'evidence_links').filter(r=>String(r.draft_id)===String(payload.draft_id));break;
-      case 'evidence.save':
-        result = handleEvidenceSave(ss, payload, expected_version);
-        break;
-      case 'evidence.queries.save':
-        if(!getRows(ss,'evidence_queries').some(q=>q.query_id===payload.query_id))appendRow(ss,'evidence_queries',{...payload,result_json:JSON.stringify(payload),sources_json:JSON.stringify(payload.sources||[]),created_at:payload.queried_at});
-        result=payload;break;
-      case 'evidence.queries.list': result=getRows(ss,'evidence_queries').filter(q=>q.inspection_id===payload.inspection_id).map(q=>JSON.parse(q.result_json));break;
-      case 'standards.get':
-        result = handleStandardsGet(ss, payload);
-        break;
       default:
         return errorResponse('VALIDATION', `허용되지 않은 action입니다: '${action}'`, false);
     }
@@ -203,11 +165,10 @@ function dispatch(request) {
 function isMutatingAction(action) {
   return [
     'inspections.createBatch',
-    'inspections.saveRecord',
-    'ai.runQueue',
-    'evidence.save',
-    'init.resources'
-    , 'photos.store', 'init.configure', 'inspections.update', 'evidence.queries.save', 'prompts.save','prompts.seed'
+    'init.resources',
+    'photos.store',
+    'init.configure',
+    'inspections.update'
   ].includes(action);
 }
 
@@ -479,8 +440,6 @@ function handleInspectionsCreateBatch(ss, payload, requestId) {
 function handleHomeGet(ss, payload) {
   // Every inspection with its current inspection time and judgment, from one read of each tab (readInspections).
   const inspections = readInspections(ss);
-  const drafts = getRows(ss, 'ai_drafts');
-  const links = getRows(ss, 'evidence_links');
 
   let latestDate = '';
   if (payload && payload.date) {
@@ -499,14 +458,13 @@ function handleHomeGet(ss, payload) {
   let totalCount = dayInspections.length;
   let ngCount = 0;
   let holdCount = 0;
-  let pendingCount = 0;
+  // Report review starts with the AI reading, so nothing waits for review yet.
+  const pendingCount = 0;
 
   for (const insp of dayInspections) {
     // The latest judgment's decision, else the registered one.
     if (insp.decision === 'NG') ngCount++;
     if (insp.decision === 'HOLD') holdCount++;
-    // Waiting for review, by the same rule as the list's review filter (the '검토 대기' card opens that list).
-    if (reviewState(insp, drafts, links).is_pending) pendingCount++;
   }
 
   const result = {
@@ -521,40 +479,8 @@ function handleHomeGet(ss, payload) {
   };
   // The home's first card page for this date, by the list's own rules over the tabs read above,
   // so the screen does not need a second web app call (inspections.list) to draw it.
-  // Left out on purpose when the list fails (a draft row with broken result JSON): the counts still answer,
-  // and the screen asks inspections.list, which shows that failure under the cards.
-  try { result.first_page = listInspections(inspections, drafts, links, { date: latestDate, page: 1, pageSize: 6 }); } catch (_) {}
+  result.first_page = listInspections(inspections, { date: latestDate, page: 1, pageSize: 6 });
   return result;
-}
-
-// Source-check statuses (evidence_links.status) the 3번 탭 saves, as src/evidence.controller.ts names them.
-const REVIEW_NEEDED_STATUSES = ['REVIEW_NEEDED_BY_USER', 'MOCK_REVIEW_NEEDED'];
-const REVIEWED_STATUSES = ['VERIFIED_BY_USER', 'MOCK_USER_REVIEWED', 'VERIFIED'];
-
-// 다시 판독 필요(stale): the product, weight or photos the AI saw (the draft's input_snapshot) differ from the inspection
-// now. A judgment, a memo or the inspection time are not AI input. The mock store has the same function.
-function draftOutdated(seen, now) {
-  const weight = w => w === null || w === undefined || w === '' ? null : Number(w);
-  const photos = list => (list || []).map(i => String(i.image_id)).sort().join(',');
-  return seen.product_id !== now.product_id || weight(seen.weight_g) !== weight(now.weight_g) || photos(seen.images) !== photos(now.images);
-}
-
-// Report review state of an inspection's latest draft, the same rule as the mock store (src/gas-transport.ts).
-// The 3번 탭 source check saved for that draft is the review; a judgment saved after it keeps it.
-// stale: the AI input changed since the draft (draftOutdated); needs_check: the last check is '검토 필요';
-// reviewed: it is '일치'; pending: no check yet. Stale, needs_check and pending wait; no draft is no_draft and does not.
-// current is the inspection as handleInspectionsGet gives it.
-function reviewState(current, drafts, links) {
-  const own = drafts.filter(d => d.inspection_id === current.inspection_id);
-  const draft = own[own.length - 1];
-  if (!draft) return {review_state: 'no_draft', is_pending: false};
-  if (draftOutdated(JSON.parse(draft.input_snapshot || '{}'), current)) return {review_state: 'stale', is_pending: true};
-  const checks = links.filter(l => String(l.draft_id) === String(draft.draft_id) && String(l.inspection_id) === String(current.inspection_id) &&
-    (REVIEW_NEEDED_STATUSES.indexOf(l.status) >= 0 || REVIEWED_STATUSES.indexOf(l.status) >= 0));
-  const last = checks[checks.length - 1];
-  if (!last) return {review_state: 'pending', is_pending: true};
-  if (REVIEW_NEEDED_STATUSES.indexOf(last.status) >= 0) return {review_state: 'needs_check', is_pending: true};
-  return {review_state: 'reviewed', is_pending: false};
 }
 
 /**
@@ -562,22 +488,12 @@ function reviewState(current, drafts, links) {
  */
 function handleInspectionsList(ss, payload) {
   // Each tab is read once and grouped per inspection in memory (readInspections), not once per inspection.
-  const drafts = getRows(ss, 'ai_drafts');
-  const links = getRows(ss, 'evidence_links');
-  return listInspections(readInspections(ss), drafts, links, payload);
+  return listInspections(readInspections(ss), payload);
 }
 
 // The list rows, filters, order and page from tabs already read (handleInspectionsList, and handleHomeGet's first page).
-function listInspections(inspections, drafts, links, payload) {
+function listInspections(inspections, payload) {
   let filtered = inspections.map(view => {
-    const own = drafts.filter(d => d.inspection_id === view.inspection_id);
-    const latestDraft = own[own.length - 1];
-    let aiStatus = '미판독';
-    if (latestDraft) {
-      const res = latestDraft.result ? JSON.parse(latestDraft.result) : {};
-      aiStatus = res.is_mock ? '모의 초안 — 실제 미판독' : res.decision ? `AI ${res.decision}` : '판독 완료';
-    }
-
     return {
       inspection_id: view.inspection_id,
       product_id: view.product_id,
@@ -589,8 +505,7 @@ function listInspections(inspections, drafts, links, payload) {
       content_version: view.content_version,
       image_url: view.images[0]?.image_url || '/media/sample.jpg',
       images_count: view.images.length,
-      ai_status: aiStatus,
-      ...reviewState(view, drafts, links)
+      is_pending: false
     };
   });
 
@@ -602,7 +517,7 @@ function listInspections(inspections, drafts, links, payload) {
   if (payload && payload.decision) {
     filtered = filtered.filter(i => i.decision === payload.decision);
   }
-  // Reports waiting for review (the home "검토 대기" card), as in the mock store.
+  // Reports waiting for review (the home "검토 대기" card): none yet, as in the mock store.
   if (payload && payload.review === 'pending') {
     filtered = filtered.filter(i => i.is_pending);
   }
@@ -655,27 +570,23 @@ function handleInspectionsGet(ss, payload) {
 // Every inspection as the detail shows it. Each tab is read once; the rows are grouped per inspection in memory.
 function readInspections(ss) {
   const tabs = {};
-  for (const tab of ['products', 'inspection_images', 'inspection_records', 'record_defects', 'inspection_defects', 'inspection_updates']) tabs[tab] = getRows(ss, tab);
+  for (const tab of ['products', 'inspection_images', 'inspection_defects', 'inspection_updates']) tabs[tab] = getRows(ss, tab);
   return getRows(ss, 'inspections').map(insp => inspectionView(insp, tabs));
 }
 
-// One inspection: its current product, time and weight (the latest edit or judgment), judgment, memo, photos and defects.
+// One inspection: its current product, time and weight (the latest edit), judgment, memo, photos and defects.
 function inspectionView(insp, tabs) {
   const id = insp.inspection_id;
   const products = tabs.products;
   const prod = products.find(p => p.product_id === insp.product_id) || { product_name: '텀블러', color: '은색', capacity_ml: 500 };
 
   const images = tabs.inspection_images.filter(img => img.inspection_id === id && img.active != 0);
-  const records = tabs.inspection_records.filter(r => r.inspection_id === id);
-  records.sort((a, b) => (Number(a.content_version) || 0) - (Number(b.content_version) || 0));
-  const latestRec = records[records.length - 1];
-
   const defects = tabs.inspection_defects.filter(d => d.inspection_id === id);
   const updates = tabs.inspection_updates.filter(u => u.inspection_id === id);
   const update = updates[updates.length - 1];
   const effective = update || insp;
   const updatedProduct = products.find(p => p.product_id === effective.product_id) || prod;
-  const measurement = latestRec && (!update || Number(latestRec.content_version) >= Number(update.content_version)) ? latestRec.weight_g : update ? update.weight_g : insp.initial_weight_g;
+  const measurement = update ? update.weight_g : insp.initial_weight_g;
 
   return {
     inspection_id: insp.inspection_id,
@@ -684,10 +595,9 @@ function inspectionView(insp, tabs) {
     color: updatedProduct.color,
     inspected_at: effective.inspected_at,
     weight_g: measurement !== '' && measurement !== null ? Number(measurement) : null,
-    // The latest judgment's memo (stored as notes), as in the mock store; without one, the latest edit's memo.
-    memo: latestRec ? (latestRec.notes || '') : (update ? update.memo : ''),
-    decision: latestRec ? latestRec.decision : (insp.initial_decision || null),
-    current_record_id: latestRec ? latestRec.record_id : null,
+    // The latest edit's memo, as in the mock store.
+    memo: update ? update.memo : '',
+    decision: insp.initial_decision || null,
     content_version: Number(insp.content_version ?? 1),
     original: {
       product_id: insp.product_id,
@@ -701,79 +611,9 @@ function inspectionView(insp, tabs) {
       drive_file_id: img.drive_file_id,
       sha256: img.sha256
     })),
-    defects: (latestRec ? tabs.record_defects.filter(d => d.record_id === latestRec.record_id) : defects).map(d => ({ defect_code: d.defect_code })),
+    defects: defects.map(d => ({ defect_code: d.defect_code })),
     created_at: insp.created_at
   };
-}
-
-/**
- * Inspection Save Record (사용자 최종 판단 및 측정값 수정 이력)
- */
-function handleInspectionsSaveRecord(ss, payload, expectedVersion) {
-  const id = payload?.id || payload?.inspection_id;
-  const inspections = getRows(ss, 'inspections');
-  const insp = inspections.find(i => i.inspection_id === id);
-  if (!insp) {
-    const err = new Error('검사 기록이 없습니다.');
-    err.code = 'NOT_FOUND';
-    throw err;
-  }
-
-  const currentVersion = Number(insp.content_version ?? 1);
-  if (expectedVersion !== undefined && expectedVersion !== null && Number(expectedVersion) !== currentVersion) {
-    const err = new Error('자료가 이미 변경되었습니다. 최신 화면을 확인 후 다시 시도하세요.');
-    err.code = 'CONFLICT';
-    throw err;
-  }
-
-  const newVersion = currentVersion + 1;
-  const history=getRows(ss,'inspection_records').filter(r=>r.inspection_id===id);
-  const latest=history[history.length-1];
-  if(payload.expected_record_id!==undefined && String(payload.expected_record_id??'')!==String(latest?.record_id??''))throw Object.assign(Error('다른 판단 기록이 저장됐습니다. 최신 화면을 확인하세요.'),{code:'CONFLICT'});
-  const requestedDefects=payload.defects||[];
-  if(requestedDefects.some(code=>!getRows(ss,'defect_codes').some(d=>d.defect_code===code)))throw Object.assign(Error('불량 선택값을 확인하세요.'),{code:'VALIDATION'});
-  const now = new Date().toISOString();
-  const recordId = `REC-${id}-${newVersion}`;
-
-  appendRow(ss, 'inspection_records', {
-    record_id: recordId,
-    inspection_id: id,
-    user_id: payload.user_id || 'factory-user',
-    recorded_at: now,
-    decision: payload.decision || 'HOLD',
-    weight_g: payload.weight_g !== undefined && payload.weight_g !== null && payload.weight_g !== '' ? Number(payload.weight_g) : '',
-    notes: payload.notes || '',
-    change_reason: payload.change_reason || '',
-    content_version: newVersion
-  });
-  requestedDefects.forEach(code=>appendRow(ss,'record_defects',{record_id:recordId,defect_code:code}));
-
-  // Update inspection content version in inspections sheet
-  const sheet = ss.getSheetByName('inspections');
-  const data = sheet.getDataRange().getValues();
-  for (let r = 1; r < data.length; r++) {
-    if (data[r][0] === id) {
-      sheet.getRange(r + 1, 6).setValue(newVersion); // content_version column
-      break;
-    }
-  }
-
-  return {
-    record_id: recordId,
-    content_version: newVersion,
-    recorded_at: now
-  };
-}
-
-/**
- * Inspection History
- */
-function handleInspectionsHistory(ss, payload) {
-  const id = payload?.id;
-  const records = getRows(ss, 'inspection_records').filter(r => r.inspection_id === id);
-  records.sort((a, b) => (Number(b.content_version) || 0) - (Number(a.content_version) || 0));
-  // memo repeats notes under the name the mock store and the judgment form use.
-  return records.map(r=>({...r,memo:r.notes||'',defects:getRows(ss,'record_defects').filter(d=>d.record_id===r.record_id).map(d=>d.defect_code)}));
 }
 
 /**
@@ -781,108 +621,4 @@ function handleInspectionsHistory(ss, payload) {
  */
 function handleProductsList(ss) {
   return getRows(ss, 'products');
-}
-
-/**
- * Standards Get
- */
-function handleStandardsGet(ss, payload) {
-  const rev = payload?.revision || 'Rev.A';
-  const standards = getRows(ss, 'standards');
-  const found = standards.find(s => s.revision === rev);
-  if (found) return found;
-  throw Object.assign(Error('적용 기준 원문이 없습니다.'),{code:'SETUP_REQUIRED'});
-}
-
-/**
- * AI Run Queue
- */
-function handleAiRunQueue(ss, payload) {
-  const inspectionId = payload?.inspection_id;
-  const inspection = handleInspectionsGet(ss, { id: inspectionId });
-
-  const runId = `RUN-${inspectionId}-${Date.now()}`;
-  appendRow(ss, 'ai_runs', {
-    run_id: runId,
-    request_id: payload.request_id || runId,
-    inspection_id: inspectionId,
-    content_version: inspection.content_version,
-    standard_version: payload.revision || 'Rev.A',
-    status: 'QUEUED',
-    error_type: '',
-    created_at: new Date().toISOString()
-  });
-
-  return {
-    run_id: runId,
-    status: 'QUEUED',
-    inspection_id: inspectionId
-  };
-}
-
-/**
- * AI Drafts Get
- */
-function handleDraftsGet(ss, payload) {
-  const id = payload?.id || payload?.inspection_id;
-  const drafts = getRows(ss, 'ai_drafts').filter(d => d.inspection_id === id);
-  drafts.sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)));
-  if (drafts.length === 0) return null;
-  const current=handleInspectionsGet(ss,{id});
-  return drafts.map(latest=>{const snapshot=JSON.parse(latest.input_snapshot||'{}');return {
-    draft_id: latest.draft_id,
-    inspection_id: latest.inspection_id,
-    result: latest.result ? JSON.parse(latest.result) : null,
-    standard_revision: latest.standard_revision,
-    model: latest.model,
-    is_mock: !!JSON.parse(latest.result || '{}').is_mock,
-    content_version: snapshot.content_version,
-    // What the AI saw besides the photos (image_hashes), so two drafts compare on the same inputs as draftOutdated.
-    product_id: snapshot.product_id,
-    weight_g: snapshot.weight_g,
-    prompt: snapshot.prompt || null,
-    contract_version: snapshot.contract_version || null,
-    safety_hash: typeof snapshot.safety_text==='string'&&snapshot.safety_text?hashString(snapshot.safety_text):null,
-    standard_hash:latest.standard_hash||'',
-    image_hashes:snapshot.images?.map(p=>p.sha256)||[],
-    stale: draftOutdated(snapshot, current),
-    created_at: latest.created_at
-  };});
-}
-
-/**
- * Evidence Links / MCP Verification Save
- */
-function handleEvidenceSave(ss, payload, expectedVersion) {
-  const id = payload?.inspection_id;
-  // The confirmation belongs to the inspection version the reviewer checked; version 0 is a real version.
-  if (!Number.isSafeInteger(expectedVersion) || expectedVersion < 0) throw Object.assign(Error('최신 검사 버전을 확인한 뒤 근거 확인을 저장하세요.'), {code: 'VALIDATION'});
-  // Checked again at the write, as in the mock store: the inspection can change after the local server read it.
-  const inspection = getRows(ss, 'inspections').find(i => i.inspection_id === id);
-  if (!inspection) throw Object.assign(Error('검사 기록이 없습니다.'), {code: 'NOT_FOUND'});
-  if (expectedVersion !== Number(inspection.content_version)) throw Object.assign(Error('자료가 이미 변경되었습니다. 최신 화면을 확인 후 다시 시도하세요.'), {code: 'CONFLICT'});
-  const now = new Date().toISOString();
-  const linkId = `EVD-${id}-${Date.now()}`;
-
-  // query_id ties the confirmation to the NotebookLM query it checked (sheets made before this column get it here).
-  ensureHeaderColumns(ss, 'evidence_links', ['query_id']);
-  appendRow(ss, 'evidence_links', {
-    link_id: linkId,
-    query_id: typeof payload.query_id === 'string' ? payload.query_id : '',
-    inspection_id: id,
-    draft_id: payload.draft_id || '',
-    content_version: expectedVersion,
-    standard_revision: payload.standard_revision || 'Rev.A',
-    notebook_id: payload.notebook_id || '',
-    source_id: payload.source_id || '',
-    quote: payload.quote || '',
-    note: payload.note || '',
-    status: payload.status || (payload.verified===true?'VERIFIED':'EXTRACTED_UNVERIFIED'),
-    verified_at: now
-  });
-
-  return {
-    link_id: linkId,
-    verified_at: now
-  };
 }

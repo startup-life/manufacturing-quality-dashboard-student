@@ -42,7 +42,7 @@ function requestLog(req: Request, res: Response, next: NextFunction) {
   next();
 }
 
-// The Nest app, ready to listen. A refused combination of switches throws before Nest starts (AppService).
+// The Nest app, ready to listen.
 export async function createNestApp(options: AppOptions = {}) {
   const service = new AppService(options);
   const app = await NestFactory.create<NestExpressApplication>(AppModule.register(service), { bodyParser: false, logger: ['error', 'warn'], abortOnError: false });
@@ -57,14 +57,11 @@ export async function createNestApp(options: AppOptions = {}) {
   instance.get('/healthz', (req, res) => { res.json({ status: 'ok' }); });
   security(app);
   app.useGlobalFilters(new ErrorFilter());
-  instance.locals.waitAiIdle = () => service.waitAiIdle();
-  instance.locals.scheduleLiveAi = (id: string, runId: string) => service.scheduleLiveAi(id, runId);
-  instance.locals.promptStore = service.promptStore;
   await app.init();
   return app;
 }
 
-// The Express app inside, for tests that serve it with http.createServer; app.locals carries waitAiIdle and scheduleLiveAi.
+// The Express app inside, for tests that serve it with http.createServer.
 export async function createApp(options: AppOptions = {}): Promise<express.Express> {
   return (await createNestApp(options)).getHttpAdapter().getInstance();
 }

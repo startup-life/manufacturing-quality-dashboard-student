@@ -3,7 +3,7 @@
  */
 
 import { GasTransport } from './gas-transport';
-import { InputError, gasHttpError } from './validation';
+import { gasHttpError } from './validation';
 
 type Row = Record<string, any>;
 
@@ -73,30 +73,6 @@ export class GasRepository {
     return await this.detail(id);
   }
 
-  async history(id: string) {
-    return await this.transport.dispatch('inspections.history', { id });
-  }
-
-  async saveRecord(id: string, userId: unknown, input: Row) {
-    try {
-      return await this.transport.dispatch('inspections.saveRecord', {
-        id,
-        user_id: userId,
-        decision: input.decision,
-        weight_g: input.weight_g,
-        memo: input.memo || input.notes || '',
-        notes: input.memo || input.notes || '',
-        change_reason: input.change_reason || '',
-        expected_record_id: input.expected_record_id !== undefined ? input.expected_record_id : null,
-        defects: input.defects || []
-      }, {
-        expected_version: input.expected_version
-      });
-    } catch (err) {
-      throw gasHttpError(err);
-    }
-  }
-
   async create(r: Row, requestId: string | null = null) {
     const batchRes = await this.createBatch([r], requestId);
     const createdId = batchRes.inspections?.[0]?.inspection_id || r.inspection_id;
@@ -107,48 +83,9 @@ export class GasRepository {
     return await this.transport.dispatch('inspections.createBatch', { items }, { request_id: requestId });
   }
 
-  async drafts(id: string) {
-    const res = await this.transport.dispatch('drafts.get', { id });
-    if (!res) return [];
-    return Array.isArray(res) ? res : [res];
-  }
-
-  async reportPacket(row: Row, revision = 'Rev.A') {
-    const standard = await this.transport.dispatch('standards.get', { revision });
-    return {
-      inspection_id: row.inspection_id,
-      product_name: row.product_name,
-      revision,
-      standard_text: standard.standard_text,
-      weight_g: row.weight_g,
-      decision: row.decision,
-      images: row.images || []
-    };
-  }
-
-  async runAi(id: string, requestId: string | null = null, revision = 'Rev.A', promptVersionId: string | null = null, expectedVersion: number | null = null) {
-    if(!Number.isSafeInteger(expectedVersion)||(expectedVersion as number)<0)throw new InputError('최신 검사 버전을 확인한 뒤 판독을 요청하세요.');
-    try{
-      return await this.transport.dispatch('ai.runQueue', { inspection_id: id, revision, prompt_version_id:promptVersionId }, { request_id: requestId,expected_version:expectedVersion });
-    }catch(err){
-      throw gasHttpError(err);
-    }
-  }
-
   get live() { return this.transport.mode === 'live'; }
-  async runs(id: string, runId: string | null = null): Promise<any[]> {
-    if (!this.live) return [];
-    return this.transport.dispatch('ai.runs', { inspection_id: id, run_id: runId });
-  }
-  async executeAi(id: string, runId: string) {
-    return this.transport.dispatch('ai.execute', { inspection_id: id, run_id: runId });
-  }
   async storePhoto(bytes: Buffer, requestId: string) {
     return this.transport.dispatch('photos.store', { data_base64: bytes.toString('base64'), mime: 'image/jpeg' }, { request_id: requestId });
   }
   async photo(imageId: string) { return this.transport.dispatch('photos.get', { image_id: imageId }); }
-
-  async saveEvidence(payload: Row, expectedVersion: number) {
-    return await this.transport.dispatch('evidence.save', payload, { expected_version: expectedVersion });
-  }
 }

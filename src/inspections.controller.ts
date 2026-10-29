@@ -1,14 +1,12 @@
-import { Body, Controller, Get, Headers, HttpCode, Param, Patch, Post, Query, Req, Res, UseGuards } from '@nestjs/common';
-import type { Request, Response } from 'express';
+import { Body, Controller, Get, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
+import type { Request } from 'express';
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { AppService } from './app.service';
 import { FactoryUserGuard } from './factory-user.guard';
-import { InputError, inspectionInput, recordInput, listInput } from './validation';
-import { GEMINI_OFF_MESSAGE } from './integrations';
+import { InputError, inspectionInput, listInput } from './validation';
 import { normalizePhoto } from './photo';
-import { errorEvent } from './log';
 
 const root = path.join(__dirname, '..');
 const imageLock = JSON.parse(fs.readFileSync(path.join(root, 'assets/image-lock.json'), 'utf8'));
@@ -24,28 +22,6 @@ export const REGISTRATION_UNKNOWN = '등록 응답을 받지 못해 저장됐는
 @Controller('api/inspections')
 export class InspectionsController {
   constructor(private readonly app: AppService) {}
-
-  @Post(':id/ai-runs')
-  @HttpCode(202)
-  async runAi(@Param('id') id: string, @Body() body: any, @Headers('x-request-id') requestId: string | undefined) {
-    const { repo, geminiMode, promptStore } = this.app;
-    if (geminiMode === 'off') throw new InputError(GEMINI_OFF_MESSAGE, 409);
-    if (geminiMode === 'live' && !repo.live) throw new InputError('실제 Google 저장소 연결이 필요합니다. 모의 판독을 실행하지 않았습니다.', 503);
-    if (!Number.isSafeInteger(body?.expected_version) || body.expected_version < 0) throw new InputError('최신 검사 버전을 확인한 뒤 판독을 요청하세요.');
-    const prompt = await promptStore.resolve('gemini', body?.prompt_version_id);
-    const result = await repo.runAi(id, requestId || null, body?.revision || 'Rev.A', prompt.prompt_version_id, body.expected_version);
-    if (result.status === 'QUEUED') this.app.scheduleLiveAi(id, result.run_id);
-    return result;
-  }
-
-  @Get([':id/ai-runs', ':id/ai-runs/:runId'])
-  async aiRuns(@Param('id') id: string, @Param('runId') runId?: string) {
-    const runs = await this.app.repo.runs(id, runId);
-    if (runId && !runs.length) throw new InputError('판독 실행이 없습니다.', 404);
-    // Only live Gemini executes queued runs; off never starts one.
-    if (this.app.geminiMode === 'live') for (const run of runs) if (run.status === 'QUEUED') this.app.scheduleLiveAi(id, run.run_id);
-    return runId ? runs[0] : runs;
-  }
 
   @Get()
   list(@Query() query: Record<string, unknown>) {
@@ -67,8 +43,8 @@ export class InspectionsController {
 
   @Post()
   @UseGuards(FactoryUserGuard)
-  async create(@Req() req: Request, @Res({ passthrough: true }) res: Response, @Body() reqBody: any) {
-    const { repo, geminiMode } = this.app;
+  async create(@Req() req: Request, @Body() reqBody: any) {
+    const { repo } = this.app;
     try {
       const requestId = req.get('X-Request-Id') || crypto.randomUUID();
       const body = { ...reqBody };
@@ -128,41 +104,9 @@ export class InspectionsController {
       }
 
       const r = inspectionInput(body, allowedImageUrls);
-      const created = await repo.create(r, requestId);
-      let aiRun = null, aiError = null;
-      // Gemini off leaves the judgment to the person; mock makes the local draft, live queues the GAS run.
-      if (geminiMode !== 'off') {
-        try {
-          aiRun = await repo.runAi(created.inspection_id, requestId + ':ai', reqBody?.revision || 'Rev.A', null, created.content_version);
-          if (aiRun.status === 'QUEUED') this.app.scheduleLiveAi(created.inspection_id, aiRun.run_id);
-        }
-        catch (err) {
-          console.error(errorEvent(err, { route: req.route.path, request_id: res.get('X-Request-Id') }));
-          // InputError carries guidance for the user at any status, e.g. a missing Gemini key (503) or no photo (400).
-          aiError = '사진과 기록은 저장됐습니다. ' + (err instanceof InputError ? err.message : '판독 연결 상태를 확인하고 요청하세요.');
-        }
-      }
-      return { ...created, ai_run: aiRun, ai_error: aiError };
+      return await repo.create(r, requestId);
     } catch (err: any) {
       throw UNKNOWN_OUTCOME.test(err?.code || '') ? Object.assign(new InputError(REGISTRATION_UNKNOWN, 503), { code: err.code, cause: err }) : err;
     }
-  }
-
-  @Get(':id/records')
-  async records(@Param('id') id: string) {
-    if (!await this.app.repo.detail(id)) throw new InputError('검사가 없습니다.', 404);
-    return this.app.repo.history(id);
-  }
-
-  @Post(':id/records')
-  @UseGuards(FactoryUserGuard)
-  saveRecord(@Param('id') id: string, @Req() req: Request, @Body() body: any) {
-    return this.app.repo.saveRecord(id, req.session.user?.id, recordInput(body));
-  }
-
-  @Get(':id/drafts')
-  async drafts(@Param('id') id: string) {
-    const d = await this.app.repo.drafts(id);
-    return Array.isArray(d) ? d : (d ? [d] : []);
   }
 }

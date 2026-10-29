@@ -8,17 +8,13 @@ import { fileURLToPath } from 'node:url';
 
 const repoRoot = fileURLToPath(new URL('../', import.meta.url));
 
-// Uploaded name and source. prompt-core.cjs is shared with Node; clasp does not upload .cjs, so it goes up as .js.
+// Uploaded name and source.
 export const GAS_SOURCES = [
-  ['PromptCore.js', 'prompts/prompt-core.cjs'],
   ['Code.gs', 'gas/Code.gs'],
-  ['Gemini.gs', 'gas/Gemini.gs'],
   ['Live.gs', 'gas/Live.gs'],
-  ['Prompts.gs', 'gas/Prompts.gs'],
   ['Setup.gs', 'gas/Setup.gs']
 ];
 export const GAS_MANIFEST = ['appsscript.json', 'gas/appsscript.json'];
-const MODULE_GUARD = "if(typeof module!=='undefined')module.exports=";
 
 // Apps Script loads every file into one global scope, so a repeated top-level name silently replaces the other.
 // All top-level declarations in these sources start at column 0 as `function name(` or `const name =`.
@@ -44,8 +40,6 @@ export function checkGasSources(files) {
       seen.set(id, name);
     }
   }
-  const core = files.find(f => f.name === 'PromptCore.js');
-  if (!core || !core.text.includes(MODULE_GUARD)) throw Error('prompt-core.cjs의 module 가드를 찾지 못했습니다. 가드가 없으면 Apps Script에서 module 참조 오류가 납니다.');
 }
 
 // Same inputs give byte-identical output: fixed order, no timestamps.

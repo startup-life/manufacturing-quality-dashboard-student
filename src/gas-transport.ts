@@ -3,25 +3,14 @@
  */
 
 import crypto from 'node:crypto';
-import { promptDefaults } from './prompts';
 import { setupError, gasHttpError } from './validation';
-import { repositoryStandard } from './reports';
 
 // Rows of the local mock store, in the GAS sheet column names.
 type Row = Record<string, any>;
 type MockDb = Record<string, Row[]>;
 export type DispatchOptions = { request_id?: string | null; expected_version?: number | null };
 
-// GAS setup messages (Script Properties, Drive folder, Gemini key) are guidance for the operator, not internal failures.
-// Source-check statuses (evidence.save status) the 3번 탭 saves, as src/evidence.controller.ts names them.
-const REVIEW_NEEDED_STATUSES = ['REVIEW_NEEDED_BY_USER', 'MOCK_REVIEW_NEEDED'];
-const REVIEWED_STATUSES = ['VERIFIED_BY_USER', 'MOCK_USER_REVIEWED', 'VERIFIED'];
-// 다시 판독 필요(stale): the product, weight or photos the AI saw differ from the inspection now. Same as gas/Code.gs.
-function draftOutdated(seen: Row, now: Row) {
-  const weight = (w: unknown) => w === null || w === undefined || w === '' ? null : Number(w);
-  const photos = (list: Row[] | undefined) => (list || []).map(i => String(i.image_id)).sort().join(',');
-  return seen.product_id !== now.product_id || weight(seen.weight_g) !== weight(now.weight_g) || photos(seen.images) !== photos(now.images);
-}
+// GAS setup messages (Script Properties, Drive folder) are guidance for the operator, not internal failures.
 const GAS_SETUP_MESSAGE=/설정(?: 확인)?이 필요합니다|설정이 없습니다|Script Properties를 확인하세요/;
 
 // What a failed web app call met, for the server log only (log.ts errorEvent): which action, how long, and for an
@@ -70,7 +59,6 @@ export class GasTransport {
 
     // In-memory mock database state for tests and offline loopback execution
     this.mockDb = {
-      prompt_versions: structuredClone(promptDefaults),
       products: [
         { product_id: 'P-SILVER', product_name: '텀블러 실버', color: '은색', capacity_ml: 500 },
         { product_id: 'P-WHITE', product_name: '텀블러 화이트', color: '흰색', capacity_ml: 500 },
@@ -85,56 +73,14 @@ export class GasTransport {
         { defect_code: 'D04', defect_name: '뚜껑 조립 오류', severity: '중대' }
       ],
       inspection_defects: [],
-      inspection_records: [],
-      inspection_record_defects: [],
       inspection_updates: [],
-      // Not read: standards.get serves the repository files. Saved local state files still carry this old placeholder copy.
-      standards: [
-        { standard_id: 'STD-01', revision: 'Rev.A', standard_text: '텀블러 품질 기준 Rev.A', sha256: 'a1b2c3d4' },
-        { standard_id: 'STD-02', revision: 'Rev.B', standard_text: '텀블러 품질 기준 Rev.B', sha256: 'b2c3d4e5' }
-      ],
-      ai_runs: [],
-      ai_drafts: [],
-      review_events: [],
-      evidence_links: [],
-      evidence_queries: [],
       requests: []
     };
   }
 
-  // The current weight, as GAS handleInspectionsGet decides it: the latest judgment's unless an edit came after it
-  // (an edit's version is the version before it plus 1), else the latest edit's, else the registered one.
-  _currentWeight(insp: Row, latestRec: Row | undefined) {
-    const updates = this.mockDb.inspection_updates.filter(u => u.inspection_id === insp.inspection_id);
-    const update = updates[updates.length - 1];
-    const updateVersion = update ? update.previous_version + 1 : -1;
-    if (latestRec && latestRec.content_version >= updateVersion) return latestRec.weight_g;
+  // The current weight: the latest edit's, else the registered one.
+  _currentWeight(insp: Row) {
     return 'current_weight_g' in insp ? insp.current_weight_g : insp.initial_weight_g;
-  }
-
-  // The product, weight and photos of an inspection now: what a draft records, and what draftOutdated compares.
-  _aiInput(insp: Row) {
-    const recs = this.mockDb.inspection_records.filter(r => r.inspection_id === insp.inspection_id);
-    return {
-      product_id: insp.current_product_id || insp.initial_product_id || insp.product_id,
-      weight_g: this._currentWeight(insp, recs[recs.length - 1]),
-      images: this.mockDb.inspection_images.filter(img => img.inspection_id === insp.inspection_id && img.active).map(img => ({ image_id: img.image_id }))
-    };
-  }
-
-  // Report review state of an inspection's latest draft, the same rule as GAS reviewState (gas/Code.gs): the 3번 탭
-  // source check (evidence.save) saved for that draft is the review, and a judgment saved after it keeps it.
-  _reviewState(insp: Row) {
-    const drafts = this.mockDb.ai_drafts.filter(d => d.inspection_id === insp.inspection_id);
-    const draft = drafts[drafts.length - 1];
-    if (!draft) return { review_state: 'no_draft', is_pending: false };
-    if (draftOutdated(draft, this._aiInput(insp))) return { review_state: 'stale', is_pending: true };
-    const checks = this.mockDb.evidence_links.filter(l => String(l.draft_id) === String(draft.draft_id) && String(l.inspection_id) === String(insp.inspection_id) &&
-      (REVIEW_NEEDED_STATUSES.includes(l.status) || REVIEWED_STATUSES.includes(l.status)));
-    const last = checks[checks.length - 1];
-    if (!last) return { review_state: 'pending', is_pending: true };
-    if (REVIEW_NEEDED_STATUSES.includes(last.status)) return { review_state: 'needs_check', is_pending: true };
-    return { review_state: 'reviewed', is_pending: false };
   }
 
   sanitizeFormula(val: unknown) {
@@ -146,30 +92,17 @@ export class GasTransport {
 
   async dispatch(action: string, payload: Row = {}, { request_id = null, expected_version = null }: DispatchOptions = {}): Promise<any> {
     const ALLOWED_ACTIONS = new Set([
-      'prompts.list','prompts.save','prompts.seed',
       'products.list',
       'home.get',
       'inspections.list',
       'inspections.get',
-      'inspections.history',
-      'inspections.saveRecord',
       'inspections.createBatch',
       'inspections.update',
-      'standards.get',
       'connection.status',
       'setup.resources',
       'init.configure',
       'photos.store',
-      'photos.get',
-      'ai.runQueue',
-      'ai.execute',
-      'ai.runs',
-      'evidence.save',
-      'evidence.queries.save',
-      'evidence.queries.list',
-      'drafts.get',
-      'drafts.reviews.list',
-      'drafts.evidence.list'
+      'photos.get'
     ]);
 
     if (!ALLOWED_ACTIONS.has(action)) {
@@ -270,19 +203,6 @@ export class GasTransport {
     const dateStr = now.toISOString().slice(0, 10).replace(/-/g, '');
 
     switch (action) {
-      case 'prompts.list':
-        result=(this.mockDb.prompt_versions||[]).filter(p=>!payload.kind||p.kind===payload.kind);break;
-      case 'prompts.save': {
-        this.mockDb.prompt_versions??=[];
-        const old=this.mockDb.prompt_versions.find(p=>p.prompt_version_id===payload.prompt_version_id);
-        if(old && old.sha256!==payload.sha256)throw Object.assign(Error('같은 저장 번호의 내용이 다릅니다.'),{code:'CONFLICT'});
-        result=old||{...payload,created_at:now.toISOString()};
-        if(!old)this.mockDb.prompt_versions.push(result);break;
-      }
-      case 'prompts.seed':
-        this.mockDb.prompt_versions??=[];
-        for(const row of payload.versions||[])if(!this.mockDb.prompt_versions.some(p=>p.prompt_version_id===row.prompt_version_id))this.mockDb.prompt_versions.push({...row,created_at:now.toISOString()});
-        result={count:this.mockDb.prompt_versions.length};break;
       case 'init.resources':
         result = { status: 'INITIALIZED', spreadsheet_id: 'mock-spreadsheet-id' };
         break;
@@ -301,17 +221,14 @@ export class GasTransport {
           date = dates[dates.length - 1] || '2026-10-01';
         }
         const dayInsps = this.mockDb.inspections.filter(i => ((i.current_inspected_at || i.initial_inspected_at || i.inspected_at) || '').startsWith(date));
-        let ng = 0, hold = 0, pending = 0;
+        let ng = 0, hold = 0;
+        // Report review starts with the AI reading, so nothing waits for review yet.
+        const pending = 0;
 
         for (const i of dayInsps) {
-          const recs = this.mockDb.inspection_records.filter(r => r.inspection_id === i.inspection_id);
-          const latest = recs[recs.length - 1];
-          const dec = latest ? latest.decision : ('current_decision' in i ? i.current_decision : i.initial_decision);
+          const dec = 'current_decision' in i ? i.current_decision : i.initial_decision;
           if (dec === 'NG') ng++;
           if (dec === 'HOLD') hold++;
-
-          // Waiting for review, by the list's rule (stale, needs_check or no source check yet).
-          if (this._reviewState(i).is_pending) pending++;
         }
 
         result = {
@@ -415,25 +332,9 @@ export class GasTransport {
           const prodId = i.current_product_id || i.initial_product_id || i.product_id;
           const inspectedAt = i.current_inspected_at || i.initial_inspected_at || i.inspected_at;
           const prod = this.mockDb.products.find(p => p.product_id === prodId) || { product_name: '텀블러', color: '은색' };
-          const recs = this.mockDb.inspection_records.filter(r => r.inspection_id === i.inspection_id);
-          const latestRec = recs[recs.length - 1];
           const imgs = this.mockDb.inspection_images.filter(img => img.inspection_id === i.inspection_id && img.active);
-          const drafts = this.mockDb.ai_drafts.filter(d => d.inspection_id === i.inspection_id);
-          const latestDraft = drafts[drafts.length - 1];
-
-          const { review_state: reviewState, is_pending: isPending } = this._reviewState(i);
-
-          let aiStatus = '미판독';
-          if (latestDraft) {
-            if (latestDraft.is_mock) {
-              aiStatus = `[모의 초안] ${latestDraft.result?.['판정'] || latestDraft.result?.decision || '완료'}`;
-            } else {
-              aiStatus = latestDraft.result?.decision ? `AI ${latestDraft.result.decision}` : (latestDraft.result?.['판정'] ? `AI ${latestDraft.result['판정']}` : '판독 완료');
-            }
-          }
-
-          const currentWeight = this._currentWeight(i, latestRec);
-          const currentDecision = latestRec ? latestRec.decision : ('current_decision' in i ? i.current_decision : i.initial_decision);
+          const currentWeight = this._currentWeight(i);
+          const currentDecision = 'current_decision' in i ? i.current_decision : i.initial_decision;
 
           return {
             inspection_id: i.inspection_id,
@@ -446,9 +347,7 @@ export class GasTransport {
             content_version: i.content_version,
             image_url: imgs[0]?.image_url || '/media/sample.jpg',
             images_count: imgs.length,
-            ai_status: aiStatus,
-            review_state: reviewState,
-            is_pending: isPending
+            is_pending: false
           };
         });
 
@@ -501,23 +400,13 @@ export class GasTransport {
         }
         // The current product (after an edit), as the list uses.
         const prod = this.mockDb.products.find(p => p.product_id === (insp.current_product_id || insp.initial_product_id || insp.product_id)) || { product_name: '텀블러', color: '은색' };
-        const recs = this.mockDb.inspection_records.filter(r => r.inspection_id === id);
-        const latestRec = recs[recs.length - 1];
         const imgs = this.mockDb.inspection_images.filter(img => img.inspection_id === id && img.active);
         const origDefects = this.mockDb.inspection_defects.filter(d => d.inspection_id === id);
 
-        let currentDefects = origDefects.map(d => {
+        const currentDefects = origDefects.map(d => {
           const codeObj = this.mockDb.defect_codes.find(c => c.defect_code === d.defect_code);
           return { defect_code: d.defect_code, defect_name: codeObj?.defect_name || d.defect_name };
         });
-
-        if (latestRec) {
-          const recDefs = this.mockDb.inspection_record_defects.filter(d => d.record_id === latestRec.record_id);
-          currentDefects = recDefs.map(d => {
-            const codeObj = this.mockDb.defect_codes.find(c => c.defect_code === d.defect_code);
-            return { defect_code: d.defect_code, defect_name: codeObj?.defect_name || d.defect_name || d.defect_code };
-          });
-        }
 
         result = {
           inspection_id: insp.inspection_id,
@@ -525,11 +414,9 @@ export class GasTransport {
           product_name: prod.product_name,
           color: prod.color,
           inspected_at: insp.current_inspected_at || insp.initial_inspected_at || insp.inspected_at,
-          weight_g: this._currentWeight(insp, latestRec),
-          decision: latestRec ? latestRec.decision : ('current_decision' in insp ? insp.current_decision : insp.initial_decision),
-          memo: latestRec ? (latestRec.memo || latestRec.notes || '') : ('current_memo' in insp ? insp.current_memo : (insp.memo || '')),
-          change_reason: latestRec ? (latestRec.change_reason || '') : '',
-          current_record_id: latestRec ? latestRec.record_id : null,
+          weight_g: this._currentWeight(insp),
+          decision: 'current_decision' in insp ? insp.current_decision : insp.initial_decision,
+          memo: 'current_memo' in insp ? insp.current_memo : (insp.memo || ''),
           content_version: insp.content_version,
           original: {
             inspection_id: insp.inspection_id,
@@ -545,101 +432,8 @@ export class GasTransport {
             drive_file_id: img.drive_file_id
           })),
           defects: currentDefects,
-          drafts: this.mockDb.ai_drafts.filter(d => d.inspection_id === id).slice().reverse().map(d => ({
-            draft_id: d.draft_id,
-            run_id: d.run_id,
-            inspection_id: d.inspection_id,
-            created_at: d.created_at,
-            standard_revision: d.standard_revision,
-            provider: d.provider || 'mock-offline-fixture',
-            model: d.model,
-            result: d.result,
-            content_version: d.content_version || 0,
-            stale: !insp || draftOutdated(d, this._aiInput(insp)),
-            is_mock: d.is_mock || false,
-            status: d.status || (d.is_mock ? 'MOCK_COMPLETED' : undefined)
-          })),
           created_at: insp.created_at
         };
-        break;
-      }
-
-      case 'inspections.saveRecord': {
-        const id = payload.id || payload.inspection_id;
-        const insp = this.mockDb.inspections.find(i => i.inspection_id === id);
-        if (!insp) {
-          const err: any = new Error('검사 기록이 없습니다.');
-          err.code = 'NOT_FOUND';
-          throw err;
-        }
-
-        if (expectedVersion !== null && expectedVersion !== undefined && Number(expectedVersion) !== insp.content_version) {
-          const err: any = new Error('자료가 이미 변경되었습니다. 최신 화면을 확인 후 다시 시도하세요.');
-          err.code = 'CONFLICT';
-          throw err;
-        }
-
-        const existingRecs = this.mockDb.inspection_records.filter(r => r.inspection_id === id);
-        const lastRec = existingRecs[existingRecs.length - 1];
-        // Same rule as gas/Code.gs: null means "no record yet", only undefined skips the check.
-        if (payload.expected_record_id !== undefined) {
-          if ((lastRec?.record_id || null) !== payload.expected_record_id) {
-            const err: any = new Error('다른 변경이 저장됐습니다. 최신 검사와 기록을 다시 조회하세요.');
-            err.code = 'CONFLICT';
-            throw err;
-          }
-        }
-
-        insp.content_version++;
-        const rec = {
-          record_id: `REC-${id}-${insp.content_version}`,
-          inspection_id: id,
-          user_id: payload.user_id || 'factory-user',
-          recorded_at: now.toISOString(),
-          decision: payload.decision || 'HOLD',
-          weight_g: payload.weight_g !== undefined && payload.weight_g !== null && payload.weight_g !== '' ? Number(payload.weight_g) : null,
-          memo: payload.memo || payload.notes || '',
-          notes: payload.notes || payload.memo || '',
-          change_reason: payload.change_reason || '',
-          content_version: insp.content_version
-        };
-        this.mockDb.inspection_records.push(rec);
-
-        insp.current_decision = rec.decision;
-        if (payload.weight_g !== undefined) {
-          insp.current_weight_g = rec.weight_g;
-        }
-
-        const recDefects = Array.isArray(payload.defects) ? payload.defects : [];
-        for (const d of recDefects) {
-          const code = typeof d === 'string' ? d : d.defect_code;
-          const defCodeObj = this.mockDb.defect_codes.find(c => c.defect_code === code);
-          this.mockDb.inspection_record_defects.push({
-            record_id: rec.record_id,
-            defect_code: code,
-            defect_name: defCodeObj?.defect_name || code
-          });
-        }
-
-        result = {
-          record_id: rec.record_id,
-          content_version: insp.content_version,
-          recorded_at: rec.recorded_at
-        };
-        break;
-      }
-
-      case 'inspections.history': {
-        const id = payload.id;
-        const recs = this.mockDb.inspection_records.filter(r => r.inspection_id === id);
-        const resultList = recs.map(r => {
-          const recDefs = this.mockDb.inspection_record_defects.filter(d => d.record_id === r.record_id);
-          return {
-            ...r,
-            defects: recDefs.map(d => d.defect_code)
-          };
-        });
-        result = [...resultList].reverse();
         break;
       }
 
@@ -691,178 +485,6 @@ export class GasTransport {
         break;
       }
 
-      case 'ai.runQueue': {
-        const id = payload.inspection_id;
-        const insp = this.mockDb.inspections.find(i => i.inspection_id === id);
-        if (!insp) {
-          const err: any = new Error('검사 기록이 없습니다.');
-          err.code = 'NOT_FOUND';
-          throw err;
-        }
-
-        // Same version check as the deployed queueLiveAi: a draft is made only for the inspection the screen showed.
-        if (expectedVersion !== null && expectedVersion !== undefined && expectedVersion !== insp.content_version) {
-          const err: any = new Error('검사 자료가 변경됐습니다. 최신 기록을 확인한 뒤 다시 판독하세요.');
-          err.code = 'CONFLICT';
-          throw err;
-        }
-
-        const runId = `RUN-${id}-${Date.now()}`;
-        const run = {
-          run_id: runId,
-          request_id: requestId || runId,
-          inspection_id: id,
-          content_version: insp.content_version,
-          standard_version: payload.revision || 'Rev.A',
-          status: 'MOCK_COMPLETED',
-          is_mock: true,
-          // Same model fields as a GAS run (gas/Live.gs liveAiRuns); the mock never falls back.
-          model: 'mock-simulation',
-          fallback_from: null,
-          created_at: now.toISOString()
-        };
-        this.mockDb.ai_runs.push(run);
-
-        const currentWeight = ('current_weight_g' in insp ? insp.current_weight_g : insp.initial_weight_g);
-        const hasWeight = currentWeight !== null && currentWeight !== undefined;
-
-        const mockKoreanResult = {
-          '판정': 'HOLD',
-          '불량유형': '모의 분석 초안 (실제 AI 판독 미실행)',
-          '관찰·수치 근거': `[모의 테스트 초안] 외부 Gemini API 미연결 상태의 로컬 모의 결과입니다. 중량: ${hasWeight ? currentWeight + 'g' : '미측정'}. 실제 모델 호출 및 사진 분석이 수행되지 않았으므로 담당자 전수 대조가 필수적입니다.`,
-          '적용 기준과 출처': `로컬 모의 시뮬레이터 (교육용 Rev.A 기준 / 외부 AI API 미연결; standards/${payload.revision || 'Rev.A'}.json)`,
-          '권고 조치': '모의 초안입니다. 실제 사진 및 중량 실측값을 기반으로 품질 담당자가 직접 대조하고 최종 판단을 기록하세요. (출하 승인 없음)',
-          '사람 승인 필요 여부': '필수 — 외부 AI 미연결 모의 초안이며 출하 승인이 아닙니다.',
-          // Metadata and backward-compatibility fields
-          is_mock: true,
-          decision: 'HOLD',
-          defects: [],
-          human_approval_required: true,
-          model: 'mock-simulation',
-          // Same field as a GAS result (gas/Gemini.gs withModel): the main model a fallback replaced.
-          fallback_from: null,
-          generated_at: now.toISOString()
-        };
-
-        const draft = {
-          draft_id: this.mockDb.ai_drafts.length + 1,
-          run_id: runId,
-          inspection_id: id,
-          standard_revision: payload.revision || 'Rev.A',
-          model: 'mock-simulation',
-          is_mock: true,
-          status: 'MOCK_COMPLETED',
-          content_version: insp.content_version || 0,
-          // What the AI saw (product_id, weight_g, images), with the names of the GAS input_snapshot.
-          ...this._aiInput(insp),
-          result: mockKoreanResult,
-          created_at: now.toISOString()
-        };
-        this.mockDb.ai_drafts.push(draft);
-
-        result = {
-          run_id: runId,
-          draft_id: draft.draft_id,
-          status: 'MOCK_COMPLETED',
-          is_mock: true,
-          notice: '[모의 테스트 초안] 외부 AI 미연결 상태의 로컬 테스트 결과입니다.',
-          result: draft.result
-        };
-        break;
-      }
-
-      case 'drafts.get': {
-        const id = payload.id || payload.inspection_id;
-        const insp = this.mockDb.inspections.find(i => i.inspection_id === id);
-        const drafts = this.mockDb.ai_drafts.filter(d => d.inspection_id === id);
-        const list = drafts.slice().reverse().map(d => ({
-          draft_id: d.draft_id,
-          run_id: d.run_id,
-          inspection_id: d.inspection_id,
-          created_at: d.created_at,
-          standard_revision: d.standard_revision,
-          provider: d.provider || 'mock-offline-fixture',
-          model: d.model,
-          result: d.result,
-          content_version: d.content_version || 0,
-          stale: !insp || draftOutdated(d, this._aiInput(insp)),
-          is_mock: d.is_mock || false,
-          status: d.status || (d.is_mock ? 'MOCK_COMPLETED' : undefined)
-        }));
-        if (list.length > 0) {
-          Object.assign(list, list[0]);
-        }
-        result = list;
-        break;
-      }
-
-      case 'drafts.reviews.list': {
-        // Compared as strings like the GAS, as in drafts.evidence.list.
-        result = this.mockDb.review_events.filter(r => String(r.draft_id) === String(payload.draft_id));
-        break;
-      }
-
-      case 'drafts.evidence.list': {
-        // Compared as strings like the GAS: draft IDs are numbers in the mock and strings in Sheets.
-        result = this.mockDb.evidence_links.filter(e => String(e.draft_id) === String(payload.draft_id));
-        break;
-      }
-
-      case 'evidence.queries.save': {
-        const old=this.mockDb.evidence_queries.find(q=>q.query_id===payload.query_id);
-        if(!old)this.mockDb.evidence_queries.push(structuredClone(payload));
-        result=old||payload;break;
-      }
-      case 'evidence.queries.list': result=this.mockDb.evidence_queries.filter(q=>q.inspection_id===payload.inspection_id);break;
-      case 'evidence.save': {
-        const id = payload.inspection_id;
-        const insp = this.mockDb.inspections.find(i => i.inspection_id === id);
-        if (!insp) {
-          const err: any = new Error('검사 기록이 없습니다.');
-          err.code = 'NOT_FOUND';
-          throw err;
-        }
-
-        if (expectedVersion !== null && expectedVersion !== undefined && Number(expectedVersion) !== insp.content_version) {
-          const err: any = new Error('자료가 이미 변경되었습니다. 최신 화면을 확인 후 다시 시도하세요.');
-          err.code = 'CONFLICT';
-          throw err;
-        }
-
-        // The GAS evidence_links columns (status, note, verified_at and the source fields) plus the mock's own.
-        const confirmedAt = new Date().toISOString();
-        const entry = {
-          evidence_id: `EVI-${id}-${Date.now()}`,
-          inspection_id: id,
-          // No draft is an empty draft_id, as GAS handleEvidenceSave stores it.
-          draft_id: payload.draft_id || '',
-          // The query this confirmation answers (GET evidence-queries attaches it by this ID).
-          query_id: payload.query_id || '',
-          content_version: insp.content_version,
-          standard_revision: payload.standard_revision || 'Rev.A',
-          notebook_id: payload.notebook_id || '',
-          source_id: payload.source_id || '',
-          quote: payload.quote || '',
-          verified: !!payload.verified,
-          status: payload.status || (payload.verified === true ? 'VERIFIED' : 'EXTRACTED_UNVERIFIED'),
-          note: payload.note || '',
-          confirmed_by: payload.confirmed_by || 'factory-user',
-          verified_at: confirmedAt,
-          created_at: confirmedAt
-        };
-        this.mockDb.evidence_links.push(entry);
-        result = { success: true, evidence_id: entry.evidence_id, entry };
-        break;
-      }
-
-      case 'standards.get': {
-        // Same row as the GAS seed, read from standards/ rather than mockDb; a missing revision is not replaced by another.
-        const found = await repositoryStandard(payload.revision || 'Rev.A');
-        if (!found) throw Object.assign(new Error('적용 기준 원문이 없습니다.'), { code: 'SETUP_REQUIRED' });
-        result = found;
-        break;
-      }
-
       default:
         throw new Error(`지원되지 않는 mock action입니다: ${action}`);
     }
@@ -881,14 +503,9 @@ export class GasTransport {
   }
 
   _isMutating(action: string) {
-    if(['prompts.save','prompts.seed'].includes(action))return true;
     return [
       'inspections.createBatch',
-      'inspections.saveRecord',
       'inspections.update',
-      'ai.runQueue',
-      'evidence.save',
-      'evidence.queries.save',
       'init.resources'
     ].includes(action);
   }

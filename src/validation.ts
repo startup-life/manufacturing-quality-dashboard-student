@@ -34,20 +34,6 @@ export function dateInput(date: unknown) {
   if (typeof date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(date) || !Number.isFinite(Date.parse(date + 'T00:00:00Z')) || new Date(date + 'T00:00:00Z').toISOString().slice(0, 10) !== date) throw new InputError('집계일은 유효한 YYYY-MM-DD 날짜입니다.');
   return date;
 }
-// GAS (and its local mock) keys records by a REC-… string.
-const validRecordId = (id: unknown) => typeof id === 'string' && !!id.trim() && id.length <= 200;
-export function recordInput(body: any) {
-  if (!body || typeof body !== 'object' || Array.isArray(body)) throw new InputError('최종 기록 객체가 필요합니다.');
-  const { decision, weight_g, memo, change_reason, expected_version, expected_record_id } = body;
-  if (!['OK', 'NG', 'HOLD'].includes(decision)) throw new InputError('최종 판정은 OK/NG/HOLD입니다.');
-  if (badWeight(weight_g)) throw new InputError('중량은 수치 또는 NULL입니다.');
-  if (decision === 'OK' && weight_g === null) throw new InputError('중량 미측정 상태는 OK로 확정할 수 없습니다. HOLD를 선택하세요.');
-  if (typeof memo !== 'string' || memo.length > 2000 || typeof change_reason !== 'string' || !change_reason.trim() || change_reason.length > 1000) throw new InputError('메모(2000자 이하)와 변경 사유(1~1000자)를 확인하세요.');
-  if (!Number.isSafeInteger(expected_version) || expected_version < 0 || (expected_record_id !== null && !validRecordId(expected_record_id))) throw new InputError('최신 검사 버전과 기록을 다시 조회하세요.');
-  const defects = body.defects;
-  if (badDefects(defects)) throw new InputError('불량코드를 확인하세요.');
-  return { decision, weight_g, memo: memo.trim(), change_reason: change_reason.trim(), expected_version, expected_record_id, defects: [...defects].sort() };
-}
 export function listInput(q: any) {
   const page = q.page === undefined ? 1 : Number(q.page), pageSize = q.pageSize === undefined ? 12 : Number(q.pageSize);
   if (!Number.isSafeInteger(page) || page < 1 || page > 100000 || !Number.isSafeInteger(pageSize) || pageSize < 1 || pageSize > 50) throw new InputError('페이지 범위 오류');
