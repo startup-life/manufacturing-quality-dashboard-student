@@ -20,14 +20,6 @@ export function restoreApiSnapshot(snapshot: Row) {
       content_version: d.content_version, created_at: d.created_at
     });
     db.inspection_images.push(...d.images.map((img: Row) => ({ ...img, inspection_id: d.inspection_id, active: 1 })));
-    db.inspection_defects.push(...(o.defects || []).map((def: Row) => ({ ...def, inspection_id: d.inspection_id })));
-    // API returns history newest first; storage expects oldest first.
-    for (const rec of [...(item.records || [])].reverse()) {
-      db.inspection_records.push({ ...rec });
-      db.inspection_record_defects.push(...(rec.defects || []).map((code: any) => ({
-        record_id: rec.record_id, defect_code: typeof code === 'string' ? code : code.defect_code
-      })));
-    }
     db.ai_drafts.push(...[...(item.drafts || [])].reverse());
   }
   db.review_events = snapshot.review_events || [];

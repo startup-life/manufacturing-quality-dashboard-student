@@ -593,71 +593,6 @@ body.unauthenticated footer {
 }
 .thumb-strip img.selected { border-color: #175f7d; }
 
-.decision-radio-group { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
-.decision-radio-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 18px;
-  border: 2px solid #d3e0eb;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 14px;
-  background: #fff;
-}
-.decision-radio-label input { width: auto; min-height: 0; margin: 0; }
-.decision-radio-label.ok { color: #176642; }
-.decision-radio-label.ng { color: #ad302b; }
-.decision-radio-label.hold { color: #775407; }
-.decision-radio-label.disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-  background: #f5f5f5;
-  border-color: #e0e0e0;
-}
-.defect-chip-group { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
-.defect-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 7px 14px;
-  border-radius: 20px;
-  border: 1px solid #cbd7e2;
-  background: #f8fafc;
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 500;
-  user-select: none;
-}
-.defect-chip input { width: auto; min-height: 0; margin: 0; }
-.defect-chip.checked {
-  background: #fff0f2;
-  border-color: #dfaaa5;
-  color: #ad302b;
-  font-weight: 700;
-}
-.summary-box {
-  background: #fdfaf3;
-  border: 1px solid #eedec2;
-  border-radius: 8px;
-  padding: 14px 18px;
-  margin: 16px 0;
-}
-.summary-box h4 { margin: 0 0 8px; color: #775407; font-size: 14px; }
-.summary-box ul { margin: 0; padding-left: 20px; font-size: 13px; color: #52677b; }
-.tech-details {
-  margin-top: 24px;
-  border: 1px solid #dce5ec;
-  border-radius: 8px;
-  padding: 12px 16px;
-  background: #fff;
-}
-.tech-details summary { font-weight: 600; color: #52677b; cursor: pointer; }
-/* A judgment memo longer than the history line shows: first characters as the summary, the whole text when opened. */
-.tech-details .history-memo summary { font-weight: 400; color: inherit; overflow-wrap: anywhere; }
-.history-memo-text { margin: 4px 0 0; white-space: pre-wrap; overflow-wrap: anywhere; }
-
 /* Evidence MCP in Detail */
 .evidence-mcp-box {
   background: #f8fbfd;
@@ -882,7 +817,5 @@ body.unauthenticated footer {
 .prompt-compare-selectors select { width:100%; font-size:16px; min-height:44px; }
 .prompt-compare-results p { overflow-wrap:anywhere; }
 @media(max-width:600px){.prompt-compare-selectors,.prompt-compare-results{grid-template-columns:1fr;}.prompt-editor textarea{min-height:260px;}}
-.judgment-choice { min-width: 0; margin: 0; padding: 0; border: 0; }
-.judgment-choice legend { padding: 0; margin-bottom: 12px; font-size: 16px; font-weight: 600; }
 .review-single { display: block; }
 .review-single .review-findings { max-width: 880px; }

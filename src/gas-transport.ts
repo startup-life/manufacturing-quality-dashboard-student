@@ -78,15 +78,6 @@ export class GasTransport {
       ],
       inspections: [],
       inspection_images: [],
-      defect_codes: [
-        { defect_code: 'D01', defect_name: '스크래치', severity: '경미' },
-        { defect_code: 'D02', defect_name: '찍힘', severity: '중대' },
-        { defect_code: 'D03', defect_name: '라벨 오류', severity: '치명' },
-        { defect_code: 'D04', defect_name: '뚜껑 조립 오류', severity: '중대' }
-      ],
-      inspection_defects: [],
-      inspection_records: [],
-      inspection_record_defects: [],
       inspection_updates: [],
       // Not read: standards.get serves the repository files. Saved local state files still carry this old placeholder copy.
       standards: [
@@ -102,28 +93,22 @@ export class GasTransport {
     };
   }
 
-  // The current weight, as GAS handleInspectionsGet decides it: the latest judgment's unless an edit came after it
-  // (an edit's version is the version before it plus 1), else the latest edit's, else the registered one.
-  _currentWeight(insp: Row, latestRec: Row | undefined) {
-    const updates = this.mockDb.inspection_updates.filter(u => u.inspection_id === insp.inspection_id);
-    const update = updates[updates.length - 1];
-    const updateVersion = update ? update.previous_version + 1 : -1;
-    if (latestRec && latestRec.content_version >= updateVersion) return latestRec.weight_g;
+  // The current weight, as GAS handleInspectionsGet decides it: the latest edit's, else the registered one.
+  _currentWeight(insp: Row) {
     return 'current_weight_g' in insp ? insp.current_weight_g : insp.initial_weight_g;
   }
 
   // The product, weight and photos of an inspection now: what a draft records, and what draftOutdated compares.
   _aiInput(insp: Row) {
-    const recs = this.mockDb.inspection_records.filter(r => r.inspection_id === insp.inspection_id);
     return {
       product_id: insp.current_product_id || insp.initial_product_id || insp.product_id,
-      weight_g: this._currentWeight(insp, recs[recs.length - 1]),
+      weight_g: this._currentWeight(insp),
       images: this.mockDb.inspection_images.filter(img => img.inspection_id === insp.inspection_id && img.active).map(img => ({ image_id: img.image_id }))
     };
   }
 
   // Report review state of an inspection's latest draft, the same rule as GAS reviewState (gas/Code.gs): the 3번 탭
-  // source check (evidence.save) saved for that draft is the review, and a judgment saved after it keeps it.
+  // source check (evidence.save) saved for that draft is the review, and an edit of the inspection time after it keeps it.
   _reviewState(insp: Row) {
     const drafts = this.mockDb.ai_drafts.filter(d => d.inspection_id === insp.inspection_id);
     const draft = drafts[drafts.length - 1];
@@ -151,8 +136,6 @@ export class GasTransport {
       'home.get',
       'inspections.list',
       'inspections.get',
-      'inspections.history',
-      'inspections.saveRecord',
       'inspections.createBatch',
       'inspections.update',
       'standards.get',
@@ -304,9 +287,7 @@ export class GasTransport {
         let ng = 0, hold = 0, pending = 0;
 
         for (const i of dayInsps) {
-          const recs = this.mockDb.inspection_records.filter(r => r.inspection_id === i.inspection_id);
-          const latest = recs[recs.length - 1];
-          const dec = latest ? latest.decision : ('current_decision' in i ? i.current_decision : i.initial_decision);
+          const dec = 'current_decision' in i ? i.current_decision : i.initial_decision;
           if (dec === 'NG') ng++;
           if (dec === 'HOLD') hold++;
 
@@ -379,18 +360,6 @@ export class GasTransport {
             });
           }
 
-          const defects = Array.isArray(item.defects) ? item.defects : [];
-          for (const d of defects) {
-            const code = typeof d === 'string' ? d : d.defect_code;
-            const defCodeObj = this.mockDb.defect_codes.find(c => c.defect_code === code);
-            this.mockDb.inspection_defects.push({
-              inspection_id: inspectionId,
-              defect_code: code,
-              defect_name: defCodeObj?.defect_name || (code === 'D01' ? '스크래치' : code === 'D02' ? '찍힘' : code === 'D03' ? '라벨 오류' : '뚜껑 조립 오류'),
-              observation_note: '작성자가 등록한 관찰'
-            });
-          }
-
           created.push({
             inspection_id: inspectionId,
             product_id: insp.product_id,
@@ -415,8 +384,6 @@ export class GasTransport {
           const prodId = i.current_product_id || i.initial_product_id || i.product_id;
           const inspectedAt = i.current_inspected_at || i.initial_inspected_at || i.inspected_at;
           const prod = this.mockDb.products.find(p => p.product_id === prodId) || { product_name: '텀블러', color: '은색' };
-          const recs = this.mockDb.inspection_records.filter(r => r.inspection_id === i.inspection_id);
-          const latestRec = recs[recs.length - 1];
           const imgs = this.mockDb.inspection_images.filter(img => img.inspection_id === i.inspection_id && img.active);
           const drafts = this.mockDb.ai_drafts.filter(d => d.inspection_id === i.inspection_id);
           const latestDraft = drafts[drafts.length - 1];
@@ -432,8 +399,8 @@ export class GasTransport {
             }
           }
 
-          const currentWeight = this._currentWeight(i, latestRec);
-          const currentDecision = latestRec ? latestRec.decision : ('current_decision' in i ? i.current_decision : i.initial_decision);
+          const currentWeight = this._currentWeight(i);
+          const currentDecision = 'current_decision' in i ? i.current_decision : i.initial_decision;
 
           return {
             inspection_id: i.inspection_id,
@@ -501,23 +468,7 @@ export class GasTransport {
         }
         // The current product (after an edit), as the list uses.
         const prod = this.mockDb.products.find(p => p.product_id === (insp.current_product_id || insp.initial_product_id || insp.product_id)) || { product_name: '텀블러', color: '은색' };
-        const recs = this.mockDb.inspection_records.filter(r => r.inspection_id === id);
-        const latestRec = recs[recs.length - 1];
         const imgs = this.mockDb.inspection_images.filter(img => img.inspection_id === id && img.active);
-        const origDefects = this.mockDb.inspection_defects.filter(d => d.inspection_id === id);
-
-        let currentDefects = origDefects.map(d => {
-          const codeObj = this.mockDb.defect_codes.find(c => c.defect_code === d.defect_code);
-          return { defect_code: d.defect_code, defect_name: codeObj?.defect_name || d.defect_name };
-        });
-
-        if (latestRec) {
-          const recDefs = this.mockDb.inspection_record_defects.filter(d => d.record_id === latestRec.record_id);
-          currentDefects = recDefs.map(d => {
-            const codeObj = this.mockDb.defect_codes.find(c => c.defect_code === d.defect_code);
-            return { defect_code: d.defect_code, defect_name: codeObj?.defect_name || d.defect_name || d.defect_code };
-          });
-        }
 
         result = {
           inspection_id: insp.inspection_id,
@@ -525,26 +476,23 @@ export class GasTransport {
           product_name: prod.product_name,
           color: prod.color,
           inspected_at: insp.current_inspected_at || insp.initial_inspected_at || insp.inspected_at,
-          weight_g: this._currentWeight(insp, latestRec),
-          decision: latestRec ? latestRec.decision : ('current_decision' in insp ? insp.current_decision : insp.initial_decision),
-          memo: latestRec ? (latestRec.memo || latestRec.notes || '') : ('current_memo' in insp ? insp.current_memo : (insp.memo || '')),
-          change_reason: latestRec ? (latestRec.change_reason || '') : '',
-          current_record_id: latestRec ? latestRec.record_id : null,
+          weight_g: this._currentWeight(insp),
+          decision: 'current_decision' in insp ? insp.current_decision : insp.initial_decision,
+          memo: 'current_memo' in insp ? insp.current_memo : (insp.memo || ''),
           content_version: insp.content_version,
           original: {
             inspection_id: insp.inspection_id,
             product_id: insp.initial_product_id || insp.product_id,
             inspected_at: insp.initial_inspected_at || insp.inspected_at,
             weight_g: insp.initial_weight_g,
-            decision: insp.initial_decision,
-            defects: origDefects.map(d => ({ defect_code: d.defect_code, defect_name: d.defect_name }))
+            decision: insp.initial_decision
           },
           images: imgs.map(img => ({
             image_id: img.image_id,
             image_url: img.image_url,
             drive_file_id: img.drive_file_id
           })),
-          defects: currentDefects,
+          defects: [],
           drafts: this.mockDb.ai_drafts.filter(d => d.inspection_id === id).slice().reverse().map(d => ({
             draft_id: d.draft_id,
             run_id: d.run_id,
@@ -561,85 +509,6 @@ export class GasTransport {
           })),
           created_at: insp.created_at
         };
-        break;
-      }
-
-      case 'inspections.saveRecord': {
-        const id = payload.id || payload.inspection_id;
-        const insp = this.mockDb.inspections.find(i => i.inspection_id === id);
-        if (!insp) {
-          const err: any = new Error('검사 기록이 없습니다.');
-          err.code = 'NOT_FOUND';
-          throw err;
-        }
-
-        if (expectedVersion !== null && expectedVersion !== undefined && Number(expectedVersion) !== insp.content_version) {
-          const err: any = new Error('자료가 이미 변경되었습니다. 최신 화면을 확인 후 다시 시도하세요.');
-          err.code = 'CONFLICT';
-          throw err;
-        }
-
-        const existingRecs = this.mockDb.inspection_records.filter(r => r.inspection_id === id);
-        const lastRec = existingRecs[existingRecs.length - 1];
-        // Same rule as gas/Code.gs: null means "no record yet", only undefined skips the check.
-        if (payload.expected_record_id !== undefined) {
-          if ((lastRec?.record_id || null) !== payload.expected_record_id) {
-            const err: any = new Error('다른 변경이 저장됐습니다. 최신 검사와 기록을 다시 조회하세요.');
-            err.code = 'CONFLICT';
-            throw err;
-          }
-        }
-
-        insp.content_version++;
-        const rec = {
-          record_id: `REC-${id}-${insp.content_version}`,
-          inspection_id: id,
-          user_id: payload.user_id || 'factory-user',
-          recorded_at: now.toISOString(),
-          decision: payload.decision || 'HOLD',
-          weight_g: payload.weight_g !== undefined && payload.weight_g !== null && payload.weight_g !== '' ? Number(payload.weight_g) : null,
-          memo: payload.memo || payload.notes || '',
-          notes: payload.notes || payload.memo || '',
-          change_reason: payload.change_reason || '',
-          content_version: insp.content_version
-        };
-        this.mockDb.inspection_records.push(rec);
-
-        insp.current_decision = rec.decision;
-        if (payload.weight_g !== undefined) {
-          insp.current_weight_g = rec.weight_g;
-        }
-
-        const recDefects = Array.isArray(payload.defects) ? payload.defects : [];
-        for (const d of recDefects) {
-          const code = typeof d === 'string' ? d : d.defect_code;
-          const defCodeObj = this.mockDb.defect_codes.find(c => c.defect_code === code);
-          this.mockDb.inspection_record_defects.push({
-            record_id: rec.record_id,
-            defect_code: code,
-            defect_name: defCodeObj?.defect_name || code
-          });
-        }
-
-        result = {
-          record_id: rec.record_id,
-          content_version: insp.content_version,
-          recorded_at: rec.recorded_at
-        };
-        break;
-      }
-
-      case 'inspections.history': {
-        const id = payload.id;
-        const recs = this.mockDb.inspection_records.filter(r => r.inspection_id === id);
-        const resultList = recs.map(r => {
-          const recDefs = this.mockDb.inspection_record_defects.filter(d => d.record_id === r.record_id);
-          return {
-            ...r,
-            defects: recDefs.map(d => d.defect_code)
-          };
-        });
-        result = [...resultList].reverse();
         break;
       }
 
@@ -671,9 +540,6 @@ export class GasTransport {
         insp.current_memo = payload.memo || '';
         if (payload.weight_g !== undefined) {
           insp.current_weight_g = payload.weight_g !== null && payload.weight_g !== '' ? Number(payload.weight_g) : null;
-        }
-        if (payload.decision !== undefined) {
-          insp.current_decision = payload.decision !== '' ? payload.decision : null;
         }
         insp.content_version++;
 
@@ -884,7 +750,6 @@ export class GasTransport {
     if(['prompts.save','prompts.seed'].includes(action))return true;
     return [
       'inspections.createBatch',
-      'inspections.saveRecord',
       'inspections.update',
       'ai.runQueue',
       'evidence.save',

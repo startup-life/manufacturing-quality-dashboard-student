@@ -71,7 +71,7 @@ export class EvidenceController {
     const drafts = await repo.drafts(id);
     const draft = draft_id === undefined ? drafts[0] : drafts.find(d => String(d.draft_id) === String(draft_id));
     if (!draft) throw new InputError('근거를 확인할 AI 초안을 먼저 선택하세요.', 409);
-    // stale means the AI input (photos, weight, product) changed since the draft; a judgment saved since keeps it.
+    // stale means the AI input (photos, weight, product) changed since the draft; an edit of the inspection time since keeps it.
     if (draft.stale) throw new InputError('변경 전 초안입니다. 최신 자료로 판독한 뒤 근거를 확인하세요.', 409);
     if (body?.revision && body.revision !== draft.standard_revision) throw new InputError('초안에 적용한 검사기준 버전과 다릅니다.', 409);
     const prompt = await promptStore.resolve('notebooklm', body?.prompt_version_id);
@@ -80,7 +80,6 @@ export class EvidenceController {
       inspectionId: id,
       draftId: draft.draft_id,
       productName: inspection.product_name,
-      defects: inspection.defects,
       standardRevision: draft.standard_revision,
       contentVersion: inspection.content_version,
       prompt, weightG: inspection.weight_g
@@ -121,7 +120,7 @@ export class EvidenceController {
 
     if (Number(expected_version) !== inspection.content_version) throw new InputError('검사 자료가 변경되었습니다. 최신 근거를 다시 확인하세요.', 409);
     // The check belongs to a current draft (the detail carries them, newest first) and its last query, made at any
-    // inspection version: a judgment saved after the query does not outdate the draft.
+    // inspection version: an edit of the inspection time after the query does not outdate the draft.
     const drafts: Row[] = inspection.drafts || [];
     const draft = draft_id === undefined ? drafts[0] : drafts.find(d => String(d.draft_id) === String(draft_id));
     if (!draft || draft.stale) throw new InputError('변경 전 초안입니다. 최신 자료로 판독한 뒤 근거를 확인하세요.', 409);

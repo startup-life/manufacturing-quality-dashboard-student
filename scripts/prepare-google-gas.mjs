@@ -1,5 +1,5 @@
 // GAS web app preparation from the local side. The web app itself is made in the editor or with clasp (docs/LOCAL_SETUP.md).
-//   npm run gas:init    sends settings, standards, products, defect codes and the default prompts to the web app
+//   npm run gas:init    sends settings, standards, products and the default prompts to the web app
 // GEMINI_API_KEY from .env is sent to the GAS Script Properties; it is never printed. Without it the stored key stays.
 import fs from 'node:fs/promises';
 import { realpathSync } from 'node:fs';
@@ -20,13 +20,6 @@ const PRODUCTS = [
   { product_id: 'P-SILVER', product_name: '텀블러 실버', color: '은색', capacity_ml: 500 },
   { product_id: 'P-WHITE', product_name: '텀블러 화이트', color: '흰색', capacity_ml: 500 },
   { product_id: 'P-BLACK', product_name: '텀블러 블랙', color: '검정', capacity_ml: 500 }
-];
-// The defect choices the judgment form offers (D01~D04). Must equal the local mock.
-const DEFECT_CODES = [
-  { defect_code: 'D01', defect_name: '스크래치', severity: '경미' },
-  { defect_code: 'D02', defect_name: '찍힘', severity: '중대' },
-  { defect_code: 'D03', defect_name: '라벨 오류', severity: '치명' },
-  { defect_code: 'D04', defect_name: '뚜껑 조립 오류', severity: '중대' }
 ];
 // Same ID for the same defaults, so running initialize again does not add rows.
 export const PROMPT_SEED_REQUEST_ID = 'prompt-defaults-' + sha(JSON.stringify(promptDefaults)).slice(0, 20);
@@ -51,7 +44,7 @@ export async function initializeRequests({ env = process.env, root = repoRoot } 
   return {
     gemini,
     keyProblem: apiKey.problem,
-    configure: { gemini_model: gemini.model, gemini_fallback_model: gemini.fallback_model, ...(apiKey.key ? { gemini_api_key: apiKey.key } : {}), standards, products: PRODUCTS, defect_codes: DEFECT_CODES },
+    configure: { gemini_model: gemini.model, gemini_fallback_model: gemini.fallback_model, ...(apiKey.key ? { gemini_api_key: apiKey.key } : {}), standards, products: PRODUCTS },
     seed: { versions: promptDefaults }
   };
 }
@@ -68,7 +61,7 @@ export async function initialize({ env = process.env, root = repoRoot, transport
   await transport.dispatch('setup.resources', {}, { request_id: crypto.randomUUID() });
   const status = await transport.dispatch('init.configure', requests.configure, { request_id: crypto.randomUUID() });
   const seeded = await transport.dispatch('prompts.seed', requests.seed, { request_id: PROMPT_SEED_REQUEST_ID });
-  log('GAS 웹앱에 판독 설정·기준 원문·제품·불량 코드·기본 지시문 ' + promptDefaults.length + '개를 보냈습니다(지시문 전체 ' + seeded.count + '개).');
+  log('GAS 웹앱에 판독 설정·기준 원문·제품·기본 지시문 ' + promptDefaults.length + '개를 보냈습니다(지시문 전체 ' + seeded.count + '개).');
   if (status.gemini_ready) log('Gemini 판독 준비가 끝났습니다(' + geminiModelText(requests.gemini.model, geminiFallbackModel(requests.gemini)) + ').');
   else log('다음 할 일: .env에 GEMINI_API_KEY를 넣고 npm.cmd run gas:init(macOS: npm run gas:init)을 다시 실행합니다.');
   return { status, seeded };

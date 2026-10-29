@@ -11,7 +11,7 @@ import { promptCore } from './prompt-core';
 
 type Env = Record<string, string | undefined>;
 export type LaunchOptions = { command?: string; args?: string[]; home?: string };
-type QueryInput = { inspectionId: string; draftId: unknown; productName?: string; defects?: unknown; standardRevision?: string; contentVersion?: number; prompt?: { text?: string } | null; weightG?: number | null };
+type QueryInput = { inspectionId: string; draftId: unknown; productName?: string; standardRevision?: string; contentVersion?: number; prompt?: { text?: string } | null; weightG?: number | null };
 export type McpLaunch = { source: string | null; command: string | null; args: string[]; env: Record<string, string>; configLabel?: string; configError?: string | null };
 
 const DEFAULT_MCP_ARGS = ['--transport', 'stdio'];
@@ -160,7 +160,7 @@ export class NotebookLmMcpClient {
     return null;
   }
 
-  async queryEvidence({ inspectionId, draftId, productName, defects, standardRevision = 'Rev.A', contentVersion = 1, prompt = null, weightG = null }: QueryInput) {
+  async queryEvidence({ inspectionId, draftId, productName, standardRevision = 'Rev.A', contentVersion = 1, prompt = null, weightG = null }: QueryInput) {
     if (!/^[A-Za-z0-9_-]{1,32}$/.test(inspectionId || '')) {
       throw new Error('유효하지 않은 검사 ID 형식입니다. 명령 주입 차단.');
     }
@@ -177,18 +177,18 @@ export class NotebookLmMcpClient {
     this.activeQueryLock.add(inspectionId);
     try {
       if (this.mode === 'live') {
-        return await this._callLiveMcpQuery({ inspectionId, draftId, productName, defects, standardRevision, contentVersion, prompt, weightG });
+        return await this._callLiveMcpQuery({ inspectionId, draftId, productName, standardRevision, contentVersion, prompt, weightG });
       }
 
       // Faithful Mock / Educational Verification Response
-      const mock=await this._callMockMcpQuery({ inspectionId, draftId, productName, defects, standardRevision, contentVersion });
+      const mock=await this._callMockMcpQuery({ inspectionId, draftId, productName, standardRevision, contentVersion });
       return {...mock,prompt};
     } finally {
       this.activeQueryLock.delete(inspectionId);
     }
   }
 
-  async _callMockMcpQuery({ inspectionId, draftId, productName, defects, standardRevision = 'Rev.A', contentVersion }: QueryInput) {
+  async _callMockMcpQuery({ inspectionId, draftId, productName, standardRevision = 'Rev.A', contentVersion }: QueryInput) {
     await new Promise(r => setTimeout(r, 50));
 
     let standardData = {
@@ -202,8 +202,6 @@ export class NotebookLmMcpClient {
       }
     } catch (_) {}
 
-    const defectList = Array.isArray(defects) ? defects.map((d: any) => typeof d === 'string' ? d : d.defect_name || d.defect_code).join(', ') : '외관 항목';
-
     return {
       query_id: `QRY-${inspectionId}-${Date.now()}`,
       inspection_id: inspectionId,
@@ -213,8 +211,8 @@ export class NotebookLmMcpClient {
       notebook_id: 'nb-tumbler-standards-2026',
       source_id: `src-tumbler-standards-${standardRevision.toLowerCase()}`,
       source_document: `텀블러 제조 품질 관리 표준서 (${standardRevision})`,
-      query_prompt: `${productName || '텀블러'} 제품의 ${standardRevision} 기준에서 [${defectList || '외관 규격'}] 판정 기준 및 허용 오차는 어떻게 되나요?`,
-      query_text: `${productName || '텀블러'} 제품의 ${standardRevision} 기준에서 [${defectList || '외관 규격'}] 판정 기준 및 허용 오차는 어떻게 되나요?`,
+      query_prompt: `${productName || '텀블러'} 제품의 ${standardRevision} 기준에서 [외관 규격] 판정 기준 및 허용 오차는 어떻게 되나요?`,
+      query_text: `${productName || '텀블러'} 제품의 ${standardRevision} 기준에서 [외관 규격] 판정 기준 및 허용 오차는 어떻게 되나요?`,
       response_text: `[${standardRevision} 표준서 기준 인용] ${standardData.visual}\n조치 기준: ${standardData.action}`,
       evidence_excerpt: `${standardRevision} 표준서 원문: "${standardData.visual}" (출하 승인 없음, 담당자 대조 확인 필요)`,
       sources: [
@@ -232,7 +230,7 @@ export class NotebookLmMcpClient {
     };
   }
 
-  async _callLiveMcpQuery({ inspectionId, draftId, productName, defects, standardRevision, contentVersion, prompt, weightG }: QueryInput & { standardRevision: string }) {
+  async _callLiveMcpQuery({ inspectionId, draftId, productName, standardRevision, contentVersion, prompt, weightG }: QueryInput & { standardRevision: string }) {
     if(!NOTEBOOK_ID.test(this.notebookId))throw setupError(NOTEBOOK_ID_MISSING,'NOTEBOOK_ID_MISSING');
     if(!['Rev.A','Rev.B'].includes(standardRevision))throw Error('지원하지 않는 검사기준 버전입니다.');
     const launch=resolveMcpLaunch(this.launchOptions);

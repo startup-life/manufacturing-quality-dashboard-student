@@ -376,14 +376,14 @@ npm.cmd run gas:init
 (macOS: `npm run gas:init`)
 
 - 맨 먼저 시트와 Drive 사진 폴더를 만듭니다. 이미 있으면 그대로 씁니다.
-- 이어서 `.env`의 `GEMINI_API_KEY`, `GEMINI_MODEL`, `GEMINI_FALLBACK_MODEL`을 GAS 스크립트 속성에 저장하고, 기준 원문(Rev.A, Rev.B), 제품 3종, 불량 코드 4개(D01~D04), 기본 지시문 6개를 보냅니다. 다시 실행해도 같은 행을 더 만들지 않습니다.
+- 이어서 `.env`의 `GEMINI_API_KEY`, `GEMINI_MODEL`, `GEMINI_FALLBACK_MODEL`을 GAS 스크립트 속성에 저장하고, 기준 원문(Rev.A, Rev.B), 제품 3종, 기본 지시문 6개를 보냅니다. 다시 실행해도 같은 행을 더 만들지 않습니다.
 - `.env`에 `GEMINI_API_KEY` 줄이 없으면 키를 보내지 않고, 스크립트 속성의 키를 그대로 둡니다.
 - 키 값은 터미널에 나오지 않습니다.
 
 확인: 터미널에 아래 두 줄이 나옵니다. (실제 배포로 확인) 미확인(Windows).
 
 ```text
-GAS 웹앱에 판독 설정·기준 원문·제품·불량 코드·기본 지시문 6개를 보냈습니다(지시문 전체 6개).
+GAS 웹앱에 판독 설정·기준 원문·제품·기본 지시문 6개를 보냈습니다(지시문 전체 6개).
 Gemini 판독 준비가 끝났습니다(<모델>, 대체 <대체 모델>).
 ```
 
@@ -555,7 +555,7 @@ npm.cmd run gas:init
 
 두 경로 모두 끝나면 `npm.cmd start`를 다시 실행합니다.
 
-- 초기화는 빠진 불량 코드와 새 기본 지시문을 채웁니다. 있는 행은 덮어쓰지 않습니다.
+- 초기화는 빠진 제품과 새 기본 지시문을 채웁니다. 있는 행은 덮어쓰지 않습니다.
 
 - 기본 지시문이 바뀌었으면 초기화가 새 지시문을 넣습니다.
 
@@ -608,7 +608,7 @@ npm.cmd run gas:init
 | `VALIDATION` | `GEMINI_MODEL은 … 중 하나여야 합니다.` | 터미널 | `.env`의 `GEMINI_MODEL`. 2.5 모델은 받지 않습니다 |
 | `VALIDATION` | `GEMINI_FALLBACK_MODEL은 off 또는 … 중 하나여야 합니다.` | 터미널 | `.env`의 `GEMINI_FALLBACK_MODEL`. 대문자 `OFF`는 받지 않습니다 |
 | (기동 경고) | `GAS 스크립트 속성의 GEMINI_MODEL 또는 GEMINI_FALLBACK_MODEL이 허용 모델이 아니어서 판독 요청이 실패합니다. …` | 터미널(`npm start`, 바로 위 연동 상태 줄은 `Gemini=live(모델 설정 확인 필요)`) | 예전 초기화로 2.5 모델 등이 스크립트 속성에 남았습니다. `.env`를 고치고 초기화(「모델이나 키를 바꿀 때」) |
-| `VALIDATION` | `불량 선택값을 확인하세요.` 등 입력 오류 | 화면(400) | 입력값 |
+| `VALIDATION` | `알 수 없는 제품번호입니다.` 등 입력 오류 | 화면(400) | 입력값 |
 | `GAS_UNREACHABLE` | `Google Apps Script에 연결하지 못했습니다. 네트워크 연결을 확인하세요.` | 터미널, 화면(503) | 네트워크 |
 | `GAS_TIMEOUT` | `Google Apps Script 응답 시간이 초과되었습니다.` | 터미널, 화면(503) | 처리 결과를 화면에서 확인한 뒤 다시 시도 |
 | (판독 실패) | `Gemini API 한도에 걸렸습니다. 잠시 뒤 다시 하거나 강사에게 다른 API 키를 받으세요.` | 화면(판독 실행 결과) | 기본 모델이 한도로 거절됐고(429, `RESOURCE_EXHAUSTED`), 대체 모델도 결과를 내지 못했거나 꺼져 있습니다. 잠시 뒤 다시 하거나 다른 키로 바꿉니다(「모델이나 키를 바꿀 때」) |

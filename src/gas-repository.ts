@@ -73,30 +73,6 @@ export class GasRepository {
     return await this.detail(id);
   }
 
-  async history(id: string) {
-    return await this.transport.dispatch('inspections.history', { id });
-  }
-
-  async saveRecord(id: string, userId: unknown, input: Row) {
-    try {
-      return await this.transport.dispatch('inspections.saveRecord', {
-        id,
-        user_id: userId,
-        decision: input.decision,
-        weight_g: input.weight_g,
-        memo: input.memo || input.notes || '',
-        notes: input.memo || input.notes || '',
-        change_reason: input.change_reason || '',
-        expected_record_id: input.expected_record_id !== undefined ? input.expected_record_id : null,
-        defects: input.defects || []
-      }, {
-        expected_version: input.expected_version
-      });
-    } catch (err) {
-      throw gasHttpError(err);
-    }
-  }
-
   async create(r: Row, requestId: string | null = null) {
     const batchRes = await this.createBatch([r], requestId);
     const createdId = batchRes.inspections?.[0]?.inspection_id || r.inspection_id;

@@ -10,7 +10,7 @@ declare module 'express-session' {
   interface SessionData { user?: SessionUser; csrf?: string }
 }
 // The three classroom accounts. They are fixed training logins on a local server, not access control:
-// the login card shows the writer and reviewer passwords. Records keep the id (public/app.js names it again).
+// the login card shows the writer and reviewer passwords.
 export const ACCOUNTS: Record<string, { id: number; role: string; password: string }> = {
   writer: { id: 1, role: 'writer', password: 'writer1234!' },
   reviewer: { id: 2, role: 'reviewer', password: 'reviewer1234!' },

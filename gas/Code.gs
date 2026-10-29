@@ -11,8 +11,6 @@ const TABS = [
   'products',
   'inspections',
   'inspection_images',
-  'defect_codes',
-  'inspection_defects',
   'inspection_records',
   'record_defects',
   'standards',
@@ -159,12 +157,6 @@ function dispatch(request) {
       case 'inspections.createBatch':
         result = handleInspectionsCreateBatch(ss, payload, request_id);
         break;
-      case 'inspections.saveRecord':
-        result = handleInspectionsSaveRecord(ss, payload, expected_version);
-        break;
-      case 'inspections.history':
-        result = handleInspectionsHistory(ss, payload);
-        break;
       case 'inspections.update': result=updateLiveInspection(ss,payload,expected_version);break;
       case 'ai.runQueue':
         result = queueLiveAi(ss, payload, request_id, expected_version);
@@ -203,7 +195,6 @@ function dispatch(request) {
 function isMutatingAction(action) {
   return [
     'inspections.createBatch',
-    'inspections.saveRecord',
     'ai.runQueue',
     'evidence.save',
     'init.resources'
@@ -374,8 +365,6 @@ function initHeadersIfEmpty(ss) {
     products: ['product_id', 'product_name', 'color', 'capacity_ml'],
     inspections: ['inspection_id', 'product_id', 'inspected_at', 'initial_weight_g', 'initial_decision', 'content_version', 'created_at'],
     inspection_images: ['image_id', 'inspection_id', 'image_url', 'drive_file_id', 'sha256', 'active', 'created_at'],
-    defect_codes: ['defect_code', 'defect_name', 'severity'],
-    inspection_defects: ['inspection_id', 'defect_code'],
     inspection_records: ['record_id', 'inspection_id', 'user_id', 'recorded_at', 'decision', 'weight_g', 'notes', 'content_version', 'change_reason'],
     record_defects: ['record_id', 'defect_code'],
     standards: ['standard_id', 'revision', 'standard_text', 'sha256', 'created_at'],
@@ -435,7 +424,7 @@ function handleInspectionsCreateBatch(ss, payload, requestId) {
       inspected_at: inspectedAt,
       initial_weight_g: weightG !== null ? weightG : '',
       initial_decision: initialDecision,
-      // Version 0 at registration, as in the mock store; each saved change (judgment or edit) adds 1.
+      // Version 0 at registration, as in the mock store; each saved edit adds 1.
       content_version: 0,
       created_at: now.toISOString()
     });
@@ -477,7 +466,7 @@ function handleInspectionsCreateBatch(ss, payload, requestId) {
  * Quality Dashboard Home Data
  */
 function handleHomeGet(ss, payload) {
-  // Every inspection with its current inspection time and judgment, from one read of each tab (readInspections).
+  // Every inspection with its current inspection time and decision, from one read of each tab (readInspections).
   const inspections = readInspections(ss);
   const drafts = getRows(ss, 'ai_drafts');
   const links = getRows(ss, 'evidence_links');
@@ -502,7 +491,7 @@ function handleHomeGet(ss, payload) {
   let pendingCount = 0;
 
   for (const insp of dayInspections) {
-    // The latest judgment's decision, else the registered one.
+    // The registered decision.
     if (insp.decision === 'NG') ngCount++;
     if (insp.decision === 'HOLD') holdCount++;
     // Waiting for review, by the same rule as the list's review filter (the '검토 대기' card opens that list).
@@ -532,7 +521,7 @@ const REVIEW_NEEDED_STATUSES = ['REVIEW_NEEDED_BY_USER', 'MOCK_REVIEW_NEEDED'];
 const REVIEWED_STATUSES = ['VERIFIED_BY_USER', 'MOCK_USER_REVIEWED', 'VERIFIED'];
 
 // 다시 판독 필요(stale): the product, weight or photos the AI saw (the draft's input_snapshot) differ from the inspection
-// now. A judgment, a memo or the inspection time are not AI input. The mock store has the same function.
+// now. A memo or the inspection time are not AI input. The mock store has the same function.
 function draftOutdated(seen, now) {
   const weight = w => w === null || w === undefined || w === '' ? null : Number(w);
   const photos = list => (list || []).map(i => String(i.image_id)).sort().join(',');
@@ -540,7 +529,7 @@ function draftOutdated(seen, now) {
 }
 
 // Report review state of an inspection's latest draft, the same rule as the mock store (src/gas-transport.ts).
-// The 3번 탭 source check saved for that draft is the review; a judgment saved after it keeps it.
+// The 3번 탭 source check saved for that draft is the review; an edit of the inspection time after it keeps it.
 // stale: the AI input changed since the draft (draftOutdated); needs_check: the last check is '검토 필요';
 // reviewed: it is '일치'; pending: no check yet. Stale, needs_check and pending wait; no draft is no_draft and does not.
 // current is the inspection as handleInspectionsGet gives it.
@@ -655,27 +644,22 @@ function handleInspectionsGet(ss, payload) {
 // Every inspection as the detail shows it. Each tab is read once; the rows are grouped per inspection in memory.
 function readInspections(ss) {
   const tabs = {};
-  for (const tab of ['products', 'inspection_images', 'inspection_records', 'record_defects', 'inspection_defects', 'inspection_updates']) tabs[tab] = getRows(ss, tab);
+  for (const tab of ['products', 'inspection_images', 'inspection_updates']) tabs[tab] = getRows(ss, tab);
   return getRows(ss, 'inspections').map(insp => inspectionView(insp, tabs));
 }
 
-// One inspection: its current product, time and weight (the latest edit or judgment), judgment, memo, photos and defects.
+// One inspection: its current product, time and weight (the latest edit), decision, memo and photos.
 function inspectionView(insp, tabs) {
   const id = insp.inspection_id;
   const products = tabs.products;
   const prod = products.find(p => p.product_id === insp.product_id) || { product_name: '텀블러', color: '은색', capacity_ml: 500 };
 
   const images = tabs.inspection_images.filter(img => img.inspection_id === id && img.active != 0);
-  const records = tabs.inspection_records.filter(r => r.inspection_id === id);
-  records.sort((a, b) => (Number(a.content_version) || 0) - (Number(b.content_version) || 0));
-  const latestRec = records[records.length - 1];
-
-  const defects = tabs.inspection_defects.filter(d => d.inspection_id === id);
   const updates = tabs.inspection_updates.filter(u => u.inspection_id === id);
   const update = updates[updates.length - 1];
   const effective = update || insp;
   const updatedProduct = products.find(p => p.product_id === effective.product_id) || prod;
-  const measurement = latestRec && (!update || Number(latestRec.content_version) >= Number(update.content_version)) ? latestRec.weight_g : update ? update.weight_g : insp.initial_weight_g;
+  const measurement = update ? update.weight_g : insp.initial_weight_g;
 
   return {
     inspection_id: insp.inspection_id,
@@ -684,10 +668,9 @@ function inspectionView(insp, tabs) {
     color: updatedProduct.color,
     inspected_at: effective.inspected_at,
     weight_g: measurement !== '' && measurement !== null ? Number(measurement) : null,
-    // The latest judgment's memo (stored as notes), as in the mock store; without one, the latest edit's memo.
-    memo: latestRec ? (latestRec.notes || '') : (update ? update.memo : ''),
-    decision: latestRec ? latestRec.decision : (insp.initial_decision || null),
-    current_record_id: latestRec ? latestRec.record_id : null,
+    // The latest edit's memo, as in the mock store.
+    memo: update ? update.memo : '',
+    decision: insp.initial_decision || null,
     content_version: Number(insp.content_version ?? 1),
     original: {
       product_id: insp.product_id,
@@ -701,79 +684,9 @@ function inspectionView(insp, tabs) {
       drive_file_id: img.drive_file_id,
       sha256: img.sha256
     })),
-    defects: (latestRec ? tabs.record_defects.filter(d => d.record_id === latestRec.record_id) : defects).map(d => ({ defect_code: d.defect_code })),
+    defects: [],
     created_at: insp.created_at
   };
-}
-
-/**
- * Inspection Save Record (사용자 최종 판단 및 측정값 수정 이력)
- */
-function handleInspectionsSaveRecord(ss, payload, expectedVersion) {
-  const id = payload?.id || payload?.inspection_id;
-  const inspections = getRows(ss, 'inspections');
-  const insp = inspections.find(i => i.inspection_id === id);
-  if (!insp) {
-    const err = new Error('검사 기록이 없습니다.');
-    err.code = 'NOT_FOUND';
-    throw err;
-  }
-
-  const currentVersion = Number(insp.content_version ?? 1);
-  if (expectedVersion !== undefined && expectedVersion !== null && Number(expectedVersion) !== currentVersion) {
-    const err = new Error('자료가 이미 변경되었습니다. 최신 화면을 확인 후 다시 시도하세요.');
-    err.code = 'CONFLICT';
-    throw err;
-  }
-
-  const newVersion = currentVersion + 1;
-  const history=getRows(ss,'inspection_records').filter(r=>r.inspection_id===id);
-  const latest=history[history.length-1];
-  if(payload.expected_record_id!==undefined && String(payload.expected_record_id??'')!==String(latest?.record_id??''))throw Object.assign(Error('다른 판단 기록이 저장됐습니다. 최신 화면을 확인하세요.'),{code:'CONFLICT'});
-  const requestedDefects=payload.defects||[];
-  if(requestedDefects.some(code=>!getRows(ss,'defect_codes').some(d=>d.defect_code===code)))throw Object.assign(Error('불량 선택값을 확인하세요.'),{code:'VALIDATION'});
-  const now = new Date().toISOString();
-  const recordId = `REC-${id}-${newVersion}`;
-
-  appendRow(ss, 'inspection_records', {
-    record_id: recordId,
-    inspection_id: id,
-    user_id: payload.user_id || 'factory-user',
-    recorded_at: now,
-    decision: payload.decision || 'HOLD',
-    weight_g: payload.weight_g !== undefined && payload.weight_g !== null && payload.weight_g !== '' ? Number(payload.weight_g) : '',
-    notes: payload.notes || '',
-    change_reason: payload.change_reason || '',
-    content_version: newVersion
-  });
-  requestedDefects.forEach(code=>appendRow(ss,'record_defects',{record_id:recordId,defect_code:code}));
-
-  // Update inspection content version in inspections sheet
-  const sheet = ss.getSheetByName('inspections');
-  const data = sheet.getDataRange().getValues();
-  for (let r = 1; r < data.length; r++) {
-    if (data[r][0] === id) {
-      sheet.getRange(r + 1, 6).setValue(newVersion); // content_version column
-      break;
-    }
-  }
-
-  return {
-    record_id: recordId,
-    content_version: newVersion,
-    recorded_at: now
-  };
-}
-
-/**
- * Inspection History
- */
-function handleInspectionsHistory(ss, payload) {
-  const id = payload?.id;
-  const records = getRows(ss, 'inspection_records').filter(r => r.inspection_id === id);
-  records.sort((a, b) => (Number(b.content_version) || 0) - (Number(a.content_version) || 0));
-  // memo repeats notes under the name the mock store and the judgment form use.
-  return records.map(r=>({...r,memo:r.notes||'',defects:getRows(ss,'record_defects').filter(d=>d.record_id===r.record_id).map(d=>d.defect_code)}));
 }
 
 /**

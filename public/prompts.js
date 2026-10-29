@@ -2,7 +2,7 @@
 let settingsGeneration=0;
 let editorDirty=false;
 const kindNames={gemini:'Gemini 판독 지시',notebooklm:'NotebookLM 근거 질문'};
-// The last query of a current draft. A judgment saved after it raises the inspection version but keeps the draft
+// The last query of a current draft. An edit of the inspection time after it raises the inspection version but keeps the draft
 // current (stale follows the AI input), so the query and its check stay valid; the version argument is not used.
 export function savedEvidenceFor(queries,draft){
   if(!Array.isArray(queries)||!draft||draft.stale)return null;
@@ -81,7 +81,7 @@ export function comparisonStatus(a,b){
     ['inspection_id','standard_revision','standard_hash','model','contract_version','safety_hash'].every(k=>typeof d[k]==='string'&&d[k].length>0)&&
     Array.isArray(d.image_hashes)&&d.image_hashes.length>0&&d.image_hashes.every(h=>typeof h==='string'&&h.length>0);
   if(!complete(a)||!complete(b))return 'unverified';
-  // Same AI input as draftOutdated uses (product, weight, photos); a judgment between the runs does not matter.
+  // Same AI input as draftOutdated uses (product, weight, photos); an edit of the inspection time between the runs does not matter.
   return a.inspection_id===b.inspection_id&&a.product_id===b.product_id&&a.weight_g===b.weight_g&&
     a.standard_revision===b.standard_revision&&a.standard_hash===b.standard_hash&&
     a.model===b.model&&a.contract_version===b.contract_version&&a.safety_hash===b.safety_hash&&
