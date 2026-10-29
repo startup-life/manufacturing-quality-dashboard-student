@@ -134,7 +134,7 @@ async function refresh(){
  if(!user)return;
  const current=++request;
  recordsRequest++;
- // While /api/home is out, 새로고침 and 재시도 would only queue the same request behind it in GAS.
+ // While /api/home is out, 새로고침 and 재시도 would only send the same request again.
  const buttons=['home-refresh','home-retry'].map(get).filter(Boolean);
  for(const b of buttons)b.disabled=true;
  const status=get('home-status');
@@ -176,8 +176,7 @@ async function refresh(){
     : '아직 등록된 검사 기록이 없습니다. 상단의 사진 등록 버튼을 눌러 첫 검사를 등록해 주세요.';
   }
 
-  // The live GAS sends the first card page with the counts. A filter or another page, an older GAS,
-  // the mock store asks /api/inspections as before.
+  // /api/home sends the first card page with the counts; a filter or another page asks /api/inspections.
   const cards=get('home-records-cards');
   if(data.firstPage&&homePage===1&&!homeMetricFilter&&cards){
    recordsRequest++;
@@ -199,7 +198,7 @@ async function refresh(){
 }
 
 // Typing a year digit by digit changes the value at every valid date (0002, 0020, 0202, 2026), and each change
-// used to send /api/home; GAS ran them all in turn. Only the value left after a short pause is asked for,
+// used to send /api/home. Only the value left after a short pause is asked for,
 // and the date already shown is not asked for again.
 const DATE_SETTLE_MS=400;
 let dateTimer=null;

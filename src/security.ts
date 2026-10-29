@@ -37,7 +37,7 @@ export function resolveSessionSecret(value = process.env.SESSION_SECRET) {
 
 const SESSION_MAX_AGE = 3600000;
 // Sessions a logout or a login (regenerate) ended, with when. A request sent before that (a photo, the home figures on
-// a slow GAS) still holds the old session and, with rolling, answers with its cookie. Arriving after the new session's
+// a slow disk) still holds the old session and, with rolling, answers with its cookie. Arriving after the new session's
 // cookie it would replace it, and the login form's token would then fail the CSRF check on every try until a reload.
 const endedSessions = new Map<string, number>();
 export function endSession(sessionID: string) {

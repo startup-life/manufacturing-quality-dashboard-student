@@ -5,7 +5,6 @@ import express from 'express';
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
 import crypto from 'node:crypto';
 import { AppModule } from './app.module';
-import { AppOptions, AppService } from './app.service';
 import { ErrorFilter } from './error.filter';
 import { routeName } from './pages.controller';
 import { security } from './security';
@@ -42,10 +41,9 @@ function requestLog(req: Request, res: Response, next: NextFunction) {
   next();
 }
 
-// The Nest app, ready to listen. A refused combination of switches throws before Nest starts (AppService).
-export async function createNestApp(options: AppOptions = {}) {
-  const service = new AppService(options);
-  const app = await NestFactory.create<NestExpressApplication>(AppModule.register(service), { bodyParser: false, logger: ['error', 'warn'], abortOnError: false });
+// The Nest app, ready to listen.
+export async function createNestApp() {
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, { bodyParser: false, logger: ['error', 'warn'], abortOnError: false });
   const instance: express.Express = app.getHttpAdapter().getInstance();
   app.disable('x-powered-by');
   // Only registration carries several photos; every other body keeps the smaller limit.
@@ -57,14 +55,11 @@ export async function createNestApp(options: AppOptions = {}) {
   instance.get('/healthz', (req, res) => { res.json({ status: 'ok' }); });
   security(app);
   app.useGlobalFilters(new ErrorFilter());
-  instance.locals.waitAiIdle = () => service.waitAiIdle();
-  instance.locals.scheduleLiveAi = (id: string, runId: string) => service.scheduleLiveAi(id, runId);
-  instance.locals.promptStore = service.promptStore;
   await app.init();
   return app;
 }
 
-// The Express app inside, for tests that serve it with http.createServer; app.locals carries waitAiIdle and scheduleLiveAi.
-export async function createApp(options: AppOptions = {}): Promise<express.Express> {
-  return (await createNestApp(options)).getHttpAdapter().getInstance();
+// The Express app inside, for tests that serve it with http.createServer.
+export async function createApp(): Promise<express.Express> {
+  return (await createNestApp()).getHttpAdapter().getInstance();
 }

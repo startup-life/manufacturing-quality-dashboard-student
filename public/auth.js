@@ -1,4 +1,4 @@
-import { api, el, resetWorkspace, renderRoute, navigate, applyStorageMode } from './app.js';
+import { api, el, resetWorkspace, renderRoute, navigate } from './app.js';
 import { initializeHome, clearHome } from './home.js';
 
 let user = null;
@@ -52,8 +52,6 @@ export async function checkSession() {
   resetWorkspace(!!user);
 
   if (user) {
-    // The storage mode needs a login to read; a failure keeps the page's own text.
-    api('/api/operations').then(applyStorageMode).catch(() => {});
     initializeHome(user, { load: false });
     await renderRoute();
   } else {
