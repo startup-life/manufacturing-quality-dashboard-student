@@ -424,6 +424,8 @@ function handleInspectionsCreateBatch(ss, payload, requestId) {
       inspected_at: inspectedAt,
       initial_weight_g: weightG !== null ? weightG : '',
       initial_decision: initialDecision,
+      memo: item.memo || '',
+      revision: item.revision || 'Rev.A',
       // Version 0 at registration, as in the mock store; each saved edit adds 1.
       content_version: 0,
       created_at: now.toISOString()
@@ -669,7 +671,8 @@ function inspectionView(insp, tabs) {
     inspected_at: effective.inspected_at,
     weight_g: measurement !== '' && measurement !== null ? Number(measurement) : null,
     // The latest edit's memo, as in the mock store.
-    memo: update ? update.memo : '',
+    memo: update ? update.memo : (insp.memo || ''),
+    revision: insp.revision || null,
     decision: insp.initial_decision || null,
     content_version: Number(insp.content_version ?? 1),
     original: {

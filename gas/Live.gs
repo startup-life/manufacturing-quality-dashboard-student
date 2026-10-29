@@ -34,6 +34,7 @@ function ensureLiveHeaders(ss) {
     inspection_images: ['mime'],
     photos: ['image_id','drive_file_id','sha256','mime','created_at'],
     inspection_updates: ['update_id','inspection_id','content_version','product_id','inspected_at','weight_g','memo','change_reason','created_at'],
+    inspections: ['memo','revision'],
     inspection_records: ['change_reason'],
     standards: ['rules_json']
     ,evidence_queries: ['result_json']
@@ -148,7 +149,7 @@ function updateLiveInspection(ss,payload,expectedVersion) {
   const weight=payload.weight_g===undefined?current.weight_g:payload.weight_g;
   if(weight!==null && (!Number.isFinite(Number(weight)) || Number(weight)<0))throw Object.assign(Error('실측 중량을 확인하세요.'),{code:'VALIDATION'});
   const version=current.content_version+1;
-  appendRow(ss,'inspection_updates',{update_id:'UPDATE-'+Utilities.getUuid(),inspection_id:current.inspection_id,content_version:version,product_id:product,inspected_at:payload.inspected_at||current.inspected_at,weight_g:weight===null?'':Number(weight),memo:payload.memo||'',change_reason:payload.change_reason||'',created_at:new Date().toISOString()});
+  appendRow(ss,'inspection_updates',{update_id:'UPDATE-'+Utilities.getUuid(),inspection_id:current.inspection_id,content_version:version,product_id:product,inspected_at:payload.inspected_at||current.inspected_at,weight_g:weight===null?'':Number(weight),memo:payload.memo===undefined?current.memo:(payload.memo||''),change_reason:payload.change_reason||'',created_at:new Date().toISOString()});
   updateLiveRow(ss,'inspections','inspection_id',current.inspection_id,{content_version:version});
   return handleInspectionsGet(ss,{id:current.inspection_id});
 }
