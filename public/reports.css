@@ -1,0 +1,10 @@
+#report-panel { min-width: 0; overflow-wrap: anywhere; }
+#report-panel .badge { white-space: normal; }
+#report-panel pre { white-space: pre-wrap; overflow-wrap: anywhere; font: inherit; }
+#report-panel label { margin-block: 12px; }
+#report-panel textarea { min-width: 0; resize: vertical; }
+#report-panel input[type="checkbox"] { width: auto; justify-self: start; }
+#report-panel summary { cursor: pointer; margin-block: 12px; }
+#report-panel dd { margin-inline-start: 12px; }
+.upload-preview {max-width:240px;max-height:240px;object-fit:contain;display:block;margin:12px 0;}
+.upload-preview[hidden] {display:none;}

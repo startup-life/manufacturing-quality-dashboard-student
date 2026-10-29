@@ -1,0 +1,74 @@
+.home-toolbar{display:flex;align-items:end;gap:12px;flex-wrap:wrap;margin:16px 0 24px}
+.home-toolbar label{display:flex;flex-direction:column;gap:8px;font-size:14px;font-weight:600;color:#3f586d}
+.home-toolbar input[type="date"]{min-height:44px;font-size:16px;padding:8px 12px;border:1px solid #bbcbd8;border-radius:6px}
+.btn-refresh{
+ background:#ffffff;color:#175f7d;border:1px solid #cbd7e2;padding:10px 18px;border-radius:6px;
+ font-size:14px;font-weight:600;min-height:44px;cursor:pointer;transition:background .15s,border-color .15s;
+}
+.btn-refresh:hover{background:#f0f4f8;border-color:#9fb3c8}
+
+.home-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin:24px 0 20px}
+.metric-box{position:relative;display:flex;flex-direction:column}
+.metric-card{
+ background:#fff;color:#172b46;border:1px solid #d8e2ec;border-radius:12px;padding:20px 18px;text-align:left;
+ min-height:150px;width:100%;box-sizing:border-box;display:flex;flex-direction:column;justify-content:space-between;
+ transition:border-color .15s,box-shadow .15s;cursor:pointer;
+}
+.metric-card:hover{border-color:#2265af;box-shadow:0 4px 12px rgba(34,101,175,0.08)}
+.metric-card[aria-pressed="true"]{outline:3px solid #2265af;border-color:#2265af;background:#f3f7fc}
+.metric-title{font-size:15px;font-weight:700;color:#28435d;display:block}
+.metric-card strong{display:block;font-size:36px;margin:8px 0;line-height:1.1;color:#122739}
+.metric-sub{font-size:14px;color:#5c7188;display:block;font-weight:400}
+
+.metric-help-btn{
+ position:absolute;top:12px;right:12px;width:44px;height:44px;min-width:44px;min-height:44px;border-radius:50%;
+ background:#edf4fa;color:#175f7d;border:1px solid #cadbe9;font-size:16px;font-weight:700;
+ display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer;z-index:3;
+ transition:background .15s,color .15s;
+}
+.metric-help-btn:hover{background:#175f7d;color:#fff}
+.metric-help-btn:focus-visible{outline:3px solid #b58013;outline-offset:2px}
+
+.metric-help-popover{
+ position:absolute;top:calc(100% + 8px);left:0;right:0;background:#ffffff;border:1px solid #c2d5e5;
+ border-radius:10px;box-shadow:0 8px 24px rgba(18,39,57,0.16);padding:16px;z-index:15;
+ font-size:14px;line-height:1.55;color:#172638;box-sizing:border-box;
+}
+.help-lead{font-weight:700;margin:0 0 6px 0;color:#175f7d;font-size:14px}
+.help-desc{margin:0 0 12px 0;color:#3d5266;font-size:14px}
+.help-close-btn{
+ background:#edf4fa;color:#175f7d;border:1px solid #cadbe9;border-radius:6px;
+ padding:10px 18px;font-size:14px;cursor:pointer;float:right;min-height:44px;font-weight:600;
+}
+.help-close-btn:hover{background:#d8e8f4}
+
+.decision{font-weight:700}
+.decision.HOLD{color:#9c6300}
+.decision.NG{color:#ad2835}
+.decision.OK{color:#1a7f45}
+.decision.UNJUDGED{color:#5f6368}
+
+#home-status.error{color:#ad2835;font-weight:600;font-size:14px}
+#auth-panel.compact-auth{display:flex;justify-content:flex-end;align-items:center;gap:16px;padding:12px 20px;margin:16px 0;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px}
+#auth-panel.compact-auth p{margin:0;font-weight:600;color:#28435d}
+
+.product,.recent-product-card{display:flex;flex-direction:column;min-width:0;border:1px solid #dce5ec;border-radius:12px;background:#fff;overflow:hidden}
+.product img,.recent-product-card img{width:100%;height:200px;object-fit:contain;background:#edf1f5}
+.product>div,.recent-product-card>div{padding:16px;display:flex;flex-direction:column;flex:1}
+.product button,.recent-product-card button{margin-top:auto;min-height:44px}
+.product h3,.recent-product-card h3{overflow-wrap:anywhere}
+#home-records-cards{margin-top:16px;align-items:stretch}
+#home-records-cards>p{grid-column:1/-1}
+
+@media(max-width:960px){
+ .home-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
+@media(max-width:650px){
+ .home-metrics{grid-template-columns:minmax(0,1fr);gap:12px}
+ .metric-card{padding:16px;min-height:130px}
+ .metric-card strong{font-size:30px}
+ .home-toolbar button{min-height:44px}
+ #auth-panel.compact-auth{flex-direction:column;align-items:stretch;gap:12px}
+ #auth-panel.compact-auth button{width:100%}
+}

@@ -1,0 +1,18 @@
+# 기본은 LF로 저장소에 넣고 작업 트리에도 LF로 꺼낸다(Windows 체크아웃 포함). 아래 줄이 위 줄보다 우선한다.
+* text=auto eol=lf
+*.csv text eol=crlf
+*.mjs text eol=lf
+*.sh text eol=lf
+*.ps1 text eol=crlf
+*.cmd text eol=crlf
+*.xlsx binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.woff binary
+*.woff2 binary

@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>텀블러 공장 · 제조품질관리</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/reports.css">
+  <link rel="stylesheet" href="/home.css">
+</head>
+<body>
+  <header class="site-header" id="site-header">
+    <div class="header-inner">
+      <a class="brand" href="/" data-nav="home" aria-label="텀블러 공장 제조품질관리">
+        <img class="brand-logo" src="/assets/tumble-factory-logo.png" alt="" width="36" height="36">
+        <span class="brand-text"><strong>텀블러공장</strong><span class="brand-descriptor">제조품질관리</span></span>
+      </a>
+      <div class="header-actions" id="header-actions" hidden>
+        <a href="/settings" data-path="/settings" id="nav-settings" class="nav-settings-link">설정</a>
+        <span id="user-info" class="user-badge">작성자(writer)</span>
+        <button id="logout-btn" type="button" class="btn-logout">로그아웃</button>
+        <button id="menu-toggle" class="menu-toggle" type="button" aria-label="메뉴 열기" aria-controls="mobile-nav-menu" aria-expanded="false">
+          <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+        </button>
+      </div>
+    </div>
+    <div id="mobile-nav-menu" class="mobile-nav-menu" hidden>
+      <a href="/settings" data-path="/settings">설정</a>
+    </div>
+  </header>
+
+  <main id="main">
+    <section id="session-loading" class="panel" role="status" aria-live="polite">
+      <h1>텀블러 공장 제조품질관리</h1>
+      <p>로그인 상태를 확인하는 중입니다. 화면은 먼저 준비하고 있습니다.</p>
+    </section>
+    <section class="panel auth-panel-wrap" id="auth-panel" hidden></section>
+
+    <div id="content-container" hidden>
+      <div class="notice global-notice">
+        AI 분석 결과는 보조 자료이며 품질 담당자의 확인이 필요합니다. 최종 출하 승인은 현장 기준에 따라 별도로 진행하세요.
+      </div>
+
+      <!-- 1. Home Panel -->
+      <section id="home-panel" hidden>
+        <div class="home-toolbar">
+          <label>집계일 <input id="home-date" type="date"></label>
+          <button id="home-refresh" type="button" class="btn-refresh">새로고침</button>
+          <a href="/inspections/new" id="home-action" class="btn-action primary">사진 등록</a>
+        </div>
+        <p id="home-status" role="status" aria-live="polite"></p>
+        <button id="home-retry" type="button" hidden>다시 조회</button>
+
+        <div class="home-metrics">
+          <div class="metric-box">
+            <button type="button" class="metric-card" data-metric="total" aria-pressed="false">
+              <span class="metric-title">검사 건수</span>
+              <strong id="home-total">—</strong>
+              <span class="metric-sub">선택일 전체 검사 수량</span>
+            </button>
+            <button type="button" class="metric-help-btn" data-help-target="help-total" aria-label="검사 건수 도움말" aria-expanded="false">?</button>
+            <div id="help-total" class="metric-help-popover" hidden>
+              <p class="help-lead">선택한 집계일의 전체 검사 수량입니다.</p>
+              <p class="help-desc">검사번호(ID) 기준으로 중복 없이 집계하며, 집계일 기본값은 시스템에 저장된 최근 검사일입니다.</p>
+              <button type="button" class="help-close-btn" data-help-close="help-total">닫기</button>
+            </div>
+          </div>
+
+          <div class="metric-box">
+            <button type="button" class="metric-card" data-metric="ng" aria-pressed="false">
+              <span class="metric-title">NG 건수</span>
+              <strong id="home-ng">—</strong>
+              <span class="metric-sub">사용자 최신 판정 NG</span>
+            </button>
+            <button type="button" class="metric-help-btn" data-help-target="help-ng" aria-label="NG 건수 도움말" aria-expanded="false">?</button>
+            <div id="help-ng" class="metric-help-popover" hidden>
+              <p class="help-lead">품질 기준에 미달하여 NG로 판정된 검사 수량입니다.</p>
+              <p class="help-desc">작업자가 다시 기록한 최신 판정을 우선 반영하며, 작업자 기록이 없으면 최초 검사 판정을 사용합니다. AI 초안 판정은 집계에 포함되지 않습니다.</p>
+              <button type="button" class="help-close-btn" data-help-close="help-ng">닫기</button>
+            </div>
+          </div>
+
+          <div class="metric-box">
+            <button type="button" class="metric-card" data-metric="hold" aria-pressed="false">
+              <span class="metric-title">HOLD 건수</span>
+              <strong id="home-hold">—</strong>
+              <span class="metric-sub">품질 보류 (미측정 등)</span>
+            </button>
+            <button type="button" class="metric-help-btn" data-help-target="help-hold" aria-label="HOLD 건수 도움말" aria-expanded="false">?</button>
+            <div id="help-hold" class="metric-help-popover" hidden>
+              <p class="help-lead">추가 확인이나 중량 실측이 필요하여 보류(HOLD)된 수량입니다.</p>
+              <p class="help-desc">작업자의 최신 판정을 기준으로 집계되며, 최초 판정 또는 중량 이탈 보류 건을 포함합니다. AI 초안 판정은 집계에 포함되지 않습니다.</p>
+              <button type="button" class="help-close-btn" data-help-close="help-hold">닫기</button>
+            </div>
+          </div>
+
+          <div class="metric-box">
+            <button type="button" class="metric-card" data-metric="pending" aria-pressed="false">
+              <span class="metric-title">보고서 검토 대기</span>
+              <strong id="home-pending">—</strong>
+              <span class="metric-sub">출처 대조 전 · 검토 필요 · 재검토</span>
+            </button>
+            <button type="button" class="metric-help-btn" data-help-target="help-pending" aria-label="보고서 검토 대기 도움말" aria-expanded="false">?</button>
+            <div id="help-pending" class="metric-help-popover" hidden>
+              <p class="help-lead">AI 판독 결과 가운데 3번 탭 출처 대조로 확인을 마치지 않은 수량입니다.</p>
+              <p class="help-desc">출처 대조를 아직 하지 않았거나 '검토 필요'로 저장한 검사, 그리고 AI가 본 사진·중량·제품이 바뀌어 판독 결과가 예전 것이 된 검사가 해당됩니다. 판단 저장이나 메모·검사일시 수정은 검토 완료를 바꾸지 않습니다. 출처 대조를 '일치'로 저장하면 검토 완료로 보고 빠집니다. 판독 결과가 없는 검사는 제외되며, NG·HOLD 건과 중복될 수 있습니다. 검토 완료는 보고서 확인을 뜻하며 최종 출하 승인을 의미하지 않습니다.</p>
+              <button type="button" class="help-close-btn" data-help-close="help-pending">닫기</button>
+            </div>
+          </div>
+        </div>
+
+        <section class="panel" id="home-records-panel">
+          <div class="section-head">
+            <h2>검사 기록</h2>
+            <span class="badge">선택일 기준 검사 목록</span>
+          </div>
+          <p class="muted">집계일 또는 수치 카드로 필터링된 검사 기록 목록입니다. 사진 썸네일과 제품, 판정 상태를 확인하세요.</p>
+          <div id="home-records-cards" class="cards"></div>
+          <div class="row pagination-row" id="home-pagination-row">
+            <button id="home-prev" type="button">이전</button>
+            <span id="home-page-status"></span>
+            <button id="home-next" type="button">다음</button>
+          </div>
+        </section>
+      </section>
+
+      <!-- 3. Single Inspection Registration Panel -->
+      <section class="panel" id="register-panel" hidden>
+        <div class="section-head">
+          <h2>사진으로 검사 등록</h2>
+          <span class="badge">검사 1건 등록</span>
+        </div>
+        <p class="muted">텀블러 한 개를 검사 1건으로 등록합니다. 같은 텀블러의 다른 각도 사진은 함께 넣고, 다른 텀블러는 따로 등록하세요.</p>
+        <p class="form-help">검사번호는 등록할 때 자동으로 만들어집니다. 불량명이나 내 판단은 지금 입력하지 않아도 됩니다.</p>
+
+        <form id="single-register-form" class="register-card-form">
+          <!-- Step A: Photo Selection & Upload -->
+          <div class="form-section">
+            <h3 class="form-section-title">1. 검사 사진 선택</h3>
+            <div class="row file-upload-row">
+              <label class="btn-file-label">
+                <span>사진 파일 선택</span>
+                <input type="file" id="reg-file-input" multiple accept="image/jpeg,image/png,image/webp" aria-describedby="reg-photo-help">
+              </label>
+              <button type="button" id="reg-clear-photo-btn" class="btn-action secondary" hidden>선택한 사진 모두 제거</button>
+            </div>
+            <p class="form-help" id="reg-photo-help">JPG·PNG·WebP, 사진 한 장당 4MB 이하, 최대 8장. 첫 사진이 대표 사진입니다. 등록 전에는 사진이 저장되지 않습니다.</p>
+            <div id="reg-photo-preview-grid" class="photo-preview-grid">
+              <div class="empty-photo-notice">사진을 선택하면 여기에 미리보기가 표시됩니다.</div>
+            </div>
+          </div>
+
+          <!-- Step B: Product & Date -->
+          <div class="form-section">
+            <h3 class="form-section-title">2. 제품 및 검사일시</h3>
+            <div class="grid-2">
+              <label>제품 선택
+                <select id="reg-product-select" required>
+                  <option value="">제품을 선택하세요</option>
+                  <option value="P-SILVER">은색 텀블러</option>
+                  <option value="P-WHITE">흰색 텀블러</option>
+                  <option value="P-BLACK">검정 텀블러</option>
+                </select>
+              </label>
+              <label>검사일시 (한국시간)
+                <input type="datetime-local" id="reg-inspected-at" step="1" required>
+              </label>
+            </div>
+            <details class="registration-standard">
+              <summary>적용할 검사기준 확인·변경</summary>
+              <div class="grid-2">
+              <label>적용 기준 버전
+                <select id="reg-revision-select">
+                  <option value="Rev.A">Rev.A (초기 표준)</option>
+                  <option value="Rev.B">Rev.B (개정 공정 표준)</option>
+                </select>
+              </label>
+              <div class="standard-preview-box">
+                <span class="info-label">적용 기준 안내:</span>
+                <span id="reg-standard-summary">로딩 중...</span>
+              </div>
+              </div>
+            </details>
+          </div>
+
+          <!-- Step C: Weight & Memo -->
+          <div class="form-section">
+            <h3 class="form-section-title">3. 측정값·메모 (선택)</h3>
+            <label>실측 중량 (g)
+              <input type="number" id="reg-weight-input" min="0" max="9999999" step="0.1" placeholder="측정하지 않았다면 비워 두세요" aria-describedby="reg-weight-help reg-weight-range-text">
+            </label>
+            <div class="weight-guidance" id="reg-weight-guidance">
+              <span class="guidance-icon">ℹ️</span>
+              <span id="reg-weight-range-text">실측 중량 허용 범위: 로딩 중...</span>
+            </div>
+            <p class="form-help" id="reg-weight-help">
+              저울로 측정한 값이나 교재에서 받은 값만 입력하세요. 사진으로 중량을 추정하지 않습니다. 비워 두면 ‘미측정’으로 저장되며, 종합 정상 판단은 할 수 없습니다.
+            </p>
+
+            <label>확인할 내용 메모
+              <textarea id="reg-memo-input" rows="3" maxlength="2000" placeholder="예: 바닥 쪽에 긁힌 흔적이 보여 확인이 필요합니다."></textarea>
+            </label>
+          </div>
+
+          <div class="form-actions">
+            <h3>등록할 내용</h3>
+            <p id="reg-save-summary" class="registration-summary" aria-live="polite"></p>
+            <p id="reg-storage-notice" class="form-help">등록한 뒤 상세 화면에서 AI 결과 확인 → 검사기준 비교 → 내 판단 기록 순서로 진행합니다.</p>
+            <p id="reg-status-message" role="status" aria-live="polite"></p>
+            <div class="registration-actions">
+              <button type="submit" id="reg-submit-btn" class="btn-action primary btn-lg">검사 등록하고 결과 확인</button>
+              <a href="/" class="registration-cancel">취소하고 품질 현황으로</a>
+            </div>
+          </div>
+        </form>
+      </section>
+
+      <!-- Inspection Detail Panel (4-Step View) -->
+      <section class="panel" id="detail" hidden></section>
+
+      <!-- 5. Settings Panel -->
+      <section class="panel" id="settings-panel" hidden>
+        <div id="prompt-settings" class="prompt-settings" aria-label="자연어 지시문 설정"></div>
+        <div class="section-head">
+          <h2>시스템 및 외부 연동 설정</h2>
+          <span class="badge">설정 및 상태 점검</span>
+        </div>
+        <p class="muted">Google Apps Script, Google Sheets, Drive 및 로컬 NotebookLM MCP 서버 연동 상태를 확인합니다.</p>
+
+        <div class="settings-grid">
+          <article class="setting-card">
+            <h3>Google Sheets & GAS 연동 상태</h3>
+            <p id="settings-storage-provider">저장소 프로바이더: <strong>Google Apps Script / Sheets (13개 탭 스키마)</strong></p>
+            <p class="muted">스프레드시트를 업무 정본 DB로 사용하여 검사, 판정, 이력을 안전하게 영구 보존합니다.</p>
+            <ul class="settings-detail-list">
+              <li>동시성 제어: ScriptLock 기반 직렬화</li>
+              <li>보안: 수식 주입 방어 (=, +, -, @ 차단) 및 bcrypt 인증 검증</li>
+              <li>무결성: 멱등성 키 기반 중복 등록 방지</li>
+            </ul>
+          </article>
+
+          <article class="setting-card">
+            <h3>NotebookLM MCP 로컬 연동 상태</h3>
+            <p>연결 상태: <strong id="settings-mcp-status" class="status-badge warning">연결 준비 필요</strong></p>
+            <p class="muted">바이너리: <code>notebooklm-mcp</code> (MCP 설정 파일의 command 경로, 로컬 stdio 전송)</p>
+            <p class="muted">NOTEBOOKLM_MODE=live이면 이 서버에서 실제 질의가 한 번 성공한 뒤 '정상 연결'로 바뀌고, 서버를 다시 시작하면 다음 질의가 성공할 때까지 '연결 준비 필요'로 보입니다. 표준서(Rev.A/B) 근거는 검사 상세에서 대조·저장합니다.</p>
+          </article>
+
+          <article class="setting-card">
+            <h3>Gemini 연결 상태</h3>
+            <p id="settings-ai-mode">판독 연결: <strong>연결 상태 조회 중…</strong></p>
+            <p id="settings-ai-model" hidden></p>
+            <p class="muted">기본 모델이 붐비거나 API 한도에 걸리면 대체 모델로 한 번 다시 판독합니다(GEMINI_FALLBACK_MODEL=off이면 하지 않습니다). 한도 초과는 판독 실패로 표시하며, 근거 부족에 따른 제품 보류와 구분합니다. 출하 승인은 지원하지 않습니다.</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- 6. Not Found Panel -->
+      <section class="panel" id="not-found-panel" hidden>
+        <div class="section-head"><h2 id="not-found-title">페이지를 찾을 수 없습니다</h2></div>
+        <p id="not-found-message">요청하신 페이지 경로가 올바르지 않거나 검사 기록이 존재하지 않습니다. 경로를 다시 확인해 주세요.</p>
+        <div class="row nav-back-row">
+          <a href="/" class="btn-action">품질 현황(홈)으로 이동</a>
+        </div>
+      </section>
+    </div>
+
+    <footer>
+      텀블러 공장 품질관리 시스템입니다. 품질 기록 정본은 Google Sheets에 안전하게 저장되며 담당자가 직접 검토합니다.
+    </footer>
+  </main>
+
+  <script type="module" src="/app.js"></script>
+  <script type="module" src="/auth.js"></script>
+</body>
+</html>

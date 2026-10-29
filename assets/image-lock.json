@@ -1,0 +1,774 @@
+{
+  "repository": "startup-life/manufacturing-quality-student-images",
+  "commit": "d69540e407846363ee87b75da69b79f69b8fb6d5",
+  "assets": [
+    {
+      "id": "IMG-001",
+      "source_path": "assets/dataset/images/TUM-PRC-025.jpg",
+      "sha256": "002f74f5d1b5702d4dc1af0e9eb5298203632a059237b793b5c68947ca7a78c0",
+      "split": "val"
+    },
+    {
+      "id": "IMG-003",
+      "source_path": "assets/dataset/images/TUM-REF-002.jpg",
+      "sha256": "0180093cfb3f9f874172c23b77ab6490ff21012ccf10c1d6df39b750c62b6afd",
+      "split": "train"
+    },
+    {
+      "id": "IMG-004",
+      "source_path": "assets/dataset/images/TUM-REF-022.jpg",
+      "sha256": "01accc8b0a8d38c34dc582e0e183ad865659c1b8fd52a0461cad562b92ca0758",
+      "split": "train"
+    },
+    {
+      "id": "IMG-005",
+      "source_path": "assets/dataset/images/TUM-REF-055.jpg",
+      "sha256": "024e57d75ff1577b8e076c0066a9898f7da9042d015e72ff6fd9d0456712dc76",
+      "split": "train"
+    },
+    {
+      "id": "IMG-007",
+      "source_path": "assets/dataset/images/TUM-REF-047.jpg",
+      "sha256": "04fd75d2acd1fbf342450c33392adce98affd44b5e199626793c82d44c6e1365",
+      "split": "train"
+    },
+    {
+      "id": "IMG-008",
+      "source_path": "assets/dataset/images/TUM-PRC-022.jpg",
+      "sha256": "0519c1cad74905982a69a04fe5e7e128d7082f39f8fd890a120c278748ff8507",
+      "split": "val"
+    },
+    {
+      "id": "IMG-011",
+      "source_path": "assets/dataset/images/TUM-REF-038.jpg",
+      "sha256": "06c1bd36c067e0020dfd55ef31aec5bdd81065ebff653888e98f61c3c38c1660",
+      "split": "train"
+    },
+    {
+      "id": "IMG-012",
+      "source_path": "assets/dataset/images/TUM-REF-029.jpg",
+      "sha256": "07cf5683c7d8c986f7b8e2aa6fdd34d37f0910a8f67156d2db29492040332d9b",
+      "split": "train"
+    },
+    {
+      "id": "IMG-013",
+      "source_path": "assets/dataset/images/TUM-PRC-034.jpg",
+      "sha256": "086b48962f249c57437cdd8478003876af14efb79aefb46f59feeb17738912a5",
+      "split": "val"
+    },
+    {
+      "id": "IMG-014",
+      "source_path": "assets/dataset/images/TUM-PRC-028.jpg",
+      "sha256": "093a0bcd4b211b343bdcaab78b968a7db2404f0062c11c52ea9cb9f8733a2b0b",
+      "split": "val"
+    },
+    {
+      "id": "IMG-015",
+      "source_path": "assets/dataset/images/TUM-REF-041.jpg",
+      "sha256": "0944fc9adf57dd2661fa18d0197d5db5a98a82c3643b9ce2b8ae69593b933344",
+      "split": "train"
+    },
+    {
+      "id": "IMG-016",
+      "source_path": "assets/dataset/images/TUM-PRC-012.jpg",
+      "sha256": "095ae54153a57d8f7a958fc9a18e56a8729d89b3bcfd5e031ab9ae04e2c80dfd",
+      "split": "val"
+    },
+    {
+      "id": "IMG-017",
+      "source_path": "assets/dataset/images/TUM-REF-064.jpg",
+      "sha256": "0e8b6130f181383bed096c98b2c89768532445d2873446c84be2981f554e1e48",
+      "split": "train"
+    },
+    {
+      "id": "IMG-019",
+      "source_path": "assets/dataset/images/TUM-PRC-032.jpg",
+      "sha256": "0f96b60745d0dd1d15687001b9a4b9bf913aa848f70feb3093dbef0910b31be3",
+      "split": "val"
+    },
+    {
+      "id": "IMG-021",
+      "source_path": "assets/dataset/images/TUM-PRC-057.jpg",
+      "sha256": "110523f4cc2b2111190d2c7b6fe2862c81ff4093f7888ac040a3646b2797f852",
+      "split": "val"
+    },
+    {
+      "id": "IMG-022",
+      "source_path": "assets/dataset/images/TUM-REF-054.jpg",
+      "sha256": "13393fe175526fd5ad470f1ccdaae5ef851b737c52bd997ca39ce8176d4ad9b4",
+      "split": "train"
+    },
+    {
+      "id": "IMG-023",
+      "source_path": "assets/dataset/images/TUM-REF-042.jpg",
+      "sha256": "135be40060dbebbb741ad5f2c8e8a8fa19aaa33009820e898d3381705f30ff93",
+      "split": "train"
+    },
+    {
+      "id": "IMG-024",
+      "source_path": "assets/dataset/images/TUM-REF-025.jpg",
+      "sha256": "14371ca76c72f748e570389e0aaea2d0ab31a9c963dab3faad2d330d70b4554d",
+      "split": "train"
+    },
+    {
+      "id": "IMG-025",
+      "source_path": "assets/dataset/images/TUM-PRC-055.jpg",
+      "sha256": "14a7d28dfeb4618ca50f477d58d44d7e49bf05555ca50183e248806817f6b82a",
+      "split": "val"
+    },
+    {
+      "id": "IMG-026",
+      "source_path": "assets/dataset/images/TUM-PRC-059.jpg",
+      "sha256": "14b0bc34dcff0592948dd72b497fa6c52af78c2efbf88465df12f34b53268ba4",
+      "split": "val"
+    },
+    {
+      "id": "IMG-027",
+      "source_path": "assets/dataset/images/TUM-REF-044.jpg",
+      "sha256": "171792a92a96451081b80b54715169407322426900de1f6b203c503888472fe2",
+      "split": "train"
+    },
+    {
+      "id": "IMG-028",
+      "source_path": "assets/dataset/images/TUM-PRC-040.jpg",
+      "sha256": "177501dddde2a7bf6309037b7fb6be1955cd372b0e5280e026486897eb32244f",
+      "split": "val"
+    },
+    {
+      "id": "IMG-031",
+      "source_path": "assets/dataset/images/TUM-REF-031.jpg",
+      "sha256": "18cb62122ef0645bf80c6b340b5b7a13319f103b096bc1f5ae3b3c7506d09a79",
+      "split": "train"
+    },
+    {
+      "id": "IMG-032",
+      "source_path": "assets/dataset/images/TUM-REF-006.jpg",
+      "sha256": "18f7204d0cf97001b00344c400a519da38020f5e67d31c0e735f34af73ad7ea8",
+      "split": "train"
+    },
+    {
+      "id": "IMG-033",
+      "source_path": "assets/dataset/images/TUM-PRC-058.jpg",
+      "sha256": "194317d01cc5fc29d26e4b1685aa656675877b415559bcb042ad37413ef8b9f6",
+      "split": "val"
+    },
+    {
+      "id": "IMG-034",
+      "source_path": "assets/dataset/images/TUM-REF-004.jpg",
+      "sha256": "1e6ab69abdf0f2dfa709ee60e0496268562c9ba6846228887885c1d8790d2941",
+      "split": "train"
+    },
+    {
+      "id": "IMG-035",
+      "source_path": "assets/dataset/images/TUM-PRC-035.jpg",
+      "sha256": "1ebd24b5d7d3f5587cdebf43268586299845ba6059b1d0a0f667b9f1b711a853",
+      "split": "val"
+    },
+    {
+      "id": "IMG-036",
+      "source_path": "assets/dataset/images/TUM-REF-037.jpg",
+      "sha256": "1ece79e83b284fe0afc2740d0518bc0af86f68eac6fda907d5ea1dd890ae94e3",
+      "split": "train"
+    },
+    {
+      "id": "IMG-037",
+      "source_path": "assets/dataset/images/TUM-REF-043.jpg",
+      "sha256": "1f750dfe96ea6d2291012c5923b26392b69592da2274a95b0778b2e64629aa5a",
+      "split": "train"
+    },
+    {
+      "id": "IMG-038",
+      "source_path": "assets/dataset/images/TUM-REF-018.jpg",
+      "sha256": "2114b55478c6030c4a6b80ca7a9815698d0747ba8faa1d4587038c6c0659c441",
+      "split": "train"
+    },
+    {
+      "id": "IMG-039",
+      "source_path": "assets/dataset/images/TUM-PRC-009.jpg",
+      "sha256": "22424aa6372d1f30807c48cd488645d2b9d96f0b5b70555f66c1e954cb08d2d7",
+      "split": "val"
+    },
+    {
+      "id": "IMG-040",
+      "source_path": "assets/dataset/images/TUM-REF-010.jpg",
+      "sha256": "23f6711521a0c996eaf37411c36dc40cb49425365bac36622e76a021cdb2ff78",
+      "split": "train"
+    },
+    {
+      "id": "IMG-043",
+      "source_path": "assets/dataset/images/TUM-REF-035.jpg",
+      "sha256": "29f86688fb6b3aad8040a20d8fec2079cb7f745f16a1980d13fa076e22fb8c5d",
+      "split": "train"
+    },
+    {
+      "id": "IMG-044",
+      "source_path": "assets/dataset/images/TUM-REF-007.jpg",
+      "sha256": "2b8dabf4e8e01d87d6250356c0130c01f2656fc1f0001a05a7bdf3167a5b41e6",
+      "split": "train"
+    },
+    {
+      "id": "IMG-045",
+      "source_path": "assets/dataset/images/TUM-PRC-061.jpg",
+      "sha256": "2c76f25ad9cb0e28c28cee9cb98b53912e50654139ebacd9afd17690bc23c9ec",
+      "split": "val"
+    },
+    {
+      "id": "IMG-046",
+      "source_path": "assets/dataset/images/TUM-PRC-039.jpg",
+      "sha256": "2c92d812b493110e895d62cbd88d190cf7e0a6c4de13b6121809ec35a893070f",
+      "split": "val"
+    },
+    {
+      "id": "IMG-049",
+      "source_path": "assets/dataset/images/TUM-REF-040.jpg",
+      "sha256": "2e2bc3247dabf64ab078d0b4dfce88ea0057da82100cbe2282f489be27536037",
+      "split": "train"
+    },
+    {
+      "id": "IMG-051",
+      "source_path": "assets/dataset/images/TUM-PRC-043.jpg",
+      "sha256": "30e2ad68edce19f7b2c9f610378e38db5ee85b130fb372aa4247a8235e66fdab",
+      "split": "val"
+    },
+    {
+      "id": "IMG-052",
+      "source_path": "assets/dataset/images/TUM-REF-039.jpg",
+      "sha256": "340332f60c60853c5ea23a0906c8d08b7d51a8ad5506d74dd84c71d71dbaface",
+      "split": "train"
+    },
+    {
+      "id": "IMG-053",
+      "source_path": "assets/dataset/images/TUM-PRC-001.jpg",
+      "sha256": "34f20293dbda9bbb29f2be24a3f7148d2045595eaf0225736da4de0d7fff50b7",
+      "split": "val"
+    },
+    {
+      "id": "IMG-054",
+      "source_path": "assets/dataset/images/TUM-REF-024.jpg",
+      "sha256": "3661dac841d504c6c5fda390e91f0a660b96a518cca740da04e7f6cddc1812ae",
+      "split": "train"
+    },
+    {
+      "id": "IMG-055",
+      "source_path": "assets/dataset/images/TUM-REF-058.jpg",
+      "sha256": "36669f0a1d0170d45039a5ed8654db13297d7cef562ee04a1b4985486769ddb1",
+      "split": "train"
+    },
+    {
+      "id": "IMG-056",
+      "source_path": "assets/dataset/images/TUM-PRC-064.jpg",
+      "sha256": "3885fb3caf488111bf5052a50e1eb882b60dbc14709008aa260c5e4b44d21ba8",
+      "split": "val"
+    },
+    {
+      "id": "IMG-057",
+      "source_path": "assets/dataset/images/TUM-PRC-053.jpg",
+      "sha256": "391e5baeb30b801b0ee9ca340a1ae1a9383e5624e6d72d8a745c9b87350feb64",
+      "split": "val"
+    },
+    {
+      "id": "IMG-060",
+      "source_path": "assets/dataset/images/TUM-PRC-045.jpg",
+      "sha256": "405a9a752425a98a6319dbc343fd74502b37b16fd9a5c2b9759408c1b87ce6df",
+      "split": "val"
+    },
+    {
+      "id": "IMG-061",
+      "source_path": "assets/dataset/images/TUM-REF-019.jpg",
+      "sha256": "412c76f4dc59e3b86a33ab773f0bb73d95c9ca333a01a5709d7e1f981df5d6b9",
+      "split": "train"
+    },
+    {
+      "id": "IMG-062",
+      "source_path": "assets/dataset/images/TUM-PRC-056.jpg",
+      "sha256": "419d43eb6cef20ec28186cb033e1e35ce93b3f181e56f01a300da35ba6077fc0",
+      "split": "val"
+    },
+    {
+      "id": "IMG-063",
+      "source_path": "assets/dataset/images/TUM-PRC-041.jpg",
+      "sha256": "46aa27959babfb5131791aed43e447d6ac0ec5f27aceac0b4de8e136fb24a811",
+      "split": "val"
+    },
+    {
+      "id": "IMG-066",
+      "source_path": "assets/dataset/images/TUM-PRC-048.jpg",
+      "sha256": "4979dd98a56cbcb0e09a56d9fce3d307ef3324cd006bf9f66dc9110fd56ab939",
+      "split": "val"
+    },
+    {
+      "id": "IMG-068",
+      "source_path": "assets/dataset/images/TUM-REF-017.jpg",
+      "sha256": "4b5f8f47987c5d9b67b7ee4d10fc4f2161dbc6579245ec719e1d46dce5d276a1",
+      "split": "train"
+    },
+    {
+      "id": "IMG-069",
+      "source_path": "assets/dataset/images/TUM-PRC-047.jpg",
+      "sha256": "4d36a40d3a0e959b779fdced41d732597a81971c88cb778ff31570cb9e2ab2f3",
+      "split": "val"
+    },
+    {
+      "id": "IMG-070",
+      "source_path": "assets/dataset/images/TUM-REF-014.jpg",
+      "sha256": "5036a799f1eb2cda4f4e6e75b3a2a797dec5ca006d4d0b96598d08eb2eb657c6",
+      "split": "train"
+    },
+    {
+      "id": "IMG-073",
+      "source_path": "assets/dataset/images/TUM-PRC-062.jpg",
+      "sha256": "51fe8d9fd9203a439ce9d1da50f36eef3e72e69623e1302934fe64a546221c57",
+      "split": "val"
+    },
+    {
+      "id": "IMG-074",
+      "source_path": "assets/dataset/images/TUM-REF-061.jpg",
+      "sha256": "5219b5aad0065f3b3158028d5fdc8b58412152a3b2b393216afa0d8ecd6f7e88",
+      "split": "train"
+    },
+    {
+      "id": "IMG-075",
+      "source_path": "assets/dataset/images/TUM-REF-026.jpg",
+      "sha256": "53a389bfb5c88e3db5fb88a49920ea62948ec48d42f97c38d023a8e00f29f962",
+      "split": "train"
+    },
+    {
+      "id": "IMG-076",
+      "source_path": "assets/dataset/images/TUM-REF-046.jpg",
+      "sha256": "5433abb75f5a5e8038722c2d2d9e27e033435e581b3566e9d595429e27e9a111",
+      "split": "train"
+    },
+    {
+      "id": "IMG-078",
+      "source_path": "assets/dataset/images/TUM-PRC-023.jpg",
+      "sha256": "55eea989e86a91f869abba5ce60f4bbaf28e83918ec372eaf03fdd500f5d32a4",
+      "split": "val"
+    },
+    {
+      "id": "IMG-079",
+      "source_path": "assets/dataset/images/TUM-REF-021.jpg",
+      "sha256": "5745a9efa58b82f6b1fb8dfc38abb71f667f9ba62f7a09d36532439aa3c423fd",
+      "split": "train"
+    },
+    {
+      "id": "IMG-080",
+      "source_path": "assets/dataset/images/TUM-REF-045.jpg",
+      "sha256": "58d50606c9e2f07518f7c7f3a5885df7ec618b505ed77a569142f2cb978911c6",
+      "split": "train"
+    },
+    {
+      "id": "IMG-081",
+      "source_path": "assets/dataset/images/TUM-PRC-036.jpg",
+      "sha256": "5b1f6a35d1bf04ffcbcceb817291ae4d5b51860dfb66f7cc819635338f1641bc",
+      "split": "val"
+    },
+    {
+      "id": "IMG-082",
+      "source_path": "assets/dataset/images/TUM-REF-015.jpg",
+      "sha256": "5cafd1b1d2ae3bd321328c972cd0b563a1cf1b3854b3c0d68419a401bc2356ca",
+      "split": "train"
+    },
+    {
+      "id": "IMG-083",
+      "source_path": "assets/dataset/images/TUM-REF-011.jpg",
+      "sha256": "607f62526cd6dc1fe054c199921fcbe2374702221e2af9af37a9e80d59ddbe7b",
+      "split": "train"
+    },
+    {
+      "id": "IMG-085",
+      "source_path": "assets/dataset/images/TUM-REF-008.jpg",
+      "sha256": "6185f12a9b8b34c1efaa159d9125442647db211f49b7f33745ae06a5e8e9c3cd",
+      "split": "train"
+    },
+    {
+      "id": "IMG-087",
+      "source_path": "assets/dataset/images/TUM-REF-059.jpg",
+      "sha256": "62d51bd7ac7c7eed6c22350d555ae2ba60857c453b5264d2211c8948109d8e3d",
+      "split": "train"
+    },
+    {
+      "id": "IMG-089",
+      "source_path": "assets/dataset/images/TUM-REF-023.jpg",
+      "sha256": "642bfceec7b23a216d3f7397f4d86d10251964c2e5d4e4283ca4f481a55b9cfc",
+      "split": "train"
+    },
+    {
+      "id": "IMG-090",
+      "source_path": "assets/dataset/images/TUM-PRC-002.jpg",
+      "sha256": "64d670a2a2c0e8a4f52c3018dd72a5b334c2f13488bde1e4697b8ea0dbd1bd9b",
+      "split": "val"
+    },
+    {
+      "id": "IMG-093",
+      "source_path": "assets/dataset/images/TUM-PRC-018.jpg",
+      "sha256": "6832282edb18811d136b57ec91ba266c99b7455ee96ea40d03452fc9b0f4543f",
+      "split": "val"
+    },
+    {
+      "id": "IMG-094",
+      "source_path": "assets/dataset/images/TUM-PRC-010.jpg",
+      "sha256": "68cb3d2948f2c02f9c24e0c71e1a01a2118ff2c96f89c145adcb2796c621dd43",
+      "split": "val"
+    },
+    {
+      "id": "IMG-095",
+      "source_path": "assets/dataset/images/TUM-PRC-020.jpg",
+      "sha256": "6c1cfaac29ea89e197db77986facd902c967c261c9908202dabdb0e303b757c5",
+      "split": "val"
+    },
+    {
+      "id": "IMG-105",
+      "source_path": "assets/dataset/images/TUM-PRC-026.jpg",
+      "sha256": "7688a8bfdc3aa497a8d7ab26c1f724a9754a69e7a9c6660052e1bc53e9d64fab",
+      "split": "val"
+    },
+    {
+      "id": "IMG-106",
+      "source_path": "assets/dataset/images/TUM-PRC-044.jpg",
+      "sha256": "7a79a07d9f4b4afd5a464e8bf45473463c693b8f137b545f6038acce73a93b8f",
+      "split": "val"
+    },
+    {
+      "id": "IMG-108",
+      "source_path": "assets/dataset/images/TUM-REF-056.jpg",
+      "sha256": "7db1225cb9c35117d29e4237a534abd9d543166d26f69d1edd13c8625aa94d85",
+      "split": "train"
+    },
+    {
+      "id": "IMG-110",
+      "source_path": "assets/dataset/images/TUM-REF-030.jpg",
+      "sha256": "812601dbc52490687349fd10221cfca3ff0f316d950fd1be1e847af671fbbc50",
+      "split": "train"
+    },
+    {
+      "id": "IMG-111",
+      "source_path": "assets/dataset/images/TUM-REF-027.jpg",
+      "sha256": "8225067a799cf125934284536d8ea00ce288ebfb57ef3bdf34a67bda28111223",
+      "split": "train"
+    },
+    {
+      "id": "IMG-112",
+      "source_path": "assets/dataset/images/TUM-PRC-042.jpg",
+      "sha256": "836b344c0d8b0f58304c59df3e223ab3f3ef4e6aa63a086b4bf1698eed80f93e",
+      "split": "val"
+    },
+    {
+      "id": "IMG-113",
+      "source_path": "assets/dataset/images/TUM-PRC-049.jpg",
+      "sha256": "84f4139324fcaff644b04a9b513c9f2ec4df7ce71beaeba964f03e48ea65fd10",
+      "split": "val"
+    },
+    {
+      "id": "IMG-114",
+      "source_path": "assets/dataset/images/TUM-REF-057.jpg",
+      "sha256": "862693b2dff0e7d456a1ffc022047a36aa2b126375e78c26c7c4934ce75b9f81",
+      "split": "train"
+    },
+    {
+      "id": "IMG-115",
+      "source_path": "assets/dataset/images/TUM-REF-049.jpg",
+      "sha256": "87081b1c7dbc42298e6036703c88c5dd3e6992510e711dfb0b47ad8b705b6983",
+      "split": "train"
+    },
+    {
+      "id": "IMG-116",
+      "source_path": "assets/dataset/images/TUM-PRC-015.jpg",
+      "sha256": "879c00aa10c25a5d9299d8b0831224cbae075dca7dc30d4ac02eac51837cc7a6",
+      "split": "val"
+    },
+    {
+      "id": "IMG-117",
+      "source_path": "assets/dataset/images/TUM-REF-062.jpg",
+      "sha256": "8865f6b2463f666d67f32d84d715f7077bbae60b49f578d9782616fe62932bba",
+      "split": "train"
+    },
+    {
+      "id": "IMG-118",
+      "source_path": "assets/dataset/images/TUM-REF-009.jpg",
+      "sha256": "8969af6ff1b64226be57794a2e5a0c0175558b412e20f8eb1e8418133b8bc450",
+      "split": "train"
+    },
+    {
+      "id": "IMG-119",
+      "source_path": "assets/dataset/images/TUM-PRC-063.jpg",
+      "sha256": "8a5da682566c92bfaa6f71408429d2cd039c032c3ebcf2cf95c1fdcd245f2eab",
+      "split": "val"
+    },
+    {
+      "id": "IMG-120",
+      "source_path": "assets/dataset/images/TUM-PRC-005.jpg",
+      "sha256": "8ab1f7611303dead7514be59549311445023674096ba6aea9dbdad2d952f4baf",
+      "split": "val"
+    },
+    {
+      "id": "IMG-124",
+      "source_path": "assets/dataset/images/TUM-REF-053.jpg",
+      "sha256": "8fa54b0c6f6a13efa9e58aa24dfd88fe52f044cfd1fca9997bbcf3844eda80ac",
+      "split": "train"
+    },
+    {
+      "id": "IMG-125",
+      "source_path": "assets/dataset/images/TUM-PRC-013.jpg",
+      "sha256": "9045278d5bce49b09a771e927f95df7a18bff09a3f3d1013c3240ce8534fde35",
+      "split": "val"
+    },
+    {
+      "id": "IMG-127",
+      "source_path": "assets/dataset/images/TUM-PRC-014.jpg",
+      "sha256": "9689e745181cf26f0a73f3022e5e13df1c088c93238490dbce6492cb62acb198",
+      "split": "val"
+    },
+    {
+      "id": "IMG-128",
+      "source_path": "assets/dataset/images/TUM-REF-048.jpg",
+      "sha256": "9a7b3136adf4670fd3fe3f7a7fc72f37b3a74d168597bce8c905efe8ce7c49e5",
+      "split": "train"
+    },
+    {
+      "id": "IMG-129",
+      "source_path": "assets/dataset/images/TUM-REF-060.jpg",
+      "sha256": "9af7ab000e510f5cb4950a7df4d4c6bbbfed6b1a97ec8da2e9fad0aba01b3295",
+      "split": "train"
+    },
+    {
+      "id": "IMG-130",
+      "source_path": "assets/dataset/images/TUM-PRC-019.jpg",
+      "sha256": "9c2ee352cd57a3031fa29cc4f127e7d636c38a39213c2eb96224e270d5bfec1a",
+      "split": "val"
+    },
+    {
+      "id": "IMG-131",
+      "source_path": "assets/dataset/images/TUM-REF-032.jpg",
+      "sha256": "9cfcb10b21a8f39ee4cb8215ef29dfd5f1a770a5dd8d4467730678cdffd1eb10",
+      "split": "train"
+    },
+    {
+      "id": "IMG-132",
+      "source_path": "assets/dataset/images/TUM-REF-001.jpg",
+      "sha256": "9d32c882a78796a1daed4dcc6e964a19a02abfdbf9bcdd4e1767fc8828ece7ae",
+      "split": "train"
+    },
+    {
+      "id": "IMG-134",
+      "source_path": "assets/dataset/images/TUM-REF-050.jpg",
+      "sha256": "a013e91eab3156e7444e3515e97a53271e1268b3b8c56af609b79470ff739453",
+      "split": "train"
+    },
+    {
+      "id": "IMG-135",
+      "source_path": "assets/dataset/images/TUM-REF-052.jpg",
+      "sha256": "a3040e98be2780e81958bafb30c0f42beff56203cadfe60d6b8ec820e9413dea",
+      "split": "train"
+    },
+    {
+      "id": "IMG-136",
+      "source_path": "assets/dataset/images/TUM-REF-036.jpg",
+      "sha256": "a85d711f98f1ebbca187765909b99b32786fe5d47141354aa6ce0c411efa977a",
+      "split": "train"
+    },
+    {
+      "id": "IMG-138",
+      "source_path": "assets/dataset/images/TUM-PRC-027.jpg",
+      "sha256": "acbb17317110ecc5e21b1c50960262b758d196db021f0a187dfcab868fbc3e3b",
+      "split": "val"
+    },
+    {
+      "id": "IMG-139",
+      "source_path": "assets/dataset/images/TUM-PRC-046.jpg",
+      "sha256": "ae33867e7e9c3bd1c085cb9f7774ad0f3e0417f05121a576b2f79961e9722ab4",
+      "split": "val"
+    },
+    {
+      "id": "IMG-142",
+      "source_path": "assets/dataset/images/TUM-PRC-029.jpg",
+      "sha256": "b04588c37e4ec9c52e3f71b56c1f53bafcf6bcdb3bac5b1f58b4636cf868b41b",
+      "split": "val"
+    },
+    {
+      "id": "IMG-143",
+      "source_path": "assets/dataset/images/TUM-PRC-006.jpg",
+      "sha256": "b25b75263868f3cbe2209d8fcaa50de4a470986ab62ca97b0e272784ea7903d7",
+      "split": "val"
+    },
+    {
+      "id": "IMG-145",
+      "source_path": "assets/dataset/images/TUM-PRC-007.jpg",
+      "sha256": "b38b6a7eb28d7f1e2112e5bd3a031815720cab2ce94febcffba66b71990ad9b9",
+      "split": "val"
+    },
+    {
+      "id": "IMG-146",
+      "source_path": "assets/dataset/images/TUM-REF-051.jpg",
+      "sha256": "b3ac96021914905ae5cb003a2f7635ff3db315aca60bf7acdd39fecf638058b4",
+      "split": "train"
+    },
+    {
+      "id": "IMG-147",
+      "source_path": "assets/dataset/images/TUM-PRC-003.jpg",
+      "sha256": "b4e512033bd2004aab63e147f4d34fb1b5beff075d69da095bba43594fad58c2",
+      "split": "val"
+    },
+    {
+      "id": "IMG-149",
+      "source_path": "assets/dataset/images/TUM-PRC-031.jpg",
+      "sha256": "b7a6fff3ec9d480cce629a381ef7080a69ab2576982aeab0a8927a9111eb8eab",
+      "split": "val"
+    },
+    {
+      "id": "IMG-150",
+      "source_path": "assets/dataset/images/TUM-REF-028.jpg",
+      "sha256": "b89884d55e9d6a18ba89296c508cbde5ab8e50b3d8ff72292c00e206a1c645a7",
+      "split": "train"
+    },
+    {
+      "id": "IMG-151",
+      "source_path": "assets/dataset/images/TUM-REF-034.jpg",
+      "sha256": "b9d9c98360e1c8476e9906129496d3ba98aae951134359a114f5bae03b032603",
+      "split": "train"
+    },
+    {
+      "id": "IMG-152",
+      "source_path": "assets/dataset/images/TUM-PRC-060.jpg",
+      "sha256": "bc43159ea7462f10383ffefa2ddb36b1d0d38e2e82e3443f0fc41b737aa9cd5f",
+      "split": "val"
+    },
+    {
+      "id": "IMG-153",
+      "source_path": "assets/dataset/images/TUM-PRC-017.jpg",
+      "sha256": "bf2accaee090c2138917bc415c5a5024dcf4a767b2b805815b9e09dbbcd70b65",
+      "split": "val"
+    },
+    {
+      "id": "IMG-154",
+      "source_path": "assets/dataset/images/TUM-PRC-030.jpg",
+      "sha256": "bf623afcd24461d06c034cd814666680613046e048caca7d54443f66be8afc97",
+      "split": "val"
+    },
+    {
+      "id": "IMG-155",
+      "source_path": "assets/dataset/images/TUM-PRC-033.jpg",
+      "sha256": "bfed3462a1759f09cd812e24fd41fffd80a8d5cd7ef7c0e799108f32aa6260f6",
+      "split": "val"
+    },
+    {
+      "id": "IMG-156",
+      "source_path": "assets/dataset/images/TUM-PRC-016.jpg",
+      "sha256": "c1d13c37c04842e65caa166879abfecef27420fbd4d9a74a9fd8965bcb8554b1",
+      "split": "val"
+    },
+    {
+      "id": "IMG-158",
+      "source_path": "assets/dataset/images/TUM-REF-033.jpg",
+      "sha256": "c2f706fe5c7174e9207e832dd0f6d06972bdc2076c07f80dcb4021063de8b756",
+      "split": "train"
+    },
+    {
+      "id": "IMG-159",
+      "source_path": "assets/dataset/images/TUM-PRC-052.jpg",
+      "sha256": "c6fc174672f2fbe8ec8ac9bb72d6d637b941a800efc5c23d4941eb4e2710bae5",
+      "split": "val"
+    },
+    {
+      "id": "IMG-160",
+      "source_path": "assets/dataset/images/TUM-REF-016.jpg",
+      "sha256": "c987c19ab33a7db7aa745a7819e3135b89f42aefa68e83d5ff7dcb5b1644913e",
+      "split": "train"
+    },
+    {
+      "id": "IMG-161",
+      "source_path": "assets/dataset/images/TUM-PRC-037.jpg",
+      "sha256": "c9926b1bb413db3f01d335e5c1c2c16425c73908da96659db488dcdff24ba131",
+      "split": "val"
+    },
+    {
+      "id": "IMG-162",
+      "source_path": "assets/dataset/images/TUM-PRC-011.jpg",
+      "sha256": "d4cd268bc2f048d172a340549175ed74aa6b8232633bc5be6832c53667e22fa8",
+      "split": "val"
+    },
+    {
+      "id": "IMG-163",
+      "source_path": "assets/dataset/images/TUM-PRC-004.jpg",
+      "sha256": "d5499fddf3b6c7ae4436868037bee05ab1736593f1591a46365e2f1aceac680e",
+      "split": "val"
+    },
+    {
+      "id": "IMG-164",
+      "source_path": "assets/dataset/images/TUM-PRC-024.jpg",
+      "sha256": "d6c2fc274e83a613ea3366f3205625d52595975094a4afc53229a50773c3d394",
+      "split": "val"
+    },
+    {
+      "id": "IMG-165",
+      "source_path": "assets/dataset/images/TUM-PRC-021.jpg",
+      "sha256": "dbf35cf956d25eb12d2607e96707c25cdd2f5e2f24636a4e6dd0974ff17bdb81",
+      "split": "val"
+    },
+    {
+      "id": "IMG-168",
+      "source_path": "assets/dataset/images/TUM-PRC-038.jpg",
+      "sha256": "e32d7db8f09b420a65ff5b79b20a1c3c5b8c86f798ad7a7ccd55fcf64090a8ba",
+      "split": "val"
+    },
+    {
+      "id": "IMG-169",
+      "source_path": "assets/dataset/images/TUM-REF-013.jpg",
+      "sha256": "e44c7411c8a1010f34f34032d83dcc7c961947872b2da22f6202306ae29de3f3",
+      "split": "train"
+    },
+    {
+      "id": "IMG-170",
+      "source_path": "assets/dataset/images/TUM-REF-020.jpg",
+      "sha256": "e455ec0eeca96d8a64e99b5ad2f96f07fa42b39e9720ed2d6c2f155a5321816b",
+      "split": "train"
+    },
+    {
+      "id": "IMG-171",
+      "source_path": "assets/dataset/images/TUM-PRC-054.jpg",
+      "sha256": "e4e2e648ff41f6bcccb7d2edf760ee362a4f406b243624b841c83498d184d9f6",
+      "split": "val"
+    },
+    {
+      "id": "IMG-180",
+      "source_path": "assets/dataset/images/TUM-REF-012.jpg",
+      "sha256": "eca6ef59587b1a64267dd6548e6ea370e15ea390b1d0751c42dce95a3ec599f4",
+      "split": "train"
+    },
+    {
+      "id": "IMG-182",
+      "source_path": "assets/dataset/images/TUM-PRC-008.jpg",
+      "sha256": "f08dcd80aceb54c73b6ae4888895a08a9b8c58125dc47a867b28253fcf5206f6",
+      "split": "val"
+    },
+    {
+      "id": "IMG-183",
+      "source_path": "assets/dataset/images/TUM-REF-003.jpg",
+      "sha256": "f3378b146f3f31725f7a595677f67ad2a2465516c28b39eaa910778f3dd414c3",
+      "split": "train"
+    },
+    {
+      "id": "IMG-184",
+      "source_path": "assets/dataset/images/TUM-PRC-050.jpg",
+      "sha256": "f54973b9db3cdd8f257e99f53c3ddc8b7f08da3a162d69664ff01195256b754c",
+      "split": "val"
+    },
+    {
+      "id": "IMG-185",
+      "source_path": "assets/dataset/images/TUM-REF-063.jpg",
+      "sha256": "f86541a6a6eaeaa4aa87580fba153912d61a1aba7ab20ff3f16a49c6ce10652e",
+      "split": "train"
+    },
+    {
+      "id": "IMG-189",
+      "source_path": "assets/dataset/images/TUM-REF-005.jpg",
+      "sha256": "ff03ed0baeb902f7c56b4b1563a365e9946099f98ffed655ce3ce2d8477ad0fe",
+      "split": "train"
+    },
+    {
+      "id": "IMG-192",
+      "source_path": "assets/dataset/images/TUM-PRC-051.jpg",
+      "sha256": "ffa7460895ec269689a34855a4d729a7281129f74799a5a14c068f0025620efe",
+      "split": "val"
+    }
+  ]
+}
