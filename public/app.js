@@ -706,8 +706,8 @@ function renderDetailView(host, id, insp, drafts, standards, draftState = {}) {
 
   renderStep1(pane1, id, insp);
   renderStep2(pane2, id, insp, drafts, draftState);
-  pane3.append(el('p', '이 탭은 41번부터 만듭니다.', 'muted'));
-  pane4.append(el('p', '이 탭은 52번부터 만듭니다.', 'muted'));
+  pane3.append(el('p', '이 탭은 5회차에서 만듭니다.', 'muted'));
+  pane4.append(el('p', '이 탭은 6회차에서 만듭니다.', 'muted'));
 
   host.append(pane1, pane2, pane3, pane4);
 
