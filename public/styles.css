@@ -566,7 +566,6 @@ body.unauthenticated footer {
 .step-actions .step-prev { grid-column: 1; justify-self: start; }
 .step-actions .step-next { grid-column: 2; justify-self: end; }
 .step-actions button { max-width: 100%; white-space: normal; }
-.evidence-query-actions { display: flex; justify-content: flex-end; }
 .photo-detail-viewer { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
 .main-photo-frame {
   width: 100%;
@@ -593,135 +592,7 @@ body.unauthenticated footer {
 }
 .thumb-strip img.selected { border-color: #175f7d; }
 
-.decision-radio-group { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
-.decision-radio-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 18px;
-  border: 2px solid #d3e0eb;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 14px;
-  background: #fff;
-}
-.decision-radio-label input { width: auto; min-height: 0; margin: 0; }
-.decision-radio-label.ok { color: #176642; }
-.decision-radio-label.ng { color: #ad302b; }
-.decision-radio-label.hold { color: #775407; }
-.decision-radio-label.disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-  background: #f5f5f5;
-  border-color: #e0e0e0;
-}
-.defect-chip-group { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
-.defect-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 7px 14px;
-  border-radius: 20px;
-  border: 1px solid #cbd7e2;
-  background: #f8fafc;
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 500;
-  user-select: none;
-}
-.defect-chip input { width: auto; min-height: 0; margin: 0; }
-.defect-chip.checked {
-  background: #fff0f2;
-  border-color: #dfaaa5;
-  color: #ad302b;
-  font-weight: 700;
-}
-.summary-box {
-  background: #fdfaf3;
-  border: 1px solid #eedec2;
-  border-radius: 8px;
-  padding: 14px 18px;
-  margin: 16px 0;
-}
-.summary-box h4 { margin: 0 0 8px; color: #775407; font-size: 14px; }
-.summary-box ul { margin: 0; padding-left: 20px; font-size: 13px; color: #52677b; }
-.tech-details {
-  margin-top: 24px;
-  border: 1px solid #dce5ec;
-  border-radius: 8px;
-  padding: 12px 16px;
-  background: #fff;
-}
-.tech-details summary { font-weight: 600; color: #52677b; cursor: pointer; }
-/* A judgment memo longer than the history line shows: first characters as the summary, the whole text when opened. */
-.tech-details .history-memo summary { font-weight: 400; color: inherit; overflow-wrap: anywhere; }
-.history-memo-text { margin: 4px 0 0; white-space: pre-wrap; overflow-wrap: anywhere; }
-
-/* Evidence MCP in Detail */
-.evidence-mcp-box {
-  background: #f8fbfd;
-  border: 1px solid #c9ddec;
-  border-radius: 10px;
-  padding: 20px;
-  margin: 20px 0;
-}
-.evidence-mcp-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-.evidence-results { margin-top: 16px; display: grid; gap: 12px; }
-.evidence-card {
-  background: #fff;
-  border: 1px solid #d8e4ee;
-  border-left: 4px solid #175f7d;
-  border-radius: 6px;
-  padding: 16px;
-}
-.evidence-cite-quote {
-  background: #f3f7fa;
-  padding: 10px 14px;
-  border-radius: 6px;
-  font-style: normal;
-  font-size: 16px;
-  line-height: 1.7;
-  overflow-wrap: anywhere;
-  color: #28435d;
-  margin: 8px 0;
-}
-.evidence-confirm-form {
-  margin-top: 14px;
-  padding-top: 14px;
-  border-top: 1px solid #eef2f6;
-  display: grid;
-  gap: 10px;
-}
-.evidence-markdown > :first-child { margin-top: 0; }
-.evidence-markdown > :last-child { margin-bottom: 0; }
-.evidence-markdown p { margin: 0 0 16px; }
-.evidence-markdown h5, .evidence-markdown h6 { font-size: 16px; margin: 24px 0 8px; }
-.evidence-markdown ul, .evidence-markdown ol { padding-left: 24px; margin: 8px 0 16px; }
-.evidence-markdown li { margin: 8px 0; }
-.evidence-markdown pre { white-space: pre-wrap; overflow-wrap: anywhere; }
-/* A quoted source sentence: a left rule and a small indent, narrow enough for a 375px screen. */
-.evidence-markdown blockquote { margin: 8px 0 16px; padding: 2px 0 2px 12px; border-left: 3px solid #9bb8cc; color: #3b5871; overflow-wrap: anywhere; }
-.evidence-markdown li > blockquote { margin: 6px 0 0; }
-.evidence-query-details { margin: 8px 0 16px; font-size: 14px; }
-.evidence-query-details summary { cursor: pointer; color: #175f7d; }
-.evidence-confirm-form h5 { font-size: 18px; margin: 0; }
-.evidence-confirm-form p { margin: 0; }
-.evidence-confirm-form .evidence-confirm-check { display: flex; align-items: flex-start; gap: 12px; padding: 12px; border: 1px solid #c9ddec; border-radius: 6px; cursor: pointer; }
-.evidence-confirm-check input[type="checkbox"] { flex: 0 0 20px; width: 20px; height: 20px; min-height: 20px; margin: 2px 0 0; padding: 0; accent-color: #175f7d; }
-.evidence-confirm-check:focus-within { outline: 2px solid #175f7d; outline-offset: 2px; }
-.evidence-confirm-form textarea { font-size: 16px; resize: vertical; }
-.evidence-confirm-help { font-size: 14px; }
-.evidence-source-link { color: #175f7d; text-decoration: underline; width: fit-content; padding: 8px 0; }
-
-/* Result review: read the result, compare the source, then record a judgment. */
+/* Result review: read the AI result and its reasons. */
 .review-step { min-width: 0; }
 .review-intro { margin: 24px 0; }
 .review-intro h2 { margin: 0 0 8px; font-size: 24px; line-height: 1.4; }
@@ -734,11 +605,10 @@ body.unauthenticated footer {
 .review-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; align-items: start; }
 .review-panel { min-width: 0; padding: 24px; border: 1px solid #dce5ec; border-radius: 12px; background: white; }
 .review-panel h3 { margin: 0; font-size: 19px; line-height: 1.4; }
-.review-panel .section-head, .review-panel .evidence-mcp-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin: 0 0 24px; }
+.review-panel .section-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin: 0 0 24px; }
 .review-panel .badge { font-size: 13px; }
 .review-panel p { overflow-wrap: anywhere; }
 .review-empty-title { font-size: 20px; margin: 24px 0 8px; }
-.review-explanation { color: #52677b; margin: 0 0 24px; }
 .review-simulation { font-size: 14px; color: #52677b; margin: 0 0 16px; }
 .review-verdict { padding: 20px; margin-bottom: 24px; border-radius: 8px; background: #fff7e4; border-left: 4px solid #b88118; }
 .review-verdict.ok { background: #edf7f3; border-color: #267558; }
@@ -758,30 +628,6 @@ body.unauthenticated footer {
 .review-panel .row { flex-wrap: wrap; align-items: center; margin-top: 16px !important; }
 .review-panel .row > button { flex: 0 1 auto; }
 .review-panel .row > [role="status"] { flex: 1 1 160px; font-size: 14px; }
-.review-standard-preview { padding: 16px; background: #f5f8fa; border-radius: 8px; margin-bottom: 24px; }
-.review-measurements { margin: 0; }
-.review-measurements > div { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 12px; padding: 8px 0; }
-.review-measurements dt { color: #52677b; font-size: 14px; }
-.review-measurements dd { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
-.review-standard-source { margin-top: 12px; }
-.review-source-name { font-size: 14px; color: #52677b; }
-.review-source-hint { font-size: 13px; margin: 4px 0 0; }
-.review-evidence-answer h4 { font-size: 17px; margin: 8px 0; }
-.review-evidence-answer .evidence-cite-quote { background: transparent; padding: 0; color: inherit; margin: 16px 0; }
-.review-evidence-answer .evidence-confirm-form { margin-top: 24px; padding-top: 24px; gap: 16px; }
-.review-evidence-answer .evidence-confirm-form h5 { font-size: 16px; }
-.review-evidence-answer .evidence-confirm-form > p { font-size: 14px; }
-.review-evidence-answer .evidence-confirm-check { background: #f5f8fa; font-size: 15px; }
-.review-confirmation-host:empty { display: none; }
-.review-confirmation.evidence-confirm-form { margin-top: 24px; padding: 24px; border: 1px solid #dce5ec; border-radius: 12px; background: #f8fafb; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px 24px; }
-.review-confirmation > h5, .review-confirmation > p { grid-column: 1 / -1; }
-.review-confirmation > h5 { font-size: 18px; }
-.review-confirmation > p { font-size: 14px; }
-.review-confirmation .evidence-confirm-check { align-self: start; background: white; font-size: 16px; }
-.review-confirmation > button { justify-self: start; }
-.review-next { margin-top: 32px; padding: 24px 0; }
-.review-next > div { grid-column: 1 / -1; }
-.review-next p { margin: 8px 0 0; font-size: 14px; }
 .review-step summary:focus-visible, .review-step button:focus-visible, .review-step select:focus-visible, .review-step textarea:focus-visible { outline: 3px solid #27839c; outline-offset: 3px; }
 @media (max-width: 800px) {
   .review-layout { grid-template-columns: minmax(0, 1fr); gap: 16px; }
@@ -789,10 +635,7 @@ body.unauthenticated footer {
   .review-intro h2 { font-size: 22px; }
   .review-context { flex-wrap: wrap; }
   .review-context button { width: 100%; }
-  .review-next { align-items: stretch; }
   .review-step select, .review-step textarea { font-size: 16px; }
-  .review-confirmation.evidence-confirm-form { grid-template-columns: minmax(0, 1fr); padding: 20px; }
-  .review-confirmation > button { width: 100%; }
 }
 
 /* Settings Grid */

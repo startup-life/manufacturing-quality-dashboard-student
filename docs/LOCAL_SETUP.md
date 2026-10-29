@@ -5,8 +5,6 @@
 - 로컬 Node의 NestJS 서버(`src/*.ts`를 빌드한 `dist/main.js`, 포트 4185)가 GAS 웹앱을 부릅니다.
 - 웹앱은 "모든 사용자" 접근으로 배포하고, 로컬 서버는 웹앱 URL만으로 부릅니다. 그래서 URL을 비밀값처럼 다룹니다.
 - GAS는 스크립트 속성에 저장한 API 키로 Gemini REST를 호출합니다.
-- Gemini Notebook(옛 이름 NotebookLM, notebook.google.com)은 로컬 Node가 로컬 MCP로 부릅니다.
-- 이 문서는 코드와 맞춰 NotebookLM으로 적습니다.
 
 이 저장소는 수업에서 만드는 텀블러 공장 앱의 완성본입니다. 실제 연결에 쓰는 Google 계정과 Gemini API 키는 수업 안내를 따릅니다.
 
@@ -17,28 +15,26 @@ GAS를 준비하는 경로는 두 가지입니다.
 
 ## 연동 스위치
 
-`.env`의 세 스위치로 저장소, Gemini 판독, NotebookLM 근거 대조를 따로 켭니다.
+`.env`의 두 스위치로 저장소와 Gemini 판독을 따로 켭니다.
 
 | 이름 | 값 | 기본값 | 막는 조합 |
 |---|---|---|---|
 | `STORAGE_MODE` | `live`, `mock` | `mock` | 없음. `live`에는 `GAS_WEBAPP_URL`이 필요합니다 |
 | `GEMINI_MODE` | `off`, `mock`, `live` | mock 저장소에서 `off`, live 저장소에서 `live` | live 저장소에 `mock`, mock 저장소에 `live` |
-| `NOTEBOOKLM_MODE` | `off`, `mock`, `live` | mock 저장소에서 `mock`, live 저장소에서 `off` | live 저장소에 `mock` |
 
 - `live` 저장소는 GAS 웹앱(실제 Sheets·Drive), `mock` 저장소는 로컬 모의 저장소(`runtime/local-gas-state.json`)입니다.
 - `off`는 어느 저장소에서나 됩니다. 값은 소문자 그대로만 받습니다.
 - 막는 조합이거나 값이 틀리면 서버가 시작하지 않고 이유와 고칠 방법을 한 줄로 알립니다.
-- 옛 이름 `GAS_TRANSPORT_MODE`(`oauth`는 `live`로 읽고 경고, `mock`은 `mock`)와 `NOTEBOOKLM_MCP_MODE`(`live`, `mock`)도 읽습니다. 새 이름과 함께 넣으면 값이 같아야 합니다.
-- 서버는 시작할 때 `연동 상태: 저장소=mock(로컬 파일) · Gemini=off(사람이 직접 판정) · NotebookLM=mock(모의 응답)`처럼 한 줄을 냅니다.
+- 옛 이름 `GAS_TRANSPORT_MODE`(`oauth`는 `live`로 읽고 경고, `mock`은 `mock`)도 읽습니다. 새 이름과 함께 넣으면 값이 같아야 합니다.
+- 서버는 시작할 때 `연동 상태: 저장소=mock(로컬 파일) · Gemini=off(사람이 직접 판정)`처럼 한 줄을 냅니다.
 
 수업에서 쓰는 조합입니다.
 
-| 단계 | `STORAGE_MODE` | `GEMINI_MODE` | `NOTEBOOKLM_MODE` |
-|---|---|---|---|
-| 0 처음 실행 | `mock` | `off`(기본) | `mock`(기본) |
-| NotebookLM 먼저 | `mock` | `mock` | `live` |
-| Gemini 연결 | `live` | `live`(기본) | `off`(기본) |
-| 둘 다 실제 | `live` | `live` | `live` |
+| 단계 | `STORAGE_MODE` | `GEMINI_MODE` |
+|---|---|---|
+| 0 처음 실행 | `mock` | `off`(기본) |
+| 모의 판독 | `mock` | `mock` |
+| Gemini 연결 | `live` | `live`(기본) |
 
 Gemini mock은 설정으로 켤 수 있습니다(GEMINI_MODE=mock).
 
@@ -59,7 +55,6 @@ Gemini mock은 설정으로 켤 수 있습니다(GEMINI_MODE=mock).
 - 「확인:」 줄 끝의 표시는 이렇게 읽습니다.
   - `(로컬 실행으로 확인)`: 이 문서를 고칠 때(2026-10-16) 이 저장소에서 실제로 실행해 본 출력입니다.
   - `(실제 배포로 확인)`: 2026-10-16에 강사용 GAS를 macOS에서 clasp 경로로 실제 배포하며 본 출력과 화면입니다. Google Workspace 계정으로 했습니다.
-  - `(실제 연결로 확인)`: 2026-10-20에 macOS에서 nlm v0.15.6과 실제 Google 계정으로 NotebookLM에 로그인하고 노트북을 만들며 본 출력과 화면, 같은 날 GAS 저장소에 이어 앱에서 근거를 실제로 질의하며 본 화면입니다.
   - `미확인(실계정 필요)`: Google 계정과 실제 GAS가 있어야 해서 실행하지 못한 단계입니다. 코드에 적힌 문구를 옮겼습니다.
   - `미확인(Windows)`: macOS에서만 실행해 본 동작입니다. Windows 명령 조립은 시험 코드로만 확인했습니다.
   - `미확인(개인 Gmail)`: Workspace 계정으로만 확인한 동작입니다. 개인 Gmail 계정에서는 해 보지 않았습니다.
@@ -130,12 +125,11 @@ npm.cmd start
 - `.env`에 BOM이 있으면 서버가 안내를 내고 종료합니다.
 - 모의 단계의 기본은 Gemini 판독이 꺼진 상태(`GEMINI_MODE=off`)입니다. 검사 상세의 `AI 판독 요청` 버튼이 꺼져 있고 `Gemini 판독이 꺼져 있습니다(GEMINI_MODE=off). 4번 탭에서 직접 판단을 기록하세요.`가 보이는 것이 정상입니다.
 - Gemini mock은 설정으로 켤 수 있습니다(GEMINI_MODE=mock). 사진을 분석하지 않는 모의 초안이고 실제 판독 횟수에 들어가지 않습니다.
-- 시작할 때 `Gemini가 꺼져 있어 NotebookLM 대조에 쓸 AI 초안이 생기지 않습니다.` 경고가 나옵니다. 기본 조합에서는 정상입니다.
 - 실행하면 `runtime/` 폴더가 생깁니다.
 
 할 곳: 터미널(Antigravity)
 
-확인: 터미널에 `GAS 품질 대시보드 서버 실행 중: http://127.0.0.1:4185`와 `연동 상태: 저장소=mock(로컬 파일) · Gemini=off(사람이 직접 판정) · NotebookLM=mock(모의 응답)`이 나옵니다. (로컬 실행으로 확인)
+확인: 터미널에 `GAS 품질 대시보드 서버 실행 중: http://127.0.0.1:4185`와 `연동 상태: 저장소=mock(로컬 파일) · Gemini=off(사람이 직접 판정)`이 나옵니다. (로컬 실행으로 확인)
 
 이어서 설정 파일을 만듭니다. 그대로 두면 모두 주석이라 모의 단계 그대로입니다.
 
@@ -409,14 +403,14 @@ npm.cmd start
 - 로그인하고 검사를 등록합니다.
 - 등록 한 번에 GAS 웹앱을 차례로 `사진 수 + 3`번 부릅니다(사진마다 저장 1번, 검사 저장, 검사 조회, 판독 접수). 사진 1~2장이면 약 28~33초 걸립니다. 그동안 화면에 `사진 업로드 및 검사 등록을 처리 중입니다...`가 그대로 있어도 멈춘 것이 아니니 기다립니다. Gemini가 `off`이면 판독 접수 1번이 빠집니다.
 - 화면을 열 때도 GAS 웹앱을 부르므로 몇 초 걸립니다. 홈은 웹앱 1번(집계)과 카드 목록 1번, 검사 목록과 검사 상세는 각각 1번입니다. 홈 카드까지 약 10초(다시 열 때), 검사 목록 약 6초, 검사 상세 약 7.5초입니다. 목록·홈은 시트 탭을 한 번씩만 읽어서 검사가 늘어도 읽는 탭 수는 그대로입니다. 여러 요청이 겹쳐 30초 안에 차례가 오지 않으면 `서버가 현재 다른 작업을 처리 중입니다. 잠시 후 다시 시도해 주세요.`가 나오니 잠시 뒤 다시 엽니다.
-- 검사 상세에서 `AI 판독 요청`을 누릅니다. 실제 Gemini 판독은 모델 응답에 따라 약 35~140초 걸립니다. 3번 탭 NotebookLM 근거 질의는 약 50~60초입니다.
+- 검사 상세에서 `AI 판독 요청`을 누릅니다. 실제 Gemini 판독은 모델 응답에 따라 약 35~140초 걸립니다.
 - 위 시간은 2026-10-20 실제 웹앱(검사 9건 안팎)에서 잰 값입니다.
 - 기본 모델이 붐비거나(HTTP 503, `UNAVAILABLE`) 한도에 걸리면(HTTP 429, `RESOURCE_EXHAUSTED`) 같은 판독 안에서 대체 모델(기본 `gemini-3.5-flash-lite`)로 한 번만 다시 보냅니다. 대체 모델이 결과를 내면 2번 탭 결과 아래에 `판독 모델: gemini-3.5-flash-lite · 기본 모델 gemini-3.8-flash 대신 대체 판독`이 나옵니다. 그 밖의 실패(요청·키 문제, 통신 실패, 응답 형식 오류)는 다시 보내지 않습니다.
 - 대체 모델도 실패하면 기본 모델의 안내가 나옵니다. 한도면 `Gemini API 한도에 걸렸습니다. 잠시 뒤 다시 하거나 강사에게 다른 API 키를 받으세요.`, 붐볐으면 `Gemini 서버가 붐벼 판독하지 못했습니다. 잠시 뒤 다시 판독을 요청하세요.`입니다.
 - 2026-10-20 새벽에는 무료 키로 `gemini-3.8-flash`를 부른 판독 8회가 모두 503이었습니다. 같은 날 02:23에 짧은 텍스트 요청을 보내 보니 `gemini-3.8-flash`는 503, `gemini-3.5-flash-lite`는 200(1.2초)이었습니다. 대체 모델은 이런 때를 위한 설정입니다. `gemini-3.5-flash-lite`로 사진을 판독한 품질은 아직 확인하지 않았습니다. 실제 Gemini로 대체가 일어나는 것은 미확인이고, 대역 테스트로만 확인했습니다.
-- GAS 저장소의 기본은 Gemini `live`, NotebookLM `off`입니다. NotebookLM은 「NotebookLM 연결」을 마친 뒤 켭니다.
+- GAS 저장소의 기본은 Gemini `live`입니다.
 
-확인: 터미널에 `연동 상태: 저장소=live(GAS 웹앱) · Gemini=live(gemini-3.8-flash, 대체 gemini-3.5-flash-lite) · NotebookLM=off(근거 대조 꺼짐)`가 나옵니다. 괄호 안 모델은 GAS 스크립트 속성의 값입니다. 이 기능 전에 배포한 GAS이면 `Gemini=live(GAS에서 Gemini 호출)`로 나오니 「다시 배포할 때」대로 코드를 올리고 초기화합니다. 스크립트 속성의 모델 값이 허용 목록 밖이면 `Gemini=live(모델 설정 확인 필요)`로 나오고 다음 줄에 경고가 나옵니다(「모델이나 키를 바꿀 때」). 설정 화면의 「Gemini 연결 상태」 카드에도 `모델: gemini-3.8-flash (과부하·한도 초과 때 gemini-3.5-flash-lite)`가 나옵니다. Gemini가 `off`·`mock`이면 이 줄은 나오지 않습니다. 판독 결과(판정 등 6항목)가 화면에 나오고, 로그인한 브라우저에서 `/api/health`를 열면 `"provider":"gas"`가 보입니다. 미확인(실계정 필요).
+확인: 터미널에 `연동 상태: 저장소=live(GAS 웹앱) · Gemini=live(gemini-3.8-flash, 대체 gemini-3.5-flash-lite)`가 나옵니다. 괄호 안 모델은 GAS 스크립트 속성의 값입니다. 이 기능 전에 배포한 GAS이면 `Gemini=live(GAS에서 Gemini 호출)`로 나오니 「다시 배포할 때」대로 코드를 올리고 초기화합니다. 스크립트 속성의 모델 값이 허용 목록 밖이면 `Gemini=live(모델 설정 확인 필요)`로 나오고 다음 줄에 경고가 나옵니다(「모델이나 키를 바꿀 때」). 설정 화면의 「Gemini 연결 상태」 카드에도 `모델: gemini-3.8-flash (과부하·한도 초과 때 gemini-3.5-flash-lite)`가 나옵니다. Gemini가 `off`·`mock`이면 이 줄은 나오지 않습니다. 판독 결과(판정 등 6항목)가 화면에 나오고, 로그인한 브라우저에서 `/api/health`를 열면 `"provider":"gas"`가 보입니다. 미확인(실계정 필요).
 
 ## 편집기 붙여넣기 경로(대안)
 
@@ -633,7 +627,7 @@ npm.cmd run gas:init
 | `npm run gas:redeploy`(`.env` 없음) | `.env에 GAS_WEBAPP_URL이 없습니다. 먼저 npm.cmd run gas:deploy(macOS: npm run gas:deploy)를 실행하세요.` |
 | `npm run gas:redeploy`(주소가 `https://`가 아니거나 배포 ID 없음) | `.env에 GAS_WEBAPP_URL이 없습니다. 먼저 npm.cmd run gas:deploy(macOS: npm run gas:deploy)를 실행하세요.` |
 | `npm run gas:build` | `build/gas`에 `PromptCore.js`, `Code.gs`, `Gemini.gs`, `Live.gs`, `Prompts.gs`, `Setup.gs`, `appsscript.json` |
-| `npm start`(설정 없음) | `GAS 품질 대시보드 서버 실행 중: http://127.0.0.1:<포트>`, `연동 상태: 저장소=mock(로컬 파일) · Gemini=off(사람이 직접 판정) · NotebookLM=mock(모의 응답)` |
+| `npm start`(설정 없음) | `GAS 품질 대시보드 서버 실행 중: http://127.0.0.1:<포트>`, `연동 상태: 저장소=mock(로컬 파일) · Gemini=off(사람이 직접 판정)` |
 
 아래 설정 검사는 `npm run gas:init`과 `npm start`가 같은 문구로 멈춥니다(종료 코드 1). 웹앱에는 아무것도 보내지 않습니다.
 
@@ -645,130 +639,3 @@ npm.cmd run gas:init
 | `/dev` 주소 | `GAS_WEBAPP_URL이 /dev 주소입니다. /dev는 로그인한 브라우저에서만 열려 서버가 부를 수 없습니다. 배포 관리의 웹앱 URL(/exec로 끝남)을 넣으세요.` |
 
 - `.env`가 없으면 위 출력 앞에 `.env not found. Continuing without it.`가 나옵니다.
-
-## NotebookLM 연결
-
-### 1. 설치·로그인
-
-할 곳: 터미널(Antigravity, 본인이 직접 입력), 이어서 웹(클릭, `nlm login`)
-
-```powershell
-uv tool install notebooklm-mcp-cli
-nlm --version
-nlm login --storage protected
-```
-
-- uv가 먼저 있어야 합니다. 설치는 uv 공식 안내를 따릅니다.
-- 버전은 고정하지 않습니다. 비전 리스크 과정과 같은 명령이고 MCP 설정도 같이 씁니다. 2026-10-20에 macOS에서 v0.15.6으로 설치와 로그인을 했습니다. (실제 연결로 확인) 앱이 부르는 도구는 `notebook_query` 하나입니다(`src/mcp-stdio.ts`).
-- `--storage protected`는 새 프로필에서 로그인 정보를 어디에 둘지 묻지 않게 합니다. 로그인 정보는 OS 키체인에 암호화해 저장됩니다. 쿠키 파일을 공유하지 않습니다.
-- `nlm login`은 **Antigravity 터미널에 본인이 직접 칩니다.** 로그인을 300초까지 기다리는데, 에이전트에게 시키고 안내를 기다리는 방식에서는 두 번 다 시간이 초과됐습니다. 본인이 직접 실행했을 때는 30초에 끝났습니다. (실제 연결로 확인)
-- 로그인 창은 nlm 전용 Chrome 프로필(홈 폴더의 `.notebooklm-mcp-cli/chrome-profiles/default`)로 새로 뜹니다. 브라우저는 자동으로 고르고(`auth.browser=auto`), 이 Mac에서는 설치된 Chrome이 골라졌습니다. 평소 쓰던 Chrome이 켜져 있어도 창이 따로 뜨고, 'Chrome이 이미 실행 중' 오류는 나지 않았습니다. 평소 Chrome의 프로필·북마크·로그인은 쓰지 않습니다. (실제 연결로 확인)
-- 로그인 창의 첫 화면은 Google 로그인 화면이 아니라 Gemini Notebook 소개 페이지(notebook.google.com/trynow)입니다. 화면의 제품 이름은 NotebookLM이 아니라 Gemini Notebook으로 바뀌었습니다. 오른쪽 위 `Sign in` 또는 가운데 `Sign in to Gemini Notebook`을 눌러야 Google 로그인으로 넘어갑니다. 본인 계정으로 로그인합니다. (실제 연결로 확인, 캡처 보관)
-
-확인: `nlm --version`이 `nlm version 0.15.6`처럼 버전을 출력하고, `nlm login`이 시간 초과 없이 끝납니다. (실제 연결로 확인) 미확인(Windows), 미확인(개인 Google AI Pro 계정).
-
-### 2. 노트북 준비
-
-할 곳: 터미널(Antigravity), 이어서 사용자 직접(.env 편집)
-
-노트북과 소스는 명령으로 만듭니다. 웹에서 할 일은 1단계의 로그인 하나입니다.
-
-```powershell
-nlm notebook create "텀블러 품질 기준(교육용)" --json
-nlm source add <노트북 ID> --file standards/notebooklm-Rev.A.md --wait
-nlm source add <노트북 ID> --file standards/notebooklm-Rev.B.md --wait
-nlm notebook list --json
-```
-
-- 첫 줄은 JSON을 출력합니다. 노트북 ID(36자 UUID)는 `"notebook_id"` 값입니다. 다음 두 줄의 `<노트북 ID>`에 그 값을 넣습니다. (실제 연결로 확인)
-- `standards/notebooklm-Rev.A.md`와 `standards/notebooklm-Rev.B.md` 두 파일을 같은 노트북의 소스로 넣습니다. 앱은 노트북 ID를 하나만 받습니다. Rev.B용 노트북을 따로 만들지 않습니다.
-  앱은 질의할 때 `조회할 원문: TUM-QC-STD-001 Rev.A`처럼 버전을 적어 보냅니다(`prompts/prompt-core.cjs`의 `notebookSourceReference`).
-- `--wait`는 소스 처리가 끝날 때까지 기다립니다. 끝나면 `✓ Added source: notebooklm-Rev.A.md (ready)`처럼 파일 이름 뒤에 `(ready)`가 붙은 줄이 나옵니다. (실제 연결로 확인)
-- `nlm notebook list --json`은 노트북마다 `"id"`, `"title"`, `"source_count"`, `"updated_at"`을 보여 줍니다. 여기서는 ID가 `"notebook_id"`가 아니라 `"id"`입니다. 다른 노트북도 함께 나오니 `"title"`로 찾습니다. (실제 연결로 확인)
-- 대안: NotebookLM 웹(notebook.google.com, 화면 이름은 Gemini Notebook)에서 노트북을 만들고 두 파일을 소스로 올려도 됩니다. 이때 노트북 ID는 노트북 주소에서 찾을 수 있습니다(미확인).
-
-`notebooklm-mcp` 실행 파일 위치를 확인합니다. uv가 명령을 설치한 폴더입니다.
-
-```powershell
-uv tool dir --bin
-```
-
-- macOS에서는 홈 폴더의 `.local/bin`이고, 실행 파일은 `~/.local/bin/notebooklm-mcp`입니다. (실제 연결로 확인)
-- Windows의 폴더와 파일 이름은 미확인(Windows)입니다.
-
-`.env`에 세 줄을 적습니다.
-
-```text
-NOTEBOOKLM_MODE=live
-NOTEBOOKLM_NOTEBOOK_ID=<노트북 ID(36자 UUID)>
-NOTEBOOKLM_MCP_COMMAND=<notebooklm-mcp 실행 파일의 절대 경로>
-```
-
-- `NOTEBOOKLM_MCP_COMMAND`에는 `~` 없이 절대 경로를 적습니다. macOS 예: `/Users/<사용자>/.local/bin/notebooklm-mcp`. 이 값이 있으면 앱은 아래 MCP 설정 파일을 읽지 않고 이 명령을 `--transport stdio`로 띄웁니다.
-- GAS 저장소(`STORAGE_MODE=live`)에서는 `NOTEBOOKLM_MODE`의 기본값이 `off`입니다. 실제 질의를 하려면 `NOTEBOOKLM_MODE=live`를 꼭 적습니다. GAS 저장소에서는 `mock`을 쓸 수 없습니다.
-- 옛 이름 `NOTEBOOKLM_MCP_MODE=live`도 읽지만 새 이름으로 바꿔 적습니다.
-
-실제 기업 문서와 개인정보는 넣지 않습니다.
-
-확인: `nlm notebook list --json`에서 `"title": "텀블러 품질 기준(교육용)"`인 항목의 `"source_count"`가 `2`입니다. `nlm source list <노트북 ID>`로 보면 두 소스(`notebooklm-Rev.A.md`, `notebooklm-Rev.B.md`) 모두 `"status": 2`로 나왔습니다. 이 숫자의 뜻은 nlm 문서로 확인하지 못했습니다. `nlm login --check`는 `✓ Authentication valid!`를 출력합니다. (실제 연결로 확인)
-
-확인: `NOTEBOOKLM_NOTEBOOK_ID`가 36자이고 숫자·a~f·하이픈만 있습니다. `NOTEBOOKLM_MCP_COMMAND`의 경로에 파일이 있습니다. (실제 연결로 확인) 미확인(Windows).
-
-#### MCP 설정 파일(선택)
-
-`NOTEBOOKLM_MCP_COMMAND`를 적었으면 이 절은 건너뜁니다. Antigravity 대화에서도 NotebookLM을 쓰려면 `nlm setup`으로 등록합니다.
-
-```powershell
-nlm setup
-```
-
-- `nlm setup`에서는 Antigravity 하나만 고릅니다(0.15.5 기준 `nlm setup add antigravity`). 기존 설정은 먼저 백업합니다. 어느 버전도 Windows에서 확인하지 않았습니다.
-
-MCP 설정 파일 위치는 두 곳입니다.
-
-- Antigravity 공식 문서의 전역 설정: `~/.gemini/config/mcp_config.json`(작업영역 설정은 `.agents/mcp_config.json`)
-- `nlm setup add antigravity`(0.15.5)가 쓰는 곳: `~/.gemini/antigravity/mcp_config.json`
-- Antigravity가 실제로 어느 파일을 읽는지는 미확인입니다.
-- `~`는 홈 폴더입니다(Windows: `C:\Users\<사용자>`).
-
-앱은 MCP 실행 방법을 이 순서로 찾습니다. 서버 이름은 `gemini-notebook-mcp`입니다.
-
-1. 환경 변수 `NOTEBOOKLM_MCP_COMMAND`
-2. `~/.gemini/config/mcp_config.json`의 `gemini-notebook-mcp` 항목
-3. `~/.gemini/antigravity/mcp_config.json`의 `gemini-notebook-mcp` 항목
-
-- 어디에도 없으면 오류 문구가 확인한 곳을 모두 보여 줍니다.
-- 이 설정은 비전 리스크 과정과 같이 씁니다.
-
-직접 등록할 때는 `mcpServers` 안에 이렇게 적습니다. `command`에 PATH에 있는 명령 이름을 쓰는 형식입니다.
-
-```json
-{
-  "mcpServers": {
-    "gemini-notebook-mcp": { "command": "uvx", "args": ["--from", "notebooklm-mcp-cli", "notebooklm-mcp"] }
-  }
-}
-```
-
-- Windows에서는 `.cmd`·`.bat`를 거절합니다. `.exe` 경로나 `uvx`를 씁니다.
-
-확인: 두 설정 파일 중 하나에 `gemini-notebook-mcp` 항목이 있습니다. 미확인(실계정 필요).
-
-### 3. 근거 질의 확인
-
-할 곳: 터미널(Antigravity), 이어서 앱 화면
-
-1. `npm.cmd start`(macOS: `npm start`)를 다시 실행합니다.
-2. clasp 경로 11단계(붙여넣기 경로 9단계)에서 만든 판독 초안이 있는 검사 상세를 엽니다. 근거 질의는 판독 초안이 있어야 합니다.
-3. `근거 확인`을 누릅니다. 상세를 연 직후라 근거 질문 목록을 아직 불러오는 중이면 `저장된 근거 질문을 불러오는 중입니다. 불러오면 이어서 근거를 확인합니다.`가 나오고, 목록을 불러온 뒤 이어서 질의합니다.
-4. 출처 원문과 대조한 뒤 `일치`(또는 `검토 필요`)로 저장합니다. 이 저장이 보고서 검토입니다. `일치`로 저장한 검사는 홈의 「보고서 검토 대기」에서 빠지고, `검토 필요`로 저장했거나 아직 저장하지 않은 검사는 남습니다. AI가 본 사진·중량·제품이 바뀌어 판독 결과가 예전 것이 되면 다시 대기에 들어갑니다. 4번 탭 판단 저장이나 메모·검사일시만 바꾼 수정은 검토 완료를 그대로 둡니다. 검토 완료는 출하 승인이 아닙니다.
-
-확인: 판독 결과가 있는 검사는 상세를 열면 2번 탭 배지가 `AI 초안 조회 중` 다음에 `대조 기록 확인 중`(노란색)으로 보입니다. 저장된 대조 이력을 불러오면 마지막으로 저장한 대조에 따라 `검토 필요`나 `확인할 결과`로 바뀝니다. 실제 GAS에서는 10~16초쯤 걸립니다. 근거를 조회만 하고 저장하지 않은 질의는 배지를 바꾸지 않습니다. (실제 연결로 확인) 이력을 불러오지 못하면 `대조 기록 확인 실패`(노란색)로 바뀝니다. 판정 결과가 아니며, 상세를 다시 열면 다시 불러옵니다. 미확인(실계정 필요): 실제 GAS가 거절한 경우는 보지 못했고, 브라우저에서 요청을 막아 본 화면입니다.
-
-확인: `NotebookLM에서 검사기준을 찾는 중입니다.` 다음에 `근거를 불러왔습니다. 원문과 일치하는지 확인하세요.`가 나옵니다. 2026-10-20 실제 질의에서는 누르고 40~60초 걸렸습니다. (실제 연결로 확인) 앱은 NotebookLM 질의를 120초, MCP 실행 전체를 135초까지 기다립니다. 어느 쪽이 넘어도 `NotebookLM 응답 시간이 초과되었습니다. 자동 재시도하지 않습니다.`가 나오고 자동으로 다시 하지 않습니다. 이때는 잠시 뒤 같은 단추(`근거 확인` 또는 `근거 다시 조회`)를 다시 누릅니다.
-
-확인: 답변 아래 접혀 있는 「근거 질문·연결 정보」를 눌러 펼치면 끝에 `실제 NotebookLM 질의 완료`가 보입니다. 접힌 채로는 보이지 않습니다. 상세를 다시 열어 저장된 답변을 볼 때는 `저장된 실제 NotebookLM 답변`이 보입니다. (실제 연결로 확인) `모의 응답 — 실제 NotebookLM 연결 아님(NOTEBOOKLM_MODE=mock)`이면 `NOTEBOOKLM_MODE`가 `mock`입니다. `NotebookLM 근거 대조가 꺼져 있습니다(NOTEBOOKLM_MODE=off).`는 펼치지 않아도 보이고, `NOTEBOOKLM_MODE=live`를 적지 않았다는 뜻입니다.
-
-확인: 「이 결과와 비교할 검사기준」 아래 문서 이름이 `교육용 텀블러 검사기준 (TUM-QC-STD-001 Rev.A)`처럼 나옵니다. 답변이 노트북 소스를 하나도 인용하지 않았으면 `문서명 미확인 · Rev.A`로 나옵니다. 이 이름과 버전은 질의한 기준이라 바로 아래에 `질의한 기준입니다. 답변이 인용한 원문의 판(Rev.A/B)은 아래 인용과 대조해 확인하세요.`가 함께 나옵니다. 답변 속 `> "…"` 인용은 `>` 기호 없이 들여 쓴 인용 단락으로 보입니다. 이 화면 동작은 로컬 테스트로 확인했고 실제 연결로는 미확인입니다.
-
-확인: 같은 서버를 띄운 채 설정 화면을 열면 「NotebookLM MCP 로컬 연동 상태」가 `정상 연결`입니다. (실제 연결로 확인) 서버를 다시 시작하면 다음 질의가 성공할 때까지 `연결 준비 필요`로 돌아갑니다.

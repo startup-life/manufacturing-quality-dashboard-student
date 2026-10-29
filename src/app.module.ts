@@ -4,7 +4,6 @@ import { AppController } from './app.controller';
 import { SessionController } from './session.controller';
 import { PromptsController } from './prompts.controller';
 import { InspectionsController } from './inspections.controller';
-import { EvidenceController } from './evidence.controller';
 import { PagesController } from './pages.controller';
 import { FactoryUserGuard } from './factory-user.guard';
 
@@ -15,7 +14,7 @@ export class AppModule {
     return {
       module: AppModule,
       // PagesController matches every path, so it stays last.
-      controllers: [SessionController, PromptsController, InspectionsController, AppController, EvidenceController, PagesController],
+      controllers: [SessionController, PromptsController, InspectionsController, AppController, PagesController],
       providers: [{ provide: AppService, useValue: service }, FactoryUserGuard]
     };
   }

@@ -1,13 +1,7 @@
 // Learners edit natural-language text, not variables, JSON, or authentication.
 let settingsGeneration=0;
 let editorDirty=false;
-const kindNames={gemini:'Gemini 판독 지시',notebooklm:'NotebookLM 근거 질문'};
-// The last query of a current draft. A judgment saved after it raises the inspection version but keeps the draft
-// current (stale follows the AI input), so the query and its check stay valid; the version argument is not used.
-export function savedEvidenceFor(queries,draft){
-  if(!Array.isArray(queries)||!draft||draft.stale)return null;
-  return queries.filter(q=>String(q.draft_id)===String(draft.draft_id)).at(-1)||null;
-}
+const kindNames={gemini:'Gemini 판독 지시'};
 // Times are stored in UTC; the screen shows Korean time as YYYY-MM-DD HH:mm, and anything that is not a date as stored.
 export function kstTime(value) {
   const t = Date.parse(value || '');
@@ -21,12 +15,12 @@ export async function loadPromptSettings(host,{api,el,setFormDirty}){
   const current=()=>generation===settingsGeneration;
   const panels=[];
   try{
-    const {versions}=await api('/api/prompts');if(generation!==settingsGeneration)return;
+    const {versions}=await api('/api/prompts?kind=gemini');if(generation!==settingsGeneration)return;
     host.replaceChildren(el('h2','자연어 지시문과 검사기준'),el('p','지시문을 저장한 뒤 검사 상세에서 선택해 실행하세요. 저장만으로 AI를 호출하지 않습니다.','muted'));
-    for(const kind of ['gemini','notebooklm']){
+    for(const kind of ['gemini']){
       const card=el('section',undefined,'panel prompt-editor');card.append(el('h3',kindNames[kind]));
       const select=el('select'),selectLabel=el('label','저장된 버전');select.setAttribute('aria-label',kindNames[kind]+' 버전');selectLabel.append(select);
-      const text=el('textarea'),textLabel=el('label','자연어 원문');text.rows=kind==='gemini'?12:6;text.maxLength=5000;text.setAttribute('aria-label',kindNames[kind]+' 원문');textLabel.append(text);
+      const text=el('textarea'),textLabel=el('label','자연어 원문');text.rows=12;text.maxLength=5000;text.setAttribute('aria-label',kindNames[kind]+' 원문');textLabel.append(text);
       const status=el('p','', 'muted');status.setAttribute('role','status');
       const save=el('button','수정본 저장','btn-action primary');save.type='button';save.disabled=true;
       let rows=selectablePrompts(versions).filter(p=>p.kind===kind),selected,saving=false,saveId=null;

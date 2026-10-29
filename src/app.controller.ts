@@ -50,12 +50,7 @@ export class AppController {
     }
   }
 
-  // Read-only draft history.
-  @Get('drafts/:id/reviews')
-  draftReviews(@Param('id') id: string) {
-    return this.app.repo.transport.dispatch('drafts.reviews.list', { draft_id: id });
-  }
-
+  // The source checks saved for a draft (read only); tab 2's badge reads them.
   @Get('drafts/:id/evidence')
   draftEvidence(@Param('id') id: string) {
     return this.app.repo.transport.dispatch('drafts.evidence.list', { draft_id: id });
@@ -63,16 +58,15 @@ export class AppController {
 
   @Get('operations')
   operations() {
-    const { repo, geminiMode, integrations, mcpClient, options } = this.app;
+    const { repo, geminiMode, integrations, options } = this.app;
     return {
       // Older fields, kept by name; with GEMINI_MODE off or mock they no longer claim the GAS Gemini call.
       ai_mode: repo.live && geminiMode === 'live' ? 'gas-gemini-free-api' : 'not-configured',
       external_api_enabled: repo.live && geminiMode === 'live' && options.geminiReady === true,
-      notebooklm: '별도 로컬 MCP 연결; 웹 자동 동기화 아님',
       revisions: ['Rev.A', 'Rev.B'],
       scope: '교육용·출하 승인 없음',
       storage_provider: repo.live ? 'gas' : 'local-simulation',
-      integrations: integrationStatus(integrations, { geminiReady: options.geminiReady, mcpClient, geminiModels: options.geminiModels })
+      integrations: integrationStatus(integrations, { geminiReady: options.geminiReady, geminiModels: options.geminiModels })
     };
   }
 }

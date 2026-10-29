@@ -1,5 +1,5 @@
 /**
- * Integration switches read once at startup: storage (live|mock), Gemini and NotebookLM (off|mock|live).
+ * Integration switches read once at startup: storage (live|mock) and Gemini (off|mock|live).
  * Messages name the setting and the fix; they never include the web app URL.
  * A mock result is used only when its switch says mock; a live failure is never replaced by one.
  */
@@ -9,7 +9,7 @@ import { geminiModelText } from './gemini';
 
 type Env = Record<string, string | undefined>;
 type Mode = { mode: string };
-export type Integrations = { storage: Mode & { webAppUrl?: string }; gemini: Mode; notebooklm: Mode };
+export type Integrations = { storage: Mode & { webAppUrl?: string }; gemini: Mode };
 export type GeminiModels = { model?: string | null; fallback_model?: string | null } | null | undefined;
 
 // A refused setting: the server does not start and prints this one-line message.
@@ -48,7 +48,6 @@ function storageMode(env: Env, warnings: string[]) {
 
 // Shown when the route is called with the switch off: a 409 with guidance, not an empty success.
 export const GEMINI_OFF_MESSAGE = 'Gemini 판독이 꺼져 있습니다(GEMINI_MODE=off). 4번 탭에서 직접 판단을 기록하세요.';
-export const NOTEBOOKLM_OFF_MESSAGE = 'NotebookLM 근거 대조가 꺼져 있습니다(NOTEBOOKLM_MODE=off). 기준 원문을 직접 읽고 판단하세요.';
 
 const GEMINI_MOCK_MESSAGE = '모의 초안입니다(GEMINI_MODE=mock). 사진을 분석하지 않았고 실제 판독 횟수에 들어가지 않습니다.';
 // Read once at startup, so it asks for a restart after the key is set.
@@ -61,7 +60,7 @@ export function geminiSettingsWarning(connection: any) {
   return connection?.gemini_model === null ? GEMINI_SETTINGS_INVALID : '';
 }
 
-const defaults = (storage: string) => ({ gemini: storage === 'live' ? 'live' : 'off', notebooklm: storage === 'live' ? 'off' : 'mock' });
+const defaults = (storage: string) => ({ gemini: storage === 'live' ? 'live' : 'off' });
 
 function featureMode(env: Env, name: string) {
   const current = value(env, name);
@@ -69,39 +68,26 @@ function featureMode(env: Env, name: string) {
   return current;
 }
 
-function notebookLmMode(env: Env) {
-  const current = featureMode(env, 'NOTEBOOKLM_MODE');
-  const legacy = value(env, 'NOTEBOOKLM_MCP_MODE');
-  if (legacy !== undefined && !['live', 'mock'].includes(legacy)) refuse(`옛 이름 NOTEBOOKLM_MCP_MODE는 live 또는 mock만 받습니다(지금 값: ${legacy}). NOTEBOOKLM_MODE=off, mock, live 중 하나로 바꾸세요.`);
-  if (current !== undefined && legacy !== undefined && current !== legacy) refuse('NOTEBOOKLM_MODE와 옛 이름 NOTEBOOKLM_MCP_MODE의 값이 다릅니다. NOTEBOOKLM_MODE 하나만 남기세요.');
-  return { mode: current ?? legacy, legacy: current === undefined && legacy !== undefined };
-}
-
-// The three refused combinations; off is allowed with either storage.
-// names: how the user wrote the storage switch and whether NotebookLM came from its old name (readIntegrations).
-export function checkModes(storage: string, gemini: string, notebooklm: string, names: { storage?: string; notebooklmLegacy?: boolean } = {}) {
+// The two refused combinations; off is allowed with either storage.
+// names: how the user wrote the storage switch (readIntegrations).
+export function checkModes(storage: string, gemini: string, names: { storage?: string } = {}) {
   const storageName = names.storage ?? `STORAGE_MODE=${storage}`;
   if (storage === 'live' && gemini === 'mock') refuse(`${storageName}에서는 GEMINI_MODE=mock을 쓸 수 없습니다(모의 결과가 실제 기록에 섞입니다). GEMINI_MODE를 live 또는 off로 바꾸세요.`);
-  if (storage === 'live' && notebooklm === 'mock') refuse(names.notebooklmLegacy
-    ? `${storageName}에서는 옛 이름 NOTEBOOKLM_MCP_MODE=mock을 쓸 수 없습니다(모의 근거가 실제 기록에 섞입니다). NOTEBOOKLM_MCP_MODE 줄을 지우고 NOTEBOOKLM_MODE를 live 또는 off로 넣으세요.`
-    : `${storageName}에서는 NOTEBOOKLM_MODE=mock을 쓸 수 없습니다(모의 근거가 실제 기록에 섞입니다). NOTEBOOKLM_MODE를 live 또는 off로 바꾸세요.`);
   if (storage === 'mock' && gemini === 'live') refuse(`${storageName}에서는 GEMINI_MODE=live를 쓸 수 없습니다(Gemini는 GAS 안에서만 호출합니다). STORAGE_MODE=live로 GAS에 연결하거나 GEMINI_MODE를 off 또는 mock으로 바꾸세요.`);
 }
 
 // createApp's modes: storage follows the transport, missing switches take the storage defaults.
 export function appIntegrations(given: Partial<Integrations> = {}, storage: string): Integrations {
   const fallback = defaults(storage);
-  const gemini = given.gemini?.mode ?? fallback.gemini, notebooklm = given.notebooklm?.mode ?? fallback.notebooklm;
-  if (!FEATURE_MODES.includes(gemini) || !FEATURE_MODES.includes(notebooklm)) refuse(`GEMINI_MODE와 NOTEBOOKLM_MODE는 off, mock, live 중 하나여야 합니다(지금 값: ${gemini}, ${notebooklm}).`);
-  checkModes(storage, gemini, notebooklm);
-  return { storage: { mode: storage }, gemini: { mode: gemini }, notebooklm: { mode: notebooklm } };
+  const gemini = given.gemini?.mode ?? fallback.gemini;
+  if (!FEATURE_MODES.includes(gemini)) refuse(`GEMINI_MODE는 off, mock, live 중 하나여야 합니다(지금 값: ${gemini}).`);
+  checkModes(storage, gemini);
+  return { storage: { mode: storage }, gemini: { mode: gemini } };
 }
 
-// GET /api/operations: each switch with whether it can run now. mcpClient reports the live NotebookLM launch check.
+// GET /api/operations: each switch with whether it can run now.
 // geminiModels: the models GAS reported at startup ({ model, fallback_model }, '' for no fallback); live only.
-export function integrationStatus({ storage, gemini, notebooklm }: Integrations, { geminiReady = false, mcpClient, geminiModels }: { geminiReady?: boolean; mcpClient?: { liveProblem?(): string | null; liveVerified?: boolean }; geminiModels?: GeminiModels } = {}) {
-  const liveProblem = notebooklm.mode === 'live' ? mcpClient?.liveProblem?.() ?? null : null;
-  const verified = notebooklm.mode === 'live' && mcpClient?.liveVerified === true;
+export function integrationStatus({ storage, gemini }: Integrations, { geminiReady = false, geminiModels }: { geminiReady?: boolean; geminiModels?: GeminiModels } = {}) {
   return {
     storage: { mode: storage.mode },
     gemini: {
@@ -109,22 +95,13 @@ export function integrationStatus({ storage, gemini, notebooklm }: Integrations,
       ready: gemini.mode === 'mock' || (gemini.mode === 'live' && geminiReady === true),
       message: gemini.mode === 'off' ? GEMINI_OFF_MESSAGE : gemini.mode === 'mock' ? GEMINI_MOCK_MESSAGE : geminiReady === true ? 'GAS에서 Gemini 판독을 호출합니다.' : GEMINI_NOT_READY,
       ...liveModels(gemini.mode, geminiModels)
-    },
-    notebooklm: {
-      mode: notebooklm.mode,
-      ready: notebooklm.mode === 'mock' || (notebooklm.mode === 'live' && !liveProblem),
-      verified,
-      message: notebooklm.mode === 'off' ? NOTEBOOKLM_OFF_MESSAGE
-        : notebooklm.mode === 'mock' ? '로컬 모의 응답입니다. 실제 NotebookLM에 질의하지 않습니다.'
-        : liveProblem || (verified ? 'NotebookLM MCP 서버가 연결되었습니다.' : '실행 설정을 확인했습니다. 실제 연결은 근거 확인을 누를 때 확인합니다.')
     }
   };
 }
 
 const LABELS: Record<string, Record<string, string>> = {
   storage: { live: 'GAS 웹앱', mock: '로컬 파일' },
-  gemini: { off: '사람이 직접 판정', mock: '모의 초안', live: 'GAS에서 Gemini 호출' },
-  notebooklm: { off: '근거 대조 꺼짐', mock: '모의 응답', live: '실제 질의' }
+  gemini: { off: '사람이 직접 판정', mock: '모의 초안', live: 'GAS에서 Gemini 호출' }
 };
 // A GAS deployed before the model fields reports none; then no model is shown rather than a guess from .env.
 function liveModels(mode: string, models: GeminiModels): { model?: string; fallback_model?: string } {
@@ -132,14 +109,14 @@ function liveModels(mode: string, models: GeminiModels): { model?: string; fallb
   return { model: models.model, fallback_model: typeof models.fallback_model === 'string' ? models.fallback_model : '' };
 }
 
-// One startup log line, e.g. "연동 상태: 저장소=mock(로컬 파일) · Gemini=off(사람이 직접 판정) · NotebookLM=mock(모의 응답)".
+// One startup log line, e.g. "연동 상태: 저장소=mock(로컬 파일) · Gemini=off(사람이 직접 판정)".
 // With the models GAS reported, live Gemini names them: "Gemini=live(gemini-3.8-flash, 대체 gemini-3.5-flash-lite)".
 // A GAS that reports null (stored values not allowed) reads differently from an older GAS without the fields.
-export function integrationSummary({ storage, gemini, notebooklm }: Integrations, { geminiModels }: { geminiModels?: GeminiModels } = {}) {
+export function integrationSummary({ storage, gemini }: Integrations, { geminiModels }: { geminiModels?: GeminiModels } = {}) {
   const models = liveModels(gemini.mode, geminiModels);
   const invalid = gemini.mode === 'live' && geminiModels?.model === null;
   const geminiLabel = models.model ? geminiModelText(models.model, models.fallback_model) : invalid ? '모델 설정 확인 필요' : LABELS.gemini[gemini.mode];
-  return `연동 상태: 저장소=${storage.mode}(${LABELS.storage[storage.mode]}) · Gemini=${gemini.mode}(${geminiLabel}) · NotebookLM=${notebooklm.mode}(${LABELS.notebooklm[notebooklm.mode]})`;
+  return `연동 상태: 저장소=${storage.mode}(${LABELS.storage[storage.mode]}) · Gemini=${gemini.mode}(${geminiLabel})`;
 }
 
 function webAppSettings(env: Env, storageName: string) {
@@ -186,13 +163,9 @@ function readSwitches(env: Env, warnings: string[]) {
   const { mode, name: storageName } = storageMode(env, warnings);
   const fallback = defaults(mode);
   const gemini = featureMode(env, 'GEMINI_MODE') ?? fallback.gemini;
-  const notebook = notebookLmMode(env);
-  const notebooklm = notebook.mode ?? fallback.notebooklm;
-  checkModes(mode, gemini, notebooklm, { storage: storageName, notebooklmLegacy: notebook.legacy });
+  checkModes(mode, gemini, { storage: storageName });
   let storage: Integrations['storage'] = { mode };
   if (mode === 'live') storage = { mode, ...webAppSettings(env, storageName) };
-  if (gemini === 'off' && notebooklm !== 'off') warnings.push('Gemini가 꺼져 있어 NotebookLM 대조에 쓸 AI 초안이 생기지 않습니다.');
-  if (notebooklm !== 'live' && value(env, 'NOTEBOOKLM_NOTEBOOK_ID') !== undefined) warnings.push(`노트북 ID가 있지만 NOTEBOOKLM_MODE=${notebooklm} 설정에서는 실제 질의를 하지 않습니다.`);
   if (mode === 'mock' && value(env, 'GAS_WEBAPP_URL') !== undefined) warnings.push('GAS_WEBAPP_URL이 있지만 STORAGE_MODE=mock이라 로컬 저장소를 씁니다.');
-  return { storage, gemini: { mode: gemini }, notebooklm: { mode: notebooklm }, warnings };
+  return { storage, gemini: { mode: gemini }, warnings };
 }

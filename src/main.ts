@@ -10,7 +10,6 @@ import { createNestApp } from './app';
 import { openLocalTransport } from './local-gas-state';
 import { GasTransport } from './gas-transport';
 import { readIntegrationsWithWarnings, IntegrationSettingError, integrationSummary, GEMINI_NOT_READY, checkGasConnection, geminiSettingsWarning, Integrations, GeminiModels } from './integrations';
-import { NotebookLmMcpClient } from './mcp-client';
 import { envFileBomError } from './env-file';
 
 const root = path.join(__dirname, '..');
@@ -40,10 +39,6 @@ async function bootstrap() {
 
   await fs.mkdir(path.join(root, 'runtime'), { recursive: true });
 
-  // NotebookLM off never queries; the client then stays in mock mode and is not called.
-  const mcpClient = new NotebookLmMcpClient({ mode: integrations.notebooklm.mode === 'live' ? 'live' : 'mock' });
-  if (integrations.notebooklm.mode === 'live') { const problem = mcpClient.liveProblem(); if (problem) console.warn(problem); }
-
   let transport: GasTransport;
   let geminiReady = false, geminiModels: GeminiModels = null;
   if (integrations.storage.mode === 'live') {
@@ -64,7 +59,7 @@ async function bootstrap() {
   // Only the modes go to the app; the web app URL stays with the transport.
   // createNestApp refuses mixed switches with one line, like the settings refused above.
   let app;
-  try { app = await createNestApp({ geminiReady, geminiModels, mcpClient, integrations: { gemini: integrations.gemini, notebooklm: integrations.notebooklm }, transport }); }
+  try { app = await createNestApp({ geminiReady, geminiModels, integrations: { gemini: integrations.gemini }, transport }); }
   catch (e: any) { console.error(e.message); process.exit(1); }
   await app.listen(port, '127.0.0.1');
   console.log(`GAS 품질 대시보드 서버 실행 중: ${process.env.APP_ORIGIN}`);

@@ -100,12 +100,12 @@
             <button type="button" class="metric-card" data-metric="pending" aria-pressed="false">
               <span class="metric-title">보고서 검토 대기</span>
               <strong id="home-pending">—</strong>
-              <span class="metric-sub">출처 대조 전 · 검토 필요 · 재검토</span>
+              <span class="metric-sub">판독 결과 확인 전 · 재검토</span>
             </button>
             <button type="button" class="metric-help-btn" data-help-target="help-pending" aria-label="보고서 검토 대기 도움말" aria-expanded="false">?</button>
             <div id="help-pending" class="metric-help-popover" hidden>
-              <p class="help-lead">AI 판독 결과 가운데 3번 탭 출처 대조로 확인을 마치지 않은 수량입니다.</p>
-              <p class="help-desc">출처 대조를 아직 하지 않았거나 '검토 필요'로 저장한 검사, 그리고 AI가 본 사진·중량·제품이 바뀌어 판독 결과가 예전 것이 된 검사가 해당됩니다. 판단 저장이나 메모·검사일시 수정은 검토 완료를 바꾸지 않습니다. 출처 대조를 '일치'로 저장하면 검토 완료로 보고 빠집니다. 판독 결과가 없는 검사는 제외되며, NG·HOLD 건과 중복될 수 있습니다. 검토 완료는 보고서 확인을 뜻하며 최종 출하 승인을 의미하지 않습니다.</p>
+              <p class="help-lead">AI 판독 결과가 있고 아직 검토를 마치지 않은 검사 수량입니다.</p>
+              <p class="help-desc">판독 결과가 있는 검사, 그리고 AI가 본 사진·중량·제품이 바뀌어 판독 결과가 예전 것이 된 검사가 해당됩니다. 메모·검사일시 수정은 이 수를 바꾸지 않습니다. 판독 결과가 없는 검사는 제외되며, NG·HOLD 건과 중복될 수 있습니다. 최종 출하 승인을 의미하지 않습니다.</p>
               <button type="button" class="help-close-btn" data-help-close="help-pending">닫기</button>
             </div>
           </div>
@@ -207,7 +207,7 @@
           <div class="form-actions">
             <h3>등록할 내용</h3>
             <p id="reg-save-summary" class="registration-summary" aria-live="polite"></p>
-            <p id="reg-storage-notice" class="form-help">등록한 뒤 상세 화면에서 AI 결과 확인 → 검사기준 비교 → 내 판단 기록 순서로 진행합니다.</p>
+            <p id="reg-storage-notice" class="form-help">등록하면 상세 화면 2번 탭이 열리고 AI 판독을 요청합니다.</p>
             <p id="reg-status-message" role="status" aria-live="polite"></p>
             <div class="registration-actions">
               <button type="submit" id="reg-submit-btn" class="btn-action primary btn-lg">검사 등록하고 결과 확인</button>
@@ -227,7 +227,7 @@
           <h2>시스템 및 외부 연동 설정</h2>
           <span class="badge">설정 및 상태 점검</span>
         </div>
-        <p class="muted">Google Apps Script, Google Sheets, Drive 및 로컬 NotebookLM MCP 서버 연동 상태를 확인합니다.</p>
+        <p class="muted">Google Apps Script, Google Sheets, Drive와 Gemini 연동 상태를 확인합니다.</p>
 
         <div class="settings-grid">
           <article class="setting-card">
@@ -239,13 +239,6 @@
               <li>보안: 수식 주입 방어 (=, +, -, @ 차단) 및 bcrypt 인증 검증</li>
               <li>무결성: 멱등성 키 기반 중복 등록 방지</li>
             </ul>
-          </article>
-
-          <article class="setting-card">
-            <h3>NotebookLM MCP 로컬 연동 상태</h3>
-            <p>연결 상태: <strong id="settings-mcp-status" class="status-badge warning">연결 준비 필요</strong></p>
-            <p class="muted">바이너리: <code>notebooklm-mcp</code> (MCP 설정 파일의 command 경로, 로컬 stdio 전송)</p>
-            <p class="muted">NOTEBOOKLM_MODE=live이면 이 서버에서 실제 질의가 한 번 성공한 뒤 '정상 연결'로 바뀌고, 서버를 다시 시작하면 다음 질의가 성공할 때까지 '연결 준비 필요'로 보입니다. 표준서(Rev.A/B) 근거는 검사 상세에서 대조·저장합니다.</p>
           </article>
 
           <article class="setting-card">

@@ -5,7 +5,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { AppService } from './app.service';
 import { FactoryUserGuard } from './factory-user.guard';
-import { InputError, inspectionInput, recordInput, listInput } from './validation';
+import { InputError, inspectionInput, listInput } from './validation';
 import { GEMINI_OFF_MESSAGE } from './integrations';
 import { normalizePhoto } from './photo';
 import { errorEvent } from './log';
@@ -146,18 +146,6 @@ export class InspectionsController {
     } catch (err: any) {
       throw UNKNOWN_OUTCOME.test(err?.code || '') ? Object.assign(new InputError(REGISTRATION_UNKNOWN, 503), { code: err.code, cause: err }) : err;
     }
-  }
-
-  @Get(':id/records')
-  async records(@Param('id') id: string) {
-    if (!await this.app.repo.detail(id)) throw new InputError('검사가 없습니다.', 404);
-    return this.app.repo.history(id);
-  }
-
-  @Post(':id/records')
-  @UseGuards(FactoryUserGuard)
-  saveRecord(@Param('id') id: string, @Req() req: Request, @Body() body: any) {
-    return this.app.repo.saveRecord(id, req.session.user?.id, recordInput(body));
   }
 
   @Get(':id/drafts')

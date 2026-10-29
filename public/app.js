@@ -1,4 +1,4 @@
-import {loadPromptSettings,promptChoice,draftComparison,resetPromptEditors,savedEvidenceFor,kstTime} from './prompts.js';
+import {loadPromptSettings,promptChoice,draftComparison,resetPromptEditors} from './prompts.js';
 function polyfillNode(n) {
   if (!n) return n;
   if (!n.querySelector) n.querySelector = () => null;
@@ -37,87 +37,6 @@ export function el(tag, text, className) {
   if (text !== undefined && text !== null) n.textContent = text;
   if (className) n.className = className;
   return n;
-}
-
-// Render only a small, safe Markdown subset. Model output is never executable HTML.
-export function evidenceInline(parent, text, depth = 0) {
-  if (depth > 5) { parent.append(el('span', text)); return; }
-  const tokens = /(`[^`\n]+`|\*\*[^\n]+?\*\*|__[^\n]+?__|\[[^\]\n]+\]\([^\s)]+\)|\*[^*\n]+\*)/g;
-  let offset = 0;
-  for (const match of text.matchAll(tokens)) {
-    if (match.index > offset) parent.append(el('span', text.slice(offset, match.index)));
-    const value = match[0];
-    let node;
-    if (value.startsWith('`')) node = el('code', value.slice(1, -1));
-    else if (value.startsWith('**') || value.startsWith('__')) {
-      node = el('strong'); evidenceInline(node, value.slice(2, -2), depth + 1);
-    } else if (value.startsWith('*')) {
-      node = el('em'); evidenceInline(node, value.slice(1, -1), depth + 1);
-    } else {
-      const link = /^\[([^\]]+)\]\(([^)]+)\)$/.exec(value);
-      let safe = false;
-      try { safe = ['https:', 'http:'].includes(new URL(link[2]).protocol); } catch (_) {}
-      node = el(safe ? 'a' : 'span', link[1]);
-      if (safe) { node.href = link[2]; node.target = '_blank'; node.rel = 'noopener noreferrer'; }
-    }
-    parent.append(node); offset = match.index + value.length;
-  }
-  if (offset < text.length) parent.append(el('span', text.slice(offset)));
-}
-
-export function renderEvidenceMarkdown(text) {
-  const root = el('div', undefined, 'evidence-cite-quote evidence-markdown');
-  const lines = String(text || '').replace(/\r\n?/g, '\n').split('\n');
-  let paragraph = [], list = null, item = null, quote = null, fenced = null;
-  const flush = () => {
-    if (!paragraph.length) return;
-    const p = el('p');
-    paragraph.forEach((line, index) => { if (index) p.append(el('br')); evidenceInline(p, line); });
-    root.append(p); paragraph = [];
-  };
-  // A "> " quote becomes a blockquote without its markers; consecutive quote lines stay in one block.
-  const quoteLine = (parent, text) => {
-    if (quote?.parent !== parent) { quote = { parent, node: el('blockquote', undefined, 'evidence-quote') }; parent.append(quote.node); }
-    else quote.node.append(el('br'));
-    evidenceInline(quote.node, text);
-  };
-  // ">=" is a comparison, not a quote marker.
-  const QUOTE = /^(\s*)(?:>(?!=)\s*)+(.*)$/;
-  for (const line of lines) {
-    if (/^\s*```/.test(line)) {
-      flush(); list = null; quote = null;
-      if (fenced !== null) { const pre = el('pre'); pre.append(el('code', fenced.join('\n'))); root.append(pre); fenced = null; }
-      else fenced = [];
-      continue;
-    }
-    if (fenced !== null) { fenced.push(line); continue; }
-    if (!line.trim()) { flush(); list = null; quote = null; continue; }
-    const quoted = QUOTE.exec(line);
-    if (quoted) {
-      // An indented quote under a list item (NotebookLM puts the source sentence there) belongs to that item.
-      flush(); const inItem = !!quoted[1] && !!list;
-      if (!inItem) list = null;
-      if (quoted[2].trim()) quoteLine(inItem ? item : root, quoted[2]); else quote = null;
-      continue;
-    }
-    quote = null;
-    const heading = /^\s{0,3}(#{1,6})\s+(.+)$/.exec(line);
-    const listItem = /^\s*(?:[-*+]\s+|(\d+)[.)]\s+)(.+)$/.exec(line);
-    if (heading) {
-      flush(); list = null; const h = el(heading[1].length > 3 ? 'h6' : 'h5'); evidenceInline(h, heading[2]); root.append(h);
-    } else if (/^\s*(?:---+|\*\*\*+)\s*$/.test(line)) {
-      flush(); list = null; root.append(el('hr'));
-    } else if (listItem) {
-      flush(); const tag = listItem[1] ? 'ol' : 'ul';
-      if (!list || list.tagName?.toLowerCase() !== tag) { list = el(tag); if (listItem[1]) list.setAttribute('start', listItem[1]); root.append(list); }
-      item = el('li'); list.append(item);
-      const inner = QUOTE.exec(listItem[2]);
-      if (!inner) evidenceInline(item, listItem[2]); else if (inner[2].trim()) quoteLine(item, inner[2]);
-    } else { list = null; paragraph.push(line); }
-  }
-  flush();
-  if (fenced !== null) { const pre = el('pre'); pre.append(el('code', fenced.join('\n'))); root.append(pre); }
-  return root;
 }
 
 function photo(url, alt) {
@@ -704,13 +623,13 @@ export async function show(id) {
           if (pane2) {
             const list = Array.isArray(drafts) ? drafts : (drafts ? [drafts] : []);
             const finalDrafts = list.length > 0 ? list : (insp.drafts || []);
-            renderStep2(pane2, id, insp, finalDrafts, {}, detail.querySelector('.step-pane[data-step="3"]'));
+            renderStep2(pane2, id, insp, finalDrafts, {});
           }
         })
         .catch(err => {
           if (!workspaceActive || current !== detailRequest || version !== workspaceVersion) return;
           const pane2 = detail.querySelector('.step-pane[data-step="2"]');
-          if (pane2) renderStep2(pane2, id, insp, insp.drafts || [], { error: err.message, retry: loadDrafts }, detail.querySelector('.step-pane[data-step="3"]'));
+          if (pane2) renderStep2(pane2, id, insp, insp.drafts || [], { error: err.message, retry: loadDrafts });
         });
       loadDrafts();
     }
@@ -786,13 +705,11 @@ function renderDetailView(host, id, insp, drafts, standards, draftState = {}) {
   });
 
   renderStep1(pane1, id, insp);
-  renderStep2(pane2, id, insp, drafts, draftState, pane3);
-  renderStep3(pane4, id, insp);
+  renderStep2(pane2, id, insp, drafts, draftState);
+  pane3.append(el('p', '이 탭은 41번부터 만듭니다.', 'muted'));
+  pane4.append(el('p', '이 탭은 52번부터 만듭니다.', 'muted'));
 
   host.append(pane1, pane2, pane3, pane4);
-
-  // 4. Tech Details collapsible at bottom
-  renderBottomTechDetails(host, id, insp);
 
   switchStep(currentStep || 1);
 }
@@ -901,7 +818,7 @@ function renderStep1(container, id, insp) {
   saveBtn.type = 'submit';
   const saveMsg = el('p', '', 'muted');
 
-  form.append(grid, weightLabel, guidanceBox, el('p', '⚠️ 중량·제품 정보를 변경하면 기존 AI 초안은 stale(재판독 필요) 상태로 변경됩니다. 검사일시만 바꾸거나 판단을 저장하면 그대로입니다.', 'alert-text'), saveBtn, saveMsg);
+  form.append(grid, weightLabel, guidanceBox, el('p', '⚠️ 중량·제품 정보를 변경하면 기존 AI 초안은 stale(재판독 필요) 상태로 변경됩니다. 검사일시만 바꾸면 그대로입니다.', 'alert-text'), saveBtn, saveMsg);
 
   form.onsubmit = async (ev) => {
     ev.preventDefault();
@@ -942,18 +859,15 @@ function renderStep1(container, id, insp) {
 }
 
 /* =========================================================
-   Step 2: AI 결과·근거 (6항목 초안 & MCP 표준서 확인)
+   Step 2: AI 결과 (6항목 초안)
    ========================================================= */
-function renderStep2(container, id, insp, drafts, draftState = {}, evidenceContainer = container) {
+function renderStep2(container, id, insp, drafts, draftState = {}) {
   container.replaceChildren();
-  if(evidenceContainer !== container)evidenceContainer.replaceChildren();
   container.classList.add('review-step');
-  evidenceContainer.classList.add('review-step');
 
   const draftList = Array.isArray(drafts) ? drafts : (drafts ? [drafts] : (insp?.drafts || []));
   const latestDraft = draftList.length ? draftList[0] : null;
   const isMockDraft = latestDraft && (latestDraft.is_mock || latestDraft.result?.is_mock || latestDraft.status === 'MOCK_COMPLETED');
-  let nextStepButton;
   const intro = el('div', undefined, 'review-intro');
   intro.append(el('h2', 'AI가 제안한 결과를 확인하세요'));
   intro.append(el('p', '결과와 이유를 확인한 뒤, 다음 탭에서 검사기준과 비교합니다.', 'muted'));
@@ -968,14 +882,13 @@ function renderStep2(container, id, insp, drafts, draftState = {}, evidenceConta
   container.append(context);
   const layout = el('div', undefined, 'review-single');
   container.append(layout);
-  const confirmationHost = el('div', undefined, 'review-confirmation-host');
 
   // 1. AI Analysis Status Card
   const aiCard = el('section', undefined, 'review-panel review-result');
   const aiHead = el('div', undefined, 'section-head');
   aiHead.append(el('h3', '1. AI 결과 확인'));
 
-  // A current draft waits for its saved source checks (tab 3) before it says 검토 필요 or 확인할 결과.
+  // A current draft waits for its saved source checks before it says 검토 필요 or 확인할 결과.
   const checkingBadge = !draftState.loading && !draftState.error && latestDraft && !latestDraft.stale;
   const statusBadge = el('span',
     draftState.loading ? 'AI 초안 조회 중' : draftState.error ? 'AI 초안 조회 실패' :
@@ -1026,8 +939,7 @@ function renderStep2(container, id, insp, drafts, draftState = {}, evidenceConta
     fields.forEach(f => {
       const box = el('div');
       const val = latestDraft.result?.[f.key] || (f.key === '판정' ? latestDraft.result?.decision : null) || '기록 없음';
-      const description = el('dd'); evidenceInline(description, val);
-      box.append(el('dt', f.label), description);
+      box.append(el('dt', f.label), el('dd', val));
       reportGrid.append(box);
     });
     aiCard.append(reportGrid);
@@ -1052,7 +964,7 @@ function renderStep2(container, id, insp, drafts, draftState = {}, evidenceConta
   runOptions.append(el('summary', '판독 조건 · 검사기준과 프롬프트'));
   const revisionLabel=el('label','다음 판독에 적용할 검사기준');revisionLabel.append(revisionSelect);runOptions.append(revisionLabel);
   aiCard.append(runOptions);
-  let geminiChoice=null,notebookChoice=null,geminiOff=false;
+  let geminiChoice=null,geminiOff=false;
   // show() draws this tab again once the drafts arrive, so the loading draw does not ask for prompts, runs, the standard or saved checks.
   if(!draftState.loading)void promptChoice(runOptions,'gemini',{api,el,inspectionId:id,getRevision:()=>revisionSelect.value,expectedVersion:insp.content_version,current}).then(choice=>{if(current())geminiChoice=choice;});
   revisionSelect.onchange=()=>geminiChoice?.refresh();
@@ -1066,7 +978,7 @@ function renderStep2(container, id, insp, drafts, draftState = {}, evidenceConta
     statusBadge.textContent=runAiStatus.textContent;
     if(['SUCCEEDED','MOCK_COMPLETED'].includes(run.status)) {
       const result=await api('/api/inspections/'+encodeURIComponent(id)+'/drafts');
-      if(current())renderStep2(container,id,insp,result,{},evidenceContainer);
+      if(current())renderStep2(container,id,insp,result,{});
       return;
     }
     if(['FAILED','UNKNOWN'].includes(run.status)) {
@@ -1120,294 +1032,30 @@ function renderStep2(container, id, insp, drafts, draftState = {}, evidenceConta
     if(geminiOff)runAiBtn.disabled=true;
     // The empty-state help would otherwise point at a button that is off.
     if(geminiOff&&emptyHelp)emptyHelp.textContent=GEMINI_OFF_TEXT;
-    // Tab 3 would send the person to tab 2's button, which is off. NotebookLM off keeps its own guidance there.
-    if(geminiOff&&!latestDraft&&notebookMode!=='off'){queryHelp.textContent=GEMINI_OFF_EVIDENCE_TEXT;queryHelp.hidden=false;}
     if(gemini.mode!=='live'||!gemini.ready)runAiStatus.textContent=gemini.message||'';
   }).catch(()=>{});
 
-  // 2. NotebookLM MCP Evidence Card
-  const mcpCard = el('section', undefined, 'review-panel review-standard');
-  const mcpHead = el('div', undefined, 'evidence-mcp-header');
-  mcpHead.append(el('h3', '2. 검사기준과 비교하기'));
-
-  const mcpBadge = el('span', '연결 상태 확인 중', 'muted');
-  // NOTEBOOKLM_MODE off or mock from the status response; the mode badge then stays whatever loads after it.
-  let notebookMode = null;
-  // Set once a query answer (saved or new) is on screen; a later status response then leaves its badge alone.
-  let evidenceShown = false;
-  mcpCard.append(mcpHead);
-
-  api('/api/notebooklm/status').then(st => {
-    if (!current()) return;
-    if (st.mode === 'off' || st.mode === 'mock') {
-      notebookMode = st.mode;
-      showNotebookMode(st.mode, mcpBadge, queryBtn, queryHelp);
-    } else if (evidenceShown) {
-      return;
-    } else if (st.connected) {
-      mcpBadge.textContent = 'NotebookLM 연결됨';
-    } else {
-      mcpBadge.textContent = 'NotebookLM 연결 여부는 근거 조회 시 확인합니다.';
-    }
-  }).catch(() => {mcpBadge.textContent='연결 상태 조회 실패';});
-
-  mcpCard.append(
-    el('p', '여기서 말하는 「근거」는 정상·불량을 나누는 검사기준 문서입니다. 결과의 설명이 이 기준과 맞는지 확인하세요.', 'review-explanation')
-  );
-  const standardArea = el('div', undefined, 'review-standard-preview');
-  const standardRevision = latestDraft?.standard_revision || 'Rev.A';
-  let updateConfirmation = () => {};
-  async function loadStandard() {
-    standardArea.replaceChildren(el('p', '검사기준을 불러오는 중입니다.', 'muted'));
-    updateConfirmation();
-    try {
-      const std = await api('/api/standards/' + encodeURIComponent(standardRevision));
-      if (!current()) return;
-      if (std.revision !== standardRevision || !std.natural_text) throw Error('기준 문서의 버전이나 내용을 확인할 수 없습니다.');
-      standardArea.replaceChildren();
-      standardArea.append(el('p', (latestDraft ? '이 결과에 적용한 기준 · ' : '기준 미리보기 · ') + standardRevision, 'review-eyebrow'));
-      const range = std.weight?.[insp.product_id];
-      if (Array.isArray(range) && range.length === 2 && range.every(Number.isFinite)) {
-        const rows = el('dl', undefined, 'review-measurements');
-        for (const [label,value] of [
-          ['중량 허용 범위', range[0] + '–' + range[1] + 'g'],
-          ['등록한 중량', insp.weight_g == null ? '미측정' : insp.weight_g + 'g'],
-          ['수치 비교', insp.weight_g == null ? '측정값이 없어 비교할 수 없습니다.' : insp.weight_g >= range[0] && insp.weight_g <= range[1] ? '중량은 기준 범위 안에 있습니다.' : '중량이 기준 범위를 벗어났습니다.']
-        ]) {const row = el('div'); row.append(el('dt',label),el('dd',value)); rows.append(row);}
-        standardArea.append(rows);
-      }
-      const source = el('details', undefined, 'review-fold review-standard-source');
-      source.append(el('summary', '검사기준 원문 읽기 · ' + standardRevision), el('p', std.natural_text, 'prompt-natural-text'));
-      standardArea.append(source);
-      updateConfirmation();
-    } catch (error) {
-      if (!current()) return;
-      const retry = el('button','검사기준 다시 불러오기','btn-action secondary');retry.onclick=loadStandard;
-      standardArea.replaceChildren(el('p','검사기준을 불러오지 못했습니다. ' + error.message,'error'),retry);
-    }
-  }
-  mcpCard.append(standardArea);
-  if (draftState.loading) standardArea.append(el('p', '검사기준을 불러오는 중입니다.', 'muted'));
-  else void loadStandard();
-  const queryOptions = el('details', undefined, 'review-fold');
-  queryOptions.append(el('summary', '근거 질문·연결 정보'));
-  // A click before the saved questions have loaded waits for them (below) instead of asking the person to choose one.
-  const notebookChoiceTask=draftState.loading?null:promptChoice(queryOptions,'notebooklm',{api,el,inspectionId:id,revision:standardRevision,expectedVersion:insp.content_version,current}).then(choice=>{if(current())notebookChoice=choice;});
-
-  const queryBtn = el('button', '근거 확인', 'btn-action primary');
-  queryBtn.disabled = !latestDraft || !!latestDraft.stale || !!draftState.loading || !!draftState.error;
-  const queryHelp = el('p', !latestDraft ? '2번 탭에서 판독 결과를 먼저 준비하세요. 결과가 생기면 근거를 볼 수 있습니다.' : latestDraft.stale ? '2번 탭에서 다시 판독해 주세요. 이전 결과로는 근거를 확인할 수 없습니다.' : '', 'form-help');
-  queryHelp.hidden = !queryHelp.textContent;
-  const queryStatus = el('p', '', 'muted');
-  queryStatus.setAttribute('role', 'status');
-  const resultArea = el('div', undefined, 'evidence-results');
-  let evidenceViewRequest=0;
-
-  queryBtn.onclick = async () => {
-    if(!latestDraft || latestDraft.stale){queryStatus.textContent='최신 자료로 판독한 AI 초안을 먼저 준비해 주세요.';return;}
-    queryBtn.disabled = true;
-    if(!notebookChoice){
-      queryStatus.textContent='저장된 근거 질문을 불러오는 중입니다. 불러오면 이어서 근거를 확인합니다.';
-      await notebookChoiceTask;
-      if(!current())return;
-      // NOTEBOOKLM_MODE=off may have arrived meanwhile; it keeps the button off.
-      if(notebookMode==='off'){queryStatus.textContent='';return;}
-    }
-    if(!notebookChoice?.id()){queryStatus.textContent='저장된 근거 질문을 먼저 조회·선택해 주세요.';queryBtn.disabled=false;return;}
-    evidenceViewRequest++;
-    queryStatus.textContent = 'NotebookLM에서 검사기준을 찾는 중입니다.';
-    resultArea.replaceChildren();
-    confirmationHost.replaceChildren();
-
-    try {
-      const qRes = await api('/api/inspections/' + encodeURIComponent(id) + '/evidence-queries', {
-        method: 'POST',
-        body: JSON.stringify({
-          expected_version: insp.content_version,
-          revision: latestDraft.standard_revision,
-          draft_id:latestDraft.draft_id,
-          prompt_version_id:notebookChoice.id()
-        })
-      });
-      if(current())showEvidence(qRes);
-    } catch (e) {
-      queryStatus.textContent = '근거 확인 실패: ' + e.message;
-    } finally {
-      queryBtn.disabled = false;
-    }
-  };
-  function showEvidence(qRes,saved=false){
-      resultArea.replaceChildren();
-      confirmationHost.replaceChildren();
-      if (nextStepButton) nextStepButton.className = 'btn-action primary step-next';
-      queryStatus.textContent = saved ? '저장된 근거를 불러왔습니다.' : '근거를 불러왔습니다. 원문과 일치하는지 확인하세요.';
-      // With NOTEBOOKLM_MODE off or mock the mode badge stays; off also keeps its guidance, and 「근거 확인」 remains off.
-      queryHelp.hidden = notebookMode !== 'off';
-      queryBtn.textContent = '근거 다시 조회';
-      queryBtn.className = 'btn-action secondary';
-      evidenceShown = true;
-      if (!notebookMode) {
-        mcpBadge.textContent=qRes.is_mock?'모의 응답 — 실제 연결 아님':saved?'저장된 실제 NotebookLM 답변':'실제 NotebookLM 질의 완료';
-        mcpBadge.className=qRes.is_mock?'status-badge warning':'status-badge success';
-      }
-      const card = el('div', undefined, 'review-evidence-answer');
-      const queryDetails = el('details', undefined, 'evidence-query-details');
-      queryDetails.append(el('summary', 'NotebookLM에 보낸 질문 보기'), el('p', qRes.query_prompt || qRes.query_text || '질의문 확인 필요'));
-      card.append(el('h4', '이 결과와 비교할 검사기준'));
-      card.append(el('p', qRes.source_document || '문서명 미확인 · ' + (qRes.standard_revision || '버전 미확인'), 'review-source-name'));
-      // A real answer's name and version are the standard queried, not read from the answer: Rev.A and Rev.B share the
-      // title and number in the notebook, and source IDs do not say which file was cited (src/mcp-client.ts).
-      if (qRes.is_mock === false) card.append(el('p', SOURCE_NAME_HINT, 'review-source-hint muted'));
-      card.append(renderEvidenceMarkdown(qRes.evidence_excerpt || qRes.response_text || '응답 근거가 없습니다. 확인 완료로 저장하지 마세요.'));
-      if(qRes.prompt)queryDetails.append(el('p','사용한 근거 질문: '+qRes.prompt.base_version+(qRes.prompt.is_default?' · 기본 원문':' · 저장한 수정본'),'muted'));
-      card.append(queryDetails);
-
-      // Confirmation Form
-      const form = el('form', undefined, 'evidence-confirm-form review-confirmation');
-      form.append(el('h5', '기준 원문과 답변이 일치하나요?'), el('p', '원문을 열어 문서명·버전·내용을 답변과 비교하세요. 일치할 때만 아래 항목에 체크합니다.', 'muted'));
-      if (/^[a-f0-9-]{36}$/i.test(qRes.notebook_id || '')) {
-        const sourceLink = el('a', 'NotebookLM에서 원문 열기', 'evidence-source-link');
-        sourceLink.href = 'https://notebook.google.com/notebook/' + qRes.notebook_id;
-        sourceLink.target = '_blank'; sourceLink.rel = 'noopener noreferrer'; form.append(sourceLink);
-      }
-      const checkLabel = el('label', undefined, 'evidence-confirm-check');
-      const check = el('input');
-      check.type = 'checkbox';
-      check.required = true;
-      checkLabel.append(check, el('span', '검사기준 원문을 읽었으며, 위 답변과 일치합니다.'));
-      // Optional and after the first check box: the person marks an AI result that does not fit this standard.
-      const reviewLabel = el('label', undefined, 'evidence-confirm-check');
-      const reviewCheck = el('input');
-      reviewCheck.type = 'checkbox';
-      reviewLabel.append(reviewCheck, el('span', 'AI 판정이 이 기준과 맞지 않습니다(검토 필요)'));
-      // The two boxes check different things, so a review mark still needs the first one (src/evidence.controller.ts).
-      const reviewHelp = el('p', REVIEW_HELP_TEXT, 'evidence-confirm-help muted');
-
-      const noteLabel = el('label', '대조 메모 (선택)');
-      const note = el('textarea'); note.rows = 2; note.maxLength = 1000;
-      note.placeholder = '어느 항목을 확인했나요? 예: 중량 기준의 범위가 답변과 일치함';
-      noteLabel.append(note);
-
-      const confirmBtn = el('button', '출처 대조 기록 저장', 'btn-action secondary');
-      confirmBtn.type = 'submit';
-      confirmBtn.disabled = true;
-      let confirmationSaved = qRes.confirmation?.verified === true;
-      let confirmationSaving = false;
-      updateConfirmation = () => { confirmBtn.disabled = !check.checked || confirmationSaved || confirmationSaving; };
-      check.onchange = updateConfirmation;
-      const confirmStatus = el('p', '체크하면 「출처 대조 기록 저장」 버튼을 누를 수 있습니다.', 'muted');
-      confirmStatus.setAttribute('role', 'status'); confirmStatus.setAttribute('aria-live', 'polite');
-      const showConfirmed = reviewNeeded => {
-        confirmationSaved = true;
-        check.checked = true; check.disabled = true; note.disabled = true;
-        reviewCheck.checked = !!reviewNeeded; reviewCheck.disabled = true;
-        confirmBtn.textContent = '기준 확인 기록 저장됨';
-        confirmStatus.textContent = reviewNeeded
-          ? '검토 필요로 저장했습니다. AI 판정이 기준과 맞지 않는다는 표시입니다. 제품에 대한 내 판단은 아래 「내 판단 기록하기」에서 따로 저장하세요.'
-          : '기준 확인은 저장됐습니다. 제품에 대한 내 판단은 아래 「내 판단 기록하기」에서 따로 저장하세요.';
-        // The tab 2 badge follows this last saved check: 검토 필요, or back to the result after a later 일치.
-        if (reviewNeeded) { statusBadge.textContent = '검토 필요'; statusBadge.className = 'badge warning'; }
-        else if (['검토 필요', '대조 기록 확인 중', '대조 기록 확인 실패'].includes(statusBadge.textContent)) showResultBadge();
-        updateConfirmation();
-      };
-      if (confirmationSaved) { note.value = qRes.confirmation.note || ''; showConfirmed(qRes.confirmation.review_needed === true); }
-
-      form.append(checkLabel, reviewLabel, reviewHelp, noteLabel, el('p', '저장되는 것은 출처를 대조했다는 기록입니다. 제품의 정상·불량 판정이나 출하 승인은 변경되지 않습니다.', 'evidence-confirm-help muted'), confirmBtn, confirmStatus);
-      form.onsubmit = async (e) => {
-        e.preventDefault();
-        if (confirmationSaved || confirmationSaving) return;
-        if (!check.checked) { confirmStatus.textContent = '원문을 먼저 대조한 뒤 확인 항목에 체크해 주세요.'; return; }
-        confirmBtn.disabled = true;
-        confirmationSaving = true;
-        check.disabled = true; reviewCheck.disabled = true;
-        const reviewNeeded = reviewCheck.checked === true;
-        try {
-          await api('/api/inspections/' + encodeURIComponent(id) + '/evidence-confirmation', {
-            method: 'POST',
-            body: JSON.stringify({
-              verified: true,
-              draft_id:qRes.draft_id,
-              note: note.value,
-              expected_version: insp.content_version,
-              ...(reviewNeeded ? { review_needed: true } : {})
-            })
-          });
-          showConfirmed(reviewNeeded);
-        } catch (err) {
-          confirmStatus.textContent = '저장 실패: ' + err.message;
-          check.disabled = false; reviewCheck.disabled = false;
-        } finally {
-          confirmationSaving = false;
-          updateConfirmation();
-        }
-      };
-
-      confirmationHost.append(form);
-      resultArea.append(card);
-  }
-  if(latestDraft&&!draftState.loading){
-    const historyRequest=evidenceViewRequest;
-    api('/api/inspections/'+encodeURIComponent(id)+'/evidence-queries').then(({queries})=>{
-      if(!current())return;
-      // Any saved review mark on this draft, from any of its queries or an earlier inspection version.
-      const reviewBadge=reviewNeededBadge(queries,latestDraft);
-      if(reviewBadge){statusBadge.textContent=reviewBadge;statusBadge.className='badge warning';}
-      else if(statusBadge.textContent==='대조 기록 확인 중')showResultBadge();
-      if(historyRequest!==evidenceViewRequest)return;
-      const saved=savedEvidenceFor(queries,latestDraft,insp.content_version);
-      if(saved)showEvidence(saved,true);
+  // The badge follows the last source check saved for the latest draft (GET /api/drafts/:id/evidence).
+  // It changes only while it still shows its first name, so a run being followed keeps its status.
+  if(latestDraft&&!draftState.loading&&!draftState.error){
+    const firstBadge=statusBadge.textContent;
+    api('/api/drafts/'+encodeURIComponent(latestDraft.draft_id)+'/evidence').then(links=>{
+      if(!current()||statusBadge.textContent!==firstBadge)return;
+      const last=(Array.isArray(links)?links:[]).filter(l=>String(l.inspection_id)===String(id)&&CHECK_STATUSES.includes(l.status)).at(-1);
+      if(REVIEW_NEEDED_STATUSES.includes(last?.status)){statusBadge.textContent=latestDraft.stale?'검토 필요(이전 버전)':'검토 필요';statusBadge.className='badge warning';}
+      else if(!latestDraft.stale)showResultBadge();
     }).catch(()=>{
-      // 409, no answer or a timeout: say the saved checks did not load instead of showing the result. Reopening the detail asks again.
       if(current()&&statusBadge.textContent==='대조 기록 확인 중'){statusBadge.textContent='대조 기록 확인 실패';statusBadge.className='badge warning';}
-      if(current()&&historyRequest===evidenceViewRequest)queryStatus.textContent='저장된 근거 이력을 조회하지 못했습니다. 근거 질문을 실행하기 전 연결 상태를 확인해 주세요.';
     });
   }
 
-  const queryActions = el('div', undefined, 'evidence-query-actions');
-  queryActions.append(queryBtn);
-  mcpCard.append(queryActions, queryHelp, queryStatus, resultArea, queryOptions);
-  queryOptions.append(mcpBadge);
-  evidenceContainer.append(mcpCard,confirmationHost);
-
   if(draftList.length > 1)draftComparison(container,draftList,{el});
-
-  // Step Actions
-  const actions = el('div', undefined, 'step-actions review-next');
-  const prevBtn = el('button', '← 이전: AI 결과 확인', 'btn-action secondary step-prev');
-  prevBtn.onclick = () => switchStep(2);
-  const nextBtn = el('button', '내 판단 기록하기 →', 'btn-action secondary step-next');
-  nextStepButton = nextBtn;
-  nextBtn.onclick = () => switchStep(4);
-  const nextHelp = el('div');
-  nextHelp.append(el('strong', '다음: 내 판단 기록'),el('p', '4번 탭에서 정상·불량·보류와 조치를 직접 선택합니다. 근거가 부족하면 보류로 기록할 수 있습니다.', 'muted'));
-  actions.append(nextHelp, prevBtn, nextBtn);
-  evidenceContainer.append(actions);
 }
 
-// NOTEBOOKLM_MODE from /api/notebooklm/status. off turns 「근거 확인」 off; the standard source above stays readable.
-const NOTEBOOK_MODE_TEXT = {off:'근거 대조 꺼짐', mock:'모의 응답 — 실제 NotebookLM 연결 아님', live:'실제 NotebookLM 질의'};
-const notebookModeText = mode => NOTEBOOK_MODE_TEXT[mode] + '(NOTEBOOKLM_MODE=' + mode + ')';
-function showNotebookMode(mode, badge, button, help) {
-  // Text and colour together, so the badge is the same whichever response arrives first.
-  badge.textContent = notebookModeText(mode);
-  badge.className = 'status-badge warning';
-  if (mode !== 'off') return;
-  button.disabled = true;
-  help.textContent = 'NotebookLM 근거 대조가 꺼져 있습니다(NOTEBOOKLM_MODE=off). 기준 원문을 직접 읽고 판단하세요.';
-  help.hidden = false;
-}
-// Tab 2 badge when the draft's last saved source check is '검토 필요' (the rule the home and the list use), or null.
-// A stale draft says it was an earlier version.
-function reviewNeededBadge(queries, draft) {
-  if (!draft || !Array.isArray(queries)) return null;
-  const last = queries.filter(q => String(q.draft_id) === String(draft.draft_id) && q.confirmation).at(-1);
-  if (last?.confirmation.review_needed !== true) return null;
-  return draft.stale ? '검토 필요(이전 버전)' : '검토 필요';
-}
-const SOURCE_NAME_HINT = '질의한 기준입니다. 답변이 인용한 원문의 판(Rev.A/B)은 아래 인용과 대조해 확인하세요.';
-const REVIEW_HELP_TEXT = '첫 번째 칸은 위 답변이 기준 원문과 같을 때 체크합니다. AI 판정이 이 기준과 맞지 않으면 두 번째 칸을 체크하고, 이때도 첫 번째 칸을 먼저 체크하세요.';
+// Source-check statuses a saved check can carry (gas/Code.gs reviewState); nothing in this app writes one yet.
+const REVIEW_NEEDED_STATUSES = ['REVIEW_NEEDED_BY_USER', 'MOCK_REVIEW_NEEDED'];
+const CHECK_STATUSES = [...REVIEW_NEEDED_STATUSES, 'VERIFIED_BY_USER', 'MOCK_USER_REVIEWED', 'VERIFIED'];
 const GEMINI_OFF_TEXT = 'Gemini 판독이 꺼져 있습니다(GEMINI_MODE=off). 4번 탭에서 직접 판단을 기록하세요.';
-const GEMINI_OFF_EVIDENCE_TEXT = 'Gemini 판독이 꺼져 있습니다(GEMINI_MODE=off). 근거 대조는 AI 초안이 있어야 할 수 있습니다. 검사기준 원문을 직접 읽고 4번 탭에서 판단을 기록하세요.';
 const GEMINI_MODE_TEXT = {off:'꺼짐 — 사람이 직접 판정', mock:'모의 초안 — 실제 AI 아님', live:'실제 Gemini 판독(GAS)'};
 // Settings card: the main model and the one tried when it is overloaded or rate-limited ('' when none).
 function geminiModelLine(model, fallback) {
@@ -1421,264 +1069,6 @@ function draftModelLine(draft) {
   if (typeof model !== 'string' || !model) return '';
   const from = draft.result?.fallback_from;
   return '판독 모델: ' + model + (from ? ' · 기본 모델 ' + from + ' 대신 대체 판독' : '');
-}
-
-/* =========================================================
-   Step 4: 내 판단 기록 (OK/NG/HOLD, 불량 칩, 미측정 OK 차단)
-   ========================================================= */
-function renderStep3(container, id, insp) {
-  container.replaceChildren();
-
-  const card = el('div', undefined, 'panel form-section');
-  card.append(el('h3', '확인한 내용을 바탕으로 내 판단을 저장하세요', 'form-section-title'));
-  card.append(el('p', 'AI 결과는 참고 자료입니다. 아래에서 직접 선택하고 저장해야 내 판단이 기록됩니다. 출하 승인은 별도입니다.', 'form-help'));
-
-  const form = el('form');
-
-  // 1. Decision Radio Group
-  const decLabel = el('fieldset', undefined, 'judgment-choice');
-  decLabel.append(el('legend', '내 판단 선택 (필수)'));
-  const radioGroup = el('div', undefined, 'decision-radio-group');
-
-  const isWeightNull = insp.weight_g === null || insp.weight_g === undefined;
-
-  const decisions = [
-    { val: 'OK', text: '정상 (OK - 적합)', cls: 'ok' },
-    { val: 'NG', text: '불량 (NG - 부적합)', cls: 'ng' },
-    { val: 'HOLD', text: '보류 (HOLD - 확인 필요)', cls: 'hold' }
-  ];
-
-  let currentSelectedDecision = (insp.decision === 'OK' || insp.decision === 'NG' || insp.decision === 'HOLD') ? insp.decision : null;
-  if (isWeightNull && currentSelectedDecision === 'OK') {
-    currentSelectedDecision = 'HOLD';
-  }
-
-  decisions.forEach(d => {
-    const lbl = el('label', undefined, `decision-radio-label ${d.cls}`);
-    const r = el('input');
-    r.type = 'radio';
-    r.name = 'decision';
-    r.required = true;
-    r.value = d.val;
-    r.checked = currentSelectedDecision === d.val;
-
-    if (d.val === 'OK' && isWeightNull) {
-      r.disabled = true;
-      lbl.classList.add('disabled');
-      lbl.title = '중량 미측정 상태에서는 적합(OK)을 확정할 수 없습니다.';
-    }
-
-    r.onchange = () => {
-      setFormDirty(true);
-      updateSummary();
-    };
-
-    lbl.append(r, ' ' + d.text);
-    radioGroup.append(lbl);
-  });
-  decLabel.append(radioGroup);
-
-  if (isWeightNull) {
-    const warningText = el('p', '중량을 측정하지 않아 정상은 선택할 수 없습니다. 명확한 불량을 확인했다면 불량, 판단 근거가 부족하면 보류를 선택하세요.', 'alert-text');
-    decLabel.append(warningText);
-  }
-  form.append(decLabel);
-
-  // 2. Defect Chips
-  const defectLabel = el('fieldset', undefined, 'judgment-choice');
-  defectLabel.append(el('legend', '확인한 불량 (선택 · 여러 항목 선택 가능)'));
-  const chipGroup = el('div', undefined, 'defect-chip-group');
-  const defectItems = [
-    { code: 'D01', name: '스크래치' },
-    { code: 'D02', name: '찍힘' },
-    { code: 'D03', name: '라벨 오류' },
-    { code: 'D04', name: '뚜껑 조립 오류' }
-  ];
-
-  const existingDefectCodes = new Set((insp.defects || []).map(d => typeof d === 'string' ? d : d.defect_code));
-
-  defectItems.forEach(d => {
-    const chip = el('label', undefined, 'defect-chip' + (existingDefectCodes.has(d.code) ? ' checked' : ''));
-    const chk = el('input');
-    chk.type = 'checkbox';
-    chk.value = d.code;
-    chk.checked = existingDefectCodes.has(d.code);
-    chk.onchange = () => {
-      chip.classList.toggle('checked', chk.checked);
-      setFormDirty(true);
-      updateSummary();
-    };
-    chip.append(chk, d.name);
-    chipGroup.append(chip);
-  });
-  defectLabel.append(chipGroup);
-  defectLabel.append(el('p', '직접 확인한 불량만 선택하세요. 확인하지 못했다면 선택하지 않아도 됩니다.', 'form-help'));
-  form.append(defectLabel);
-
-  // 3. Memo & Reason
-  const memoLabel = el('label', '조치 사항 및 작업 메모');
-  const memoInput = el('textarea');
-  memoInput.rows = 3;
-  memoInput.placeholder = '판정 근거 및 후속 조치 내용을 구체적으로 기재하세요.';
-  memoInput.value = insp.memo || '';
-  memoInput.oninput = () => { setFormDirty(true); updateSummary(); };
-  memoLabel.append(memoInput);
-
-  const reasonLabel = el('label', '변경 사유');
-  const reasonInput = el('input');
-  reasonInput.placeholder = '판정 또는 메모 등록/수정 사유를 입력하세요 (예: 1차 육안 검사 완료)';
-  reasonInput.value = '담당자 대조 판정 기록';
-  reasonInput.required = true;
-  reasonInput.oninput = () => setFormDirty(true);
-  reasonLabel.append(reasonInput);
-
-  form.append(memoLabel, reasonLabel);
-
-  // 4. Pre-save Summary Box
-  const summaryBox = el('div', undefined, 'summary-box');
-  const summaryTitle = el('h4', '📋 저장 전 판정 요약');
-  const summaryList = el('ul');
-  summaryBox.append(summaryTitle, summaryList);
-  form.append(summaryBox);
-
-  const updateSummary = () => {
-    summaryList.replaceChildren();
-    const selDec = form.querySelector('input[name="decision"]:checked')?.value;
-    const decText = selDec === 'OK' ? '정상(OK)' : selDec === 'NG' ? '부적합(NG)' : selDec === 'HOLD' ? '보류(HOLD)' : '(미선택 - 판정을 선택하세요)';
-    const checkedDefects = Array.from(chipGroup.querySelectorAll('input:checked')).map(c => {
-      const item = defectItems.find(d => d.code === c.value);
-      return item ? item.name : c.value;
-    });
-
-    summaryList.append(
-      el('li', `최종 판정: ${decText}`),
-      el('li', `실측 중량: ${insp.weight_g !== null && insp.weight_g !== undefined ? insp.weight_g + 'g' : '미측정'}`),
-      el('li', `선택된 불량 항목: ${checkedDefects.length ? checkedDefects.join(', ') : '없음'}`),
-      el('li', `작업 메모: ${memoInput.value.trim() || '(입력 안 됨)'}`)
-    );
-  };
-  updateSummary();
-
-  // Submit Button
-  const submitBtn = el('button', '내 판단 저장', 'btn-action primary btn-lg');
-  submitBtn.type = 'submit';
-  const saveStatus = el('p', '', 'muted');
-  saveStatus.setAttribute('role', 'status');
-
-  form.append(submitBtn, saveStatus);
-
-  form.onsubmit = async (e) => {
-    e.preventDefault();
-    if (submitBtn.disabled) return;
-    const selDec = form.querySelector('input[name="decision"]:checked')?.value;
-    if (!selDec) {
-      alert('판정을 선택하세요.');
-      return;
-    }
-    if (selDec === 'OK' && isWeightNull) {
-      alert('중량이 미측정된 검사는 적합(OK)으로 확정할 수 없습니다. 보류(HOLD)를 선택하세요.');
-      return;
-    }
-
-    submitBtn.disabled = true;
-    saveStatus.textContent = '판정 기록을 저장하는 중입니다...';
-
-    const selectedCodes = Array.from(chipGroup.querySelectorAll('input:checked')).map(c => c.value);
-
-    try {
-      await api('/api/inspections/' + encodeURIComponent(id) + '/records', {
-        method: 'POST',
-        body: JSON.stringify({
-          decision: selDec,
-          weight_g: insp.weight_g,
-          memo: memoInput.value.trim(),
-          change_reason: reasonInput.value.trim(),
-          expected_version: insp.content_version,
-          expected_record_id: insp.current_record_id || null,
-          defects: selectedCodes
-        })
-      });
-
-      isFormDirty = false;
-      saveStatus.className = 'badge success';
-      saveStatus.textContent = '판정이 정상적으로 저장되었습니다.';
-      setTimeout(() => show(id), 600);
-    } catch (err) {
-      saveStatus.className = 'error';
-      saveStatus.textContent = '저장 실패: ' + err.message;
-      submitBtn.disabled = false;
-    }
-  };
-
-  card.append(form);
-  container.append(card);
-
-  // Step Actions
-  const actions = el('div', undefined, 'step-actions');
-  const prevBtn = el('button', '← 이전: 검사기준과 비교하기', 'btn-action secondary step-prev');
-  prevBtn.onclick = () => switchStep(3);
-  actions.append(prevBtn);
-  container.append(actions);
-}
-
-/* =========================================================
-   Bottom Collapsible Tech Details
-   ========================================================= */
-// History is shown in Korean time (kstTime, public/prompts.js).
-// Records keep the account's number (the session's user id); the screen names the account it belongs to, or shows the number.
-// The ids of the classroom accounts in src/security.ts.
-const ACCOUNT_NAMES = { 1: 'writer', 2: 'reviewer', 3: 'factory-user' };
-function accountName(record) {
-  if (record.username) return record.username;
-  return ACCOUNT_NAMES[record.user_id] || record.user_id;
-}
-// The judgment memo after the history line: up to HISTORY_MEMO_CHARS characters as is, a longer one cut there with
-// the whole text in a fold. Plain text only.
-const HISTORY_MEMO_CHARS = 60;
-function appendHistoryMemo(li, memo) {
-  const text = String(memo ?? '').trim();
-  if (!text) return;
-  const chars = [...text.replace(/\s+/g, ' ')];
-  if (chars.length <= HISTORY_MEMO_CHARS && !/\n/.test(text)) { li.append(el('span', ', 메모: ' + chars.join(''))); return; }
-  const fold = el('details', undefined, 'history-memo');
-  fold.append(el('summary', '메모: ' + chars.slice(0, HISTORY_MEMO_CHARS).join('') + (chars.length > HISTORY_MEMO_CHARS ? '…' : '')), el('p', text, 'history-memo-text'));
-  li.append(fold);
-}
-function renderBottomTechDetails(host, id, insp) {
-  const details = el('details', undefined, 'tech-details');
-  const summary = el('summary', '🔍 검사 수정 이력 및 기술 정보 (펼치기)');
-  details.append(summary);
-
-  const content = el('div');
-  content.style.marginTop = '12px';
-
-  // A failed read says so with a retry, like the AI draft read, instead of leaving the fold empty.
-  const loadHistory = () => api('/api/inspections/' + encodeURIComponent(id) + '/records').then(history => {
-    if (history && history.length) {
-      content.append(el('h4', '기록 변경 이력'));
-      const ul = el('ul');
-      history.forEach(h => {
-        const li = el('li', `[${kstTime(h.recorded_at || h.created_at)}] v${h.content_version} - 판정: ${h.decision}, 중량: ${h.weight_g == null ? '미측정' : h.weight_g + 'g'}, 작성자: ${accountName(h)}, 사유: ${h.change_reason || '-'}`);
-        appendHistoryMemo(li, h.memo);
-        ul.append(li);
-      });
-      content.append(ul);
-    } else {
-      content.append(el('p', '과거 수정 이력이 없습니다. 최초 등록 상태입니다.', 'muted'));
-    }
-  }).catch(err => {
-    const failure = el('div');
-    const error = el('p', '수정 이력을 조회하지 못했습니다: ' + err.message, 'error');
-    error.setAttribute('role', 'alert');
-    const retry = el('button', '수정 이력 다시 조회', 'btn-action secondary');
-    retry.onclick = () => { retry.disabled = true; failure.remove(); loadHistory(); };
-    failure.append(error, retry);
-    content.append(failure);
-  });
-  loadHistory();
-
-  details.append(content);
-  host.append(details);
 }
 
 /* =========================================================
@@ -1703,30 +1093,11 @@ async function loadSettings() {
   const active = () => current === settingsRequest && version === workspaceVersion && workspaceActive;
   const promptHost=byId('prompt-settings');
   if(promptHost)void loadPromptSettings(promptHost,{api,el,setFormDirty});
-  const mcpBadge = byId('settings-mcp-status');
   const aiMode = byId('settings-ai-mode');
   const aiModel = byId('settings-ai-model');
   const storageEl = byId('settings-storage-provider');
 
-  for (const node of [mcpBadge, aiMode, storageEl]) if (node) node.textContent = '연결 상태 조회 중…';
-  const mcpTask = api('/api/notebooklm/status').then(mcp => {
-    if (!active()) return;
-    if (mcpBadge) {
-      if (mcp.mode === 'off' || mcp.mode === 'mock') {
-        mcpBadge.textContent = notebookModeText(mcp.mode);
-        mcpBadge.className = 'status-badge warning';
-      } else if (mcp.connected) {
-        mcpBadge.textContent = '정상 연결';
-        mcpBadge.className = 'status-badge success';
-      } else {
-        mcpBadge.textContent = '연결 준비 필요';
-        mcpBadge.className = 'status-badge warning';
-      }
-    }
-
-  }).catch(() => {
-    if (active() && mcpBadge) { mcpBadge.textContent = 'NotebookLM 상태 조회 실패'; mcpBadge.className = 'status-badge warning'; }
-  });
+  for (const node of [aiMode, storageEl]) if (node) node.textContent = '연결 상태 조회 중…';
   const operationsTask = api('/api/operations').then(ops => {
     if (!active()) return;
     if (aiMode) {
@@ -1750,7 +1121,7 @@ async function loadSettings() {
     if (aiMode) aiMode.textContent = '판독 상태 조회 실패';
     if (storageEl) storageEl.textContent = '저장소 상태 조회 실패';
   });
-  await Promise.all([operationsTask, mcpTask]);
+  await operationsTask;
 }
 
 /* =========================================================
