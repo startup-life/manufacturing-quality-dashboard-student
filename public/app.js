@@ -70,7 +70,7 @@ export function parseRoute() {
 }
 
 function updateNav(view) {
-  for (const a of document.querySelectorAll('nav a, .mobile-nav-menu a')) {
+  for (const a of document.querySelectorAll('nav a, .mobile-nav-menu a, a.nav-settings-link')) {
     const href = a.getAttribute('data-path') || a.getAttribute('href');
     const isActive = (view === 'home' && href === '/') ||
       (view === 'settings' && href === '/settings');
