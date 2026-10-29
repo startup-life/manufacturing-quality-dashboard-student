@@ -10,7 +10,7 @@ declare module 'express-session' {
   interface SessionData { user?: SessionUser; csrf?: string }
 }
 // The three classroom accounts. They are fixed training logins on a local server, not access control:
-// the login card shows the writer and reviewer passwords. Records keep the id (public/app.js names it again).
+// the login card shows the writer and reviewer passwords.
 export const ACCOUNTS: Record<string, { id: number; role: string; password: string }> = {
   writer: { id: 1, role: 'writer', password: 'writer1234!' },
   reviewer: { id: 2, role: 'reviewer', password: 'reviewer1234!' },
@@ -20,8 +20,6 @@ export const ACCOUNTS: Record<string, { id: number; role: string; password: stri
 // After a logout or a restart in another tab the open page still shows; a reload brings the login screen back.
 const LOGIN_REQUIRED = '로그인이 필요합니다. 페이지를 새로고침한 뒤 다시 로그인하세요.';
 export const requireLogin: RequestHandler = (req, res, next) => req.session.user ? next() : next(new InputError(LOGIN_REQUIRED, 401));
-// Both legacy account labels and factory-user have full factory permissions (factory-user.guard.ts).
-export const FACTORY_ROLES = ['writer', 'reviewer', 'factory-user'];
 // The page may be opened as 127.0.0.1 or localhost, on the configured port or the port this server listens on.
 const loopbackOrigins = (origin: string) => { let u; try { u = new URL(origin); } catch { return []; } if (u.protocol !== 'http:' || !['127.0.0.1', 'localhost'].includes(u.hostname)) return []; return ['127.0.0.1', 'localhost'].map(h => 'http://' + h + (u.port ? ':' + u.port : '')); };
 export function allowedOrigins({ configured = process.env.APP_ORIGIN || 'http://127.0.0.1:4185', localPort }: { configured?: string; localPort?: number } = {}) {
@@ -36,8 +34,8 @@ export function resolveSessionSecret(value = process.env.SESSION_SECRET) {
 }
 
 const SESSION_MAX_AGE = 3600000;
-// Sessions a logout or a login (regenerate) ended, with when. A request sent before that (a photo, the home figures on
-// a slow GAS) still holds the old session and, with rolling, answers with its cookie. Arriving after the new session's
+// Sessions a logout or a login (regenerate) ended, with when. A request sent before that (still in flight)
+// still holds the old session and, with rolling, answers with its cookie. Arriving after the new session's
 // cookie it would replace it, and the login form's token would then fail the CSRF check on every try until a reload.
 const endedSessions = new Map<string, number>();
 export function endSession(sessionID: string) {

@@ -2,7 +2,6 @@ import { All, Controller, Next, Req, Res } from '@nestjs/common';
 import express from 'express';
 import type { NextFunction, Request, Response } from 'express';
 import path from 'node:path';
-import { requireLogin } from './security';
 
 const root = path.join(__dirname, '..');
 const indexPath = path.join(root, 'public/index.html');
@@ -14,15 +13,10 @@ export const routeName = (req: Request, fallback: string) => {
   return route && route !== '/' + PAGES_ROUTE ? route : fallback;
 };
 
-// Everything that is not an API route, in the original order: the removed about page, the /api 404,
-// the photos (login required), the screen files and the screen's own addresses.
+// Everything that is not an API route, in order: the /api 404, the screen files and the screen's own addresses.
 function pages() {
   const router = express.Router();
-  // Return 404 for removed about.html (do not fallback to SPA index.html)
-  router.get('/about.html', (req, res) => { res.status(404).send('Not Found'); });
   router.use('/api', (req, res) => { res.status(404).json({ error: 'API를 찾을 수 없습니다.' }); });
-  router.use('/media', requireLogin, express.static(path.join(root, 'runtime/images'), { dotfiles: 'deny', index: false }));
-  router.use('/uploads', requireLogin, express.static(path.join(root, 'runtime/uploads'), { dotfiles: 'deny', index: false }));
   router.use(express.static(path.join(root, 'public'), { dotfiles: 'deny' }));
   router.get(['/', '/inspections', '/inspections/new', '/inspections/:id', '/settings'], (req, res) => res.sendFile(indexPath));
   router.use((req, res, next) => {

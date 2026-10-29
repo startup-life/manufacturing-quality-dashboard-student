@@ -1,9 +1,7 @@
-import { api, el, resetWorkspace, renderRoute, navigate, applyStorageMode } from './app.js';
-import { initializeHome, clearHome } from './home.js';
+import { api, el, resetWorkspace, renderRoute, navigate, setFormDirty } from './app.js';
 
 let user = null;
 const auth = document.getElementById('auth-panel');
-const primaryNav = document.getElementById('primary-navigation');
 const headerActions = document.getElementById('header-actions');
 const userInfo = document.getElementById('user-info');
 const logoutBtn = document.getElementById('logout-btn');
@@ -36,14 +34,12 @@ export async function checkSession() {
   if (user) {
     document.body.classList.remove('unauthenticated');
     document.body.classList.add('authenticated');
-    if (primaryNav) primaryNav.hidden = false;
     if (headerActions) headerActions.hidden = false;
     if (userInfo) userInfo.textContent = `${user.username} (${user.role === 'writer' ? '작성자' : user.role === 'reviewer' ? '검토자' : '품질관리'})`;
     if (auth) auth.hidden = true;
   } else {
     document.body.classList.add('unauthenticated');
     document.body.classList.remove('authenticated');
-    if (primaryNav) primaryNav.hidden = true;
     if (headerActions) headerActions.hidden = true;
     if (auth) auth.hidden = false;
     drawLoginForm();
@@ -51,15 +47,7 @@ export async function checkSession() {
 
   resetWorkspace(!!user);
 
-  if (user) {
-    // The storage mode needs a login to read; a failure keeps the page's own text.
-    api('/api/operations').then(applyStorageMode).catch(() => {});
-    initializeHome(user, { load: false });
-    await renderRoute();
-  } else {
-    clearHome();
-    await renderRoute();
-  }
+  if (user) await renderRoute();
 }
 
 function drawLoginForm() {
@@ -136,6 +124,8 @@ function drawLoginForm() {
 
 if (logoutBtn) {
   logoutBtn.onclick = async () => {
+    // Logging out does not ask; it drops the unsaved-change mark.
+    setFormDirty(false);
     try {
       await api('/api/logout', { method: 'POST', body: '{}' });
     } catch (_) {}

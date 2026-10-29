@@ -9,21 +9,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json && node scripts/build-server.mjs",
     "prestart": "npm run build",
-    "start": "node --env-file-if-exists=.env dist/main.js",
-    "gas:build": "node scripts/build-gas.mjs",
-    "gas:bundle": "node scripts/build-gas.mjs --bundle",
-    "gas:login": "npx --yes @google/clasp@3.4.1 login",
-    "gas:create": "npm run gas:build && npx --yes @google/clasp@3.4.1 create-script --type standalone --title \"텀블러 품질 대시보드\" --rootDir build/gas",
-    "gas:push": "npm run gas:build && npx --yes @google/clasp@3.4.1 push --force",
-    "gas:deploy": "node scripts/gas-clasp.mjs deploy",
-    "gas:redeploy": "node scripts/gas-clasp.mjs redeploy",
-    "gas:open": "node scripts/gas-clasp.mjs open",
-    "gas:editor": "npx --yes @google/clasp@3.4.1 open-script",
-    "pregas:init": "npm run build",
-    "gas:init": "node --env-file-if-exists=.env scripts/prepare-google-gas.mjs initialize"
-  },
-  "overrides": {
-    "js-yaml": "4.3.2"
+    "start": "node --env-file-if-exists=.env dist/main.js"
   },
   "dependencies": {
     "@nestjs/common": "11.2.7",
@@ -34,8 +20,7 @@
     "express-session": "1.19.0",
     "helmet": "8.3.0",
     "reflect-metadata": "0.2.2",
-    "rxjs": "7.8.2",
-    "sharp": "0.35.5"
+    "rxjs": "7.8.2"
   },
   "devDependencies": {
     "@types/bcrypt": "6.0.0",

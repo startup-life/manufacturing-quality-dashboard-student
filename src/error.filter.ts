@@ -21,8 +21,7 @@ function notFoundPage(req: Request, res: Response) {
   res.end(req.method === 'HEAD' ? undefined : body);
 }
 
-// Every failure answers { error } with its status. Only InputError carries setup, sign-in or connection guidance
-// written for the user; any other 500 says 서버 처리 실패 and goes to the log.
+// Every failure answers { error } with its status. Only InputError carries guidance written for the user; any other 500 says 서버 처리 실패 and goes to the log.
 @Catch()
 export class ErrorFilter implements ExceptionFilter {
   catch(err: any, host: ArgumentsHost) {
