@@ -685,9 +685,9 @@ function renderDetailView(host, id, insp) {
 
   renderStep1(pane1, id, insp);
   // Tabs 2-4 are built in later steps (29, 41, 52).
-  pane2.append(el('p', '이 탭은 29번부터 만듭니다.', 'muted'));
-  pane3.append(el('p', '이 탭은 41번부터 만듭니다.', 'muted'));
-  pane4.append(el('p', '이 탭은 52번부터 만듭니다.', 'muted'));
+  pane2.append(el('p', '이 탭은 4회차에서 만듭니다.', 'muted'));
+  pane3.append(el('p', '이 탭은 5회차에서 만듭니다.', 'muted'));
+  pane4.append(el('p', '이 탭은 6회차에서 만듭니다.', 'muted'));
 
   host.append(pane1, pane2, pane3, pane4);
 
