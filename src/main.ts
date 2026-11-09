@@ -6,6 +6,7 @@ import session from 'express-session';
 import path from 'node:path';
 import { ApiExceptionFilter } from './api-exception.filter';
 import { AppModule } from './app.module';
+import { getStorageInfo } from './storage-mode';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -62,7 +63,7 @@ async function bootstrap(): Promise<void> {
   const port = Number(process.env.PORT ?? 4185);
   await app.listen(port, '127.0.0.1');
   console.log(`품질 대시보드 서버 실행 중: http://127.0.0.1:${port}`);
-  console.log('저장소: 내 컴퓨터(runtime/local-state.json)');
+  console.log(`저장소: ${getStorageInfo().label}`);
 }
 
 void bootstrap();

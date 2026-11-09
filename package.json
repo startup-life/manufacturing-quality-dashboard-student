@@ -7,6 +7,13 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
+    "gas:login": "node --env-file-if-exists=.env scripts/gas-login.js",
+    "gas:create": "node --env-file-if-exists=.env scripts/gas-create.js",
+    "gas:push": "node --env-file-if-exists=.env scripts/gas-push.js",
+    "gas:deploy": "node --env-file-if-exists=.env scripts/gas-deploy.js",
+    "gas:redeploy": "node --env-file-if-exists=.env scripts/gas-redeploy.js",
+    "gas:open": "node --env-file-if-exists=.env scripts/gas-open.js",
+    "gas:init": "node --env-file-if-exists=.env scripts/gas-init.js",
     "prestart": "npm run build",
     "start": "node --env-file-if-exists=.env dist/main.js"
   },

@@ -6,14 +6,14 @@ export class HomeController {
   constructor(private readonly store: InspectionStore) {}
 
   @Get()
-  getHome(@Query('date') requestedDate?: string): {
+  async getHome(@Query('date') requestedDate?: string): Promise<{
     date: string;
     total: number;
     ng: number;
     hold: number;
     review_pending: number;
-  } {
-    const inspections = this.store.getAll();
+  }> {
+    const inspections = await this.store.getAll();
     const mostRecent = inspections
       .map((inspection) => inspection.inspected_at.slice(0, 10))
       .sort((a, b) => b.localeCompare(a))[0] ?? '';
