@@ -14,4 +14,6 @@ export interface Inspection {
 
 export interface LocalState {
   inspections: Inspection[];
+  inspection_records?: import('./inspection-record.types').InspectionRecord[];
+  record_defects?: import('./inspection-record.types').InspectionRecordDefect[];
 }

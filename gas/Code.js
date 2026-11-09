@@ -17,6 +17,8 @@ function doPost(event) {
       else if (request.action === 'getPhoto') data = getPhoto(request.id);
       else if (request.action === 'saveGeminiResult') data = saveGeminiResult(spreadsheet, request.record);
       else if (request.action === 'listGeminiResults') data = listGeminiResults(spreadsheet, request.inspection_id);
+      else if (request.action === 'saveInspectionRecord') data = saveInspectionRecord(spreadsheet, request.record, request.defects);
+      else if (request.action === 'listInspectionRecords') data = listInspectionRecords(spreadsheet, request.inspection_id);
       else if (request.action === 'saveEvidenceQuery') data = saveEvidenceQuery(spreadsheet, request.record);
       else if (request.action === 'listEvidenceQueries') data = listEvidenceQueries(spreadsheet, request.inspection_id);
       else if (request.action === 'saveEvidenceLink') data = saveEvidenceLink(spreadsheet, request.record);
@@ -50,6 +52,18 @@ function setupStorage() {
     'content_version',
   ]);
   ensureSheetHeaders(spreadsheet, 'images', ['inspection_id', 'position', 'image_url']);
+  ensureSheetHeaders(spreadsheet, 'inspection_records', [
+    'record_id',
+    'inspection_id',
+    'user_id',
+    'recorded_at',
+    'decision',
+    'weight_g',
+    'notes',
+    'content_version',
+    'change_reason',
+  ]);
+  ensureSheetHeaders(spreadsheet, 'record_defects', ['record_id', 'defect_code']);
   ensureSheetHeaders(spreadsheet, 'gemini_results', [
     'result_id',
     'inspection_id',
@@ -240,6 +254,74 @@ function listGeminiResults(spreadsheet, inspectionId) {
       result: parseGeminiJsonCell(row.result, {}),
     }));
   return { results: rows };
+}
+
+function saveInspectionRecord(spreadsheet, record, defects) {
+  if (!record || typeof record !== 'object' || Array.isArray(record)) {
+    throw createUserError('판단을 확인하세요.');
+  }
+  if (
+    typeof record.record_id !== 'string' ||
+    typeof record.inspection_id !== 'string' ||
+    typeof record.user_id !== 'string' ||
+    typeof record.recorded_at !== 'string' ||
+    !['OK', 'NG', 'HOLD'].includes(record.decision) ||
+    (record.weight_g !== null && typeof record.weight_g !== 'number') ||
+    typeof record.notes !== 'string' ||
+    typeof record.content_version !== 'number' ||
+    typeof record.change_reason !== 'string'
+  ) {
+    throw createUserError('판단을 확인하세요.');
+  }
+  if (!Array.isArray(defects) || defects.some((code) => !['D01', 'D02', 'D03', 'D04'].includes(code))) {
+    throw createUserError('불량을 확인하세요.');
+  }
+
+  const inspectionSheet = spreadsheet.getSheetByName('inspections');
+  if (!inspectionSheet) throw createUserError('검사를 찾을 수 없습니다.');
+  const inspectionRows = readSheetRows(inspectionSheet);
+  if (!inspectionRows.some((row) => row.inspection_id === record.inspection_id)) {
+    throw createUserError('검사를 찾을 수 없습니다.');
+  }
+
+  appendRows(spreadsheet, {
+    inspection_records: [record],
+    record_defects: defects.map((defect_code) => ({
+      record_id: record.record_id,
+      defect_code: defect_code,
+    })),
+  });
+  updateRow(spreadsheet, {
+    tab: 'inspections',
+    key: 'inspection_id',
+    value: record.inspection_id,
+    changes: { content_version: record.content_version },
+  });
+  return { saved: 1 };
+}
+
+function listInspectionRecords(spreadsheet, inspectionId) {
+  if (inspectionId !== undefined && typeof inspectionId !== 'string') {
+    throw createUserError('검사번호를 확인하세요.');
+  }
+  const recordSheet = spreadsheet.getSheetByName('inspection_records');
+  const defectSheet = spreadsheet.getSheetByName('record_defects');
+  const records = recordSheet
+    ? readSheetRows(recordSheet)
+      .filter((row) => inspectionId === undefined || row.inspection_id === inspectionId)
+      .map((row) => ({
+        ...row,
+        weight_g: row.weight_g === '' || row.weight_g === null ? null : Number(row.weight_g),
+        notes: row.notes === '' || row.notes === null ? '' : String(row.notes),
+        change_reason: row.change_reason === '' || row.change_reason === null ? '' : String(row.change_reason),
+        content_version: Number(row.content_version) || 0,
+      }))
+    : [];
+  const recordIds = new Set(records.map((record) => record.record_id));
+  const defects = defectSheet
+    ? readSheetRows(defectSheet).filter((row) => recordIds.has(row.record_id))
+    : [];
+  return { records: records, defects: defects };
 }
 
 function saveEvidenceQuery(spreadsheet, record) {

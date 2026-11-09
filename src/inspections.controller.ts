@@ -21,6 +21,13 @@ import { EvidenceQueryStore } from './evidence-query.store';
 import type { EvidenceQueryRecord } from './evidence-query.types';
 import { EvidenceLinkStore } from './evidence-link.store';
 import type { EvidenceLinkRecord, EvidenceLinkStatus } from './evidence-link.types';
+import {
+  inspectionDefectNames,
+  type InspectionRecord,
+  type InspectionRecordDecision,
+  type InspectionRecordWithDefects,
+  type InspectionView,
+} from './inspection-record.types';
 import { NotebookLMClient } from './notebooklm.client';
 import { findPrompt } from './prompts.controller';
 import { getGeminiInfo, getNotebookLMInfo } from './storage-mode';
@@ -49,6 +56,13 @@ interface SaveEvidenceLinkBody {
   memo?: unknown;
 }
 
+interface SaveInspectionRecordBody {
+  decision?: unknown;
+  defects?: unknown;
+  memo?: unknown;
+  change_reason?: unknown;
+}
+
 const productNames: Record<string, string> = {
   'P-SILVER': '텀블러 실버',
   'P-WHITE': '텀블러 화이트',
@@ -70,7 +84,7 @@ export class InspectionsController {
     @Query('date') date?: string,
     @Query('decision') decision?: string,
     @Query('review') review?: string,
-  ): Promise<Inspection[]> {
+  ): Promise<InspectionView[]> {
     let inspections = await this.store.getAll();
     if (date) inspections = inspections.filter((item) => item.inspected_at.slice(0, 10) === date);
     if (decision) inspections = inspections.filter((item) => item.decision === decision);
@@ -117,7 +131,7 @@ export class InspectionsController {
   }
 
   @Get(':inspectionId')
-  async getOne(@Param('inspectionId') inspectionId: string): Promise<Inspection> {
+  async getOne(@Param('inspectionId') inspectionId: string): Promise<InspectionView> {
     const inspection = await this.store.find(inspectionId);
     if (!inspection) throw new NotFoundException('검사를 찾을 수 없습니다.');
     return inspection;
@@ -127,7 +141,7 @@ export class InspectionsController {
   async update(
     @Param('inspectionId') inspectionId: string,
     @Body() body: Partial<Pick<Inspection, 'product_id' | 'inspected_at' | 'weight_g'>>,
-  ): Promise<Inspection> {
+  ): Promise<InspectionView> {
     const inspection = await this.store.find(inspectionId);
     if (!inspection) throw new NotFoundException('검사를 찾을 수 없습니다.');
 
@@ -147,6 +161,69 @@ export class InspectionsController {
     inspection.content_version += 1;
     await this.store.update(inspection);
     return inspection;
+  }
+
+  @Post(':inspectionId/records')
+  async saveInspectionRecord(
+    @Param('inspectionId') inspectionId: string,
+    @Body() body: SaveInspectionRecordBody,
+    @Req() request: Request,
+  ): Promise<InspectionRecordWithDefects> {
+    const inspection = await this.store.find(inspectionId);
+    if (!inspection) throw new NotFoundException('검사를 찾을 수 없습니다.');
+
+    if (body?.decision !== 'OK' && body?.decision !== 'NG' && body?.decision !== 'HOLD') {
+      throw new BadRequestException('판정을 골라 주세요.');
+    }
+    if (typeof body.change_reason !== 'string' || body.change_reason.trim() === '') {
+      throw new BadRequestException('변경 사유를 적어 주세요.');
+    }
+    if (inspection.weight_g === null && body.decision === 'OK') {
+      throw new BadRequestException('중량이 없는 검사는 정상(OK)으로 저장할 수 없습니다.');
+    }
+    if (body.memo !== undefined && typeof body.memo !== 'string') {
+      throw new BadRequestException('메모를 확인하세요.');
+    }
+    const defects = body.defects === undefined ? [] : body.defects;
+    if (
+      !Array.isArray(defects) ||
+      defects.some(
+        (defect) =>
+          typeof defect !== 'string' || !Object.prototype.hasOwnProperty.call(inspectionDefectNames, defect),
+      ) ||
+      new Set(defects).size !== defects.length
+    ) {
+      throw new BadRequestException('불량을 확인하세요.');
+    }
+
+    const record: InspectionRecord = {
+      record_id: `REC-${randomBytes(4).toString('hex')}`,
+      inspection_id: inspection.inspection_id,
+      user_id: request.session.user?.username ?? '',
+      recorded_at: this.koreanDateTime(),
+      decision: body.decision as InspectionRecordDecision,
+      weight_g: inspection.weight_g,
+      notes: typeof body.memo === 'string' ? body.memo : '',
+      content_version: inspection.content_version + 1,
+      change_reason: body.change_reason,
+    };
+    await this.store.saveRecord(inspection, record, defects as string[]);
+    return {
+      ...record,
+      defects: (defects as string[]).map((defect_code) => ({
+        defect_code,
+        defect_name: inspectionDefectNames[defect_code],
+      })),
+    };
+  }
+
+  @Get(':inspectionId/records')
+  async getInspectionRecords(
+    @Param('inspectionId') inspectionId: string,
+  ): Promise<InspectionRecordWithDefects[]> {
+    const inspection = await this.store.find(inspectionId);
+    if (!inspection) throw new NotFoundException('검사를 찾을 수 없습니다.');
+    return this.store.getRecords(inspectionId);
   }
 
   @Post(':inspectionId/gemini')

@@ -346,6 +346,56 @@
 
       .inspection-tab-panel { min-height: 48px; padding-top: 18px; }
 
+      .judgment-section { display: grid; gap: 22px; }
+
+      .judgment-section h2 { margin: 0; font-size: 22px; }
+
+      .judgment-group { margin: 0; padding: 0; border: 0; }
+
+      .judgment-group legend { margin-bottom: 10px; font-weight: 700; }
+
+      .judgment-options { display: flex; flex-wrap: wrap; gap: 10px; }
+
+      .judgment-options button {
+        width: auto;
+        margin: 0;
+        padding: 11px 16px;
+        border: 1px solid #c9d8ce;
+        color: #40584d;
+        background: #edf2ee;
+      }
+
+      .judgment-options button[aria-pressed="true"] { color: #fff; }
+
+      .judgment-options button[data-judgment="OK"][aria-pressed="true"] {
+        border-color: #28744b;
+        background: #28744b;
+      }
+
+      .judgment-options button[data-judgment="NG"][aria-pressed="true"] {
+        border-color: #b42318;
+        background: #b42318;
+      }
+
+      .judgment-options button[data-judgment="HOLD"][aria-pressed="true"] {
+        border-color: #b87500;
+        background: #b87500;
+      }
+
+      .judgment-options button[data-defect][aria-pressed="true"] {
+        border-color: #276447;
+        color: #fff;
+        background: #276447;
+      }
+
+      .detail-record-history { margin-top: 24px; padding-top: 18px; border-top: 1px solid #d8e3dc; }
+
+      .detail-record-history summary { color: #276447; font-weight: 750; cursor: pointer; }
+
+      .detail-record-history ol { display: grid; gap: 10px; padding-left: 24px; }
+
+      .detail-record-history li { padding: 12px; border-radius: 8px; background: #f2f6f3; line-height: 1.6; overflow-wrap: anywhere; }
+
       .inspection-detail-grid {
         display: grid;
         grid-template-columns: minmax(0, 1.2fr) minmax(260px, 0.8fr);
@@ -709,8 +759,42 @@
                   </section>
                 </section>
               </section>
-              <p id="detail-placeholder" hidden></p>
+              <section id="detail-judgment" class="judgment-section" hidden aria-labelledby="detail-judgment-title">
+                <h2 id="detail-judgment-title">내 판단 기록</h2>
+                <fieldset class="judgment-group">
+                  <legend>판정</legend>
+                  <div class="judgment-options" aria-label="판정 선택">
+                    <button type="button" data-judgment="OK" aria-pressed="false">정상 OK</button>
+                    <button type="button" data-judgment="NG" aria-pressed="false">불량 NG</button>
+                    <button type="button" data-judgment="HOLD" aria-pressed="false">보류 HOLD</button>
+                  </div>
+                </fieldset>
+                <fieldset class="judgment-group">
+                  <legend>불량</legend>
+                  <div class="judgment-options" aria-label="불량 선택">
+                    <button type="button" data-defect="D01" aria-pressed="false">스크래치</button>
+                    <button type="button" data-defect="D02" aria-pressed="false">찍힘</button>
+                    <button type="button" data-defect="D03" aria-pressed="false">라벨 오류</button>
+                    <button type="button" data-defect="D04" aria-pressed="false">뚜껑 조립 오류</button>
+                  </div>
+                </fieldset>
+                <div>
+                  <label for="detail-judgment-memo">조치 메모</label>
+                  <textarea id="detail-judgment-memo"></textarea>
+                  <label for="detail-judgment-change-reason">변경 사유</label>
+                  <input id="detail-judgment-change-reason" type="text" />
+                </div>
+                <div>
+                  <button id="detail-judgment-save" type="button">내 판단 저장</button>
+                  <p id="detail-judgment-save-error" class="error-message" role="alert" hidden></p>
+                </div>
+              </section>
             </div>
+            <details id="detail-record-history" class="detail-record-history">
+              <summary>변경 이력</summary>
+              <p id="detail-record-history-error" class="error-message" role="alert" hidden></p>
+              <ol id="detail-record-history-list"></ol>
+            </details>
           </div>
         </section>
         <section id="not-found-view" hidden>
@@ -796,7 +880,16 @@
       const detailEvidenceReviewMemo = document.querySelector('#detail-evidence-review-memo');
       const detailEvidenceReviewSave = document.querySelector('#detail-evidence-review-save');
       const detailEvidenceReviewError = document.querySelector('#detail-evidence-review-error');
-      const detailPlaceholder = document.querySelector('#detail-placeholder');
+      const detailJudgment = document.querySelector('#detail-judgment');
+      const detailJudgmentMemo = document.querySelector('#detail-judgment-memo');
+      const detailJudgmentChangeReason = document.querySelector('#detail-judgment-change-reason');
+      const detailJudgmentSave = document.querySelector('#detail-judgment-save');
+      const detailJudgmentSaveError = document.querySelector('#detail-judgment-save-error');
+      const detailRecordHistory = document.querySelector('#detail-record-history');
+      const detailRecordHistoryList = document.querySelector('#detail-record-history-list');
+      const detailRecordHistoryError = document.querySelector('#detail-record-history-error');
+      const judgmentDecisionButtons = [...document.querySelectorAll('[data-judgment]')];
+      const judgmentDefectButtons = [...document.querySelectorAll('[data-defect]')];
       const detailMainImage = document.querySelector('#detail-main-image');
       const detailThumbnails = document.querySelector('#detail-thumbnails');
       const detailEditForm = document.querySelector('#detail-edit-form');
@@ -818,6 +911,9 @@
       let activeDetailImages = [];
       let activeDetailInspectionId = '';
       let activeDetailRevision = 'Rev.A';
+      let detailRecordHistoryRequestId = 0;
+      let selectedJudgment = null;
+      const selectedDefects = new Set();
       let detailPromptRecords = [];
       let detailPromptOptionsInspectionId = '';
       let detailPromptOptionsRequestId = 0;
@@ -1215,6 +1311,7 @@
           if (window.location.pathname !== route) return;
           activeDetailInspectionId = inspection.inspection_id;
           activeDetailRevision = inspection.revision;
+          void loadInspectionRecordHistory(inspection.inspection_id);
           if (detailPromptOptionsInspectionId !== inspection.inspection_id) {
             detailPromptOptionsInspectionId = inspection.inspection_id;
             detailGeminiOptionsReady = false;
@@ -1239,12 +1336,17 @@
           document.querySelector('#detail-value-revision').textContent = inspection.revision;
           document.querySelector('#detail-value-weight').textContent = inspection.weight_g === null ? '미측정' : `${inspection.weight_g}g`;
           document.querySelector('#detail-value-memo').textContent = inspection.memo || '없음';
+          detailJudgmentMemo.value = inspection.memo || '';
+          detailJudgmentChangeReason.value = '담당자 대조 판정 기록';
+          detailJudgmentSaveError.hidden = true;
           populateDetailProductOptions(inspection.product_id);
           document.querySelector('#detail-edit-date').value = inspection.inspected_at.replace(' ', 'T');
           document.querySelector('#detail-edit-weight').value = inspection.weight_g ?? '';
           detailEditError.hidden = true;
           renderDetailImages(Array.isArray(inspection.images) ? inspection.images : []);
-          selectDetailTab(new URLSearchParams(window.location.search).get('tab') === '2' ? 1 : 0, false);
+          renderJudgmentSelection(inspection);
+          const requestedTab = new URLSearchParams(window.location.search).get('tab');
+          selectDetailTab(requestedTab === '2' ? 1 : requestedTab === '4' ? 3 : 0, false);
           inspectionDetailContent.hidden = false;
         } catch (error) {
           if (window.location.pathname !== route) return;
@@ -1261,8 +1363,7 @@
         detailPhotoMeasurement.hidden = index !== 0;
         detailGeminiResult.hidden = index !== 1;
         detailEvidenceReference.hidden = index !== 2;
-        detailPlaceholder.hidden = index < 3;
-        detailPlaceholder.textContent = index < 3 ? '' : '이 탭은 나중 회차에서 만듭니다.';
+        detailJudgment.hidden = index !== 3;
         if (index === 1 && activeDetailInspectionId) {
           void loadGeminiResult(activeDetailInspectionId);
         } else if (index === 2 && activeDetailInspectionId) {
@@ -1275,9 +1376,34 @@
         if (updateAddress) {
           const query = new URLSearchParams(window.location.search);
           if (index === 1) query.set('tab', '2');
+          else if (index === 3) query.set('tab', '4');
           else query.delete('tab');
           const search = query.toString();
           history.replaceState({}, '', `${window.location.pathname}${search ? `?${search}` : ''}`);
+        }
+      }
+
+      async function loadInspectionRecordHistory(inspectionId) {
+        const requestId = ++detailRecordHistoryRequestId;
+        detailRecordHistory.open = false;
+        detailRecordHistoryList.replaceChildren();
+        detailRecordHistoryError.hidden = true;
+        try {
+          const response = await fetch(`/api/inspections/${encodeURIComponent(inspectionId)}/records`);
+          const records = await response.json();
+          if (!response.ok) throw new Error(records.error || '변경 이력을 불러오지 못했습니다.');
+          if (requestId !== detailRecordHistoryRequestId || activeDetailInspectionId !== inspectionId) return;
+          records.forEach((record) => {
+            const item = document.createElement('li');
+            const weight = record.weight_g === null ? '미측정' : `${record.weight_g}g`;
+            item.textContent = `${record.recorded_at} · 기록 버전 ${record.content_version} · 판정 ${record.decision} · 중량 ${weight} · 저장한 사람 ${record.user_id} · 변경 사유 ${record.change_reason}`;
+            detailRecordHistoryList.append(item);
+          });
+        } catch (error) {
+          if (requestId !== detailRecordHistoryRequestId || activeDetailInspectionId !== inspectionId) return;
+          detailRecordHistoryError.textContent = error.message || '변경 이력을 불러오지 못했습니다.';
+          detailRecordHistoryError.hidden = false;
+          detailRecordHistory.open = true;
         }
       }
 
@@ -1827,6 +1953,72 @@
       }
 
       detailTabs.forEach((tab, index) => tab.addEventListener('click', () => selectDetailTab(index)));
+
+      function renderJudgmentSelection(inspection) {
+        selectedJudgment = ['OK', 'NG', 'HOLD'].includes(inspection.decision) ? inspection.decision : null;
+        selectedDefects.clear();
+        (Array.isArray(inspection.defects) ? inspection.defects : []).forEach((defect) => {
+          if (defect?.defect_code) selectedDefects.add(defect.defect_code);
+        });
+        updateJudgmentButtonStates();
+      }
+
+      function updateJudgmentButtonStates() {
+        judgmentDecisionButtons.forEach((button) => {
+          button.setAttribute('aria-pressed', String(button.dataset.judgment === selectedJudgment));
+        });
+        judgmentDefectButtons.forEach((button) => {
+          button.setAttribute('aria-pressed', String(selectedDefects.has(button.dataset.defect)));
+        });
+      }
+
+      judgmentDecisionButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+          selectedJudgment = button.dataset.judgment;
+          updateJudgmentButtonStates();
+        });
+      });
+
+      judgmentDefectButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+          const defectCode = button.dataset.defect;
+          if (selectedDefects.has(defectCode)) selectedDefects.delete(defectCode);
+          else selectedDefects.add(defectCode);
+          updateJudgmentButtonStates();
+        });
+      });
+
+      detailJudgmentSave.addEventListener('click', () => void saveInspectionJudgment());
+
+      async function saveInspectionJudgment() {
+        if (!activeDetailInspectionId) return;
+        const inspectionId = activeDetailInspectionId;
+        detailJudgmentSave.disabled = true;
+        detailJudgmentSaveError.hidden = true;
+        try {
+          const response = await fetch(
+            `/api/inspections/${encodeURIComponent(inspectionId)}/records`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                decision: selectedJudgment,
+                defects: [...selectedDefects],
+                memo: detailJudgmentMemo.value,
+                change_reason: detailJudgmentChangeReason.value,
+              }),
+            },
+          );
+          const result = await response.json();
+          if (!response.ok) throw new Error(result.error || '판단을 저장하지 못했습니다.');
+          await loadInspectionDetail(`/inspections/${encodeURIComponent(inspectionId)}`);
+        } catch (error) {
+          detailJudgmentSaveError.textContent = error.message || '판단을 저장하지 못했습니다.';
+          detailJudgmentSaveError.hidden = false;
+        } finally {
+          detailJudgmentSave.disabled = false;
+        }
+      }
 
       detailEvidenceRequest.addEventListener('click', () => {
         if (activeDetailInspectionId) void askForEvidence(activeDetailInspectionId);
