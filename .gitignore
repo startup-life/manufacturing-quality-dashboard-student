@@ -3,3 +3,4 @@ dist
 .env
 .clasp.json
 runtime
+gas/gemini-result.js

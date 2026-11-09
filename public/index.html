@@ -407,6 +407,49 @@
 
       .detail-edit button { margin-top: 18px; }
 
+      .gemini-result { display: grid; gap: 14px; }
+
+      .gemini-result-heading { display: flex; align-items: center; gap: 12px; }
+
+      .gemini-result-heading h3 { margin: 0; }
+
+      .gemini-result-badge { padding: 5px 10px; border-radius: 999px; color: #315b45; background: #edf5ef; font-size: 14px; font-weight: 750; }
+
+      .gemini-result button { width: fit-content; margin: 0; padding: 10px 16px; }
+
+      .gemini-run-controls { display: grid; grid-template-columns: minmax(140px, 0.7fr) minmax(220px, 1.4fr) auto; align-items: end; gap: 12px; }
+
+      .gemini-run-controls label { margin-top: 0; }
+
+      .gemini-result-fields { display: grid; gap: 12px; margin: 0; }
+
+      .gemini-result-fields div { padding: 14px; border: 1px solid #d8e3dc; border-radius: 10px; background: #fbfcfb; }
+
+      .gemini-result-fields dt { margin-bottom: 6px; color: #52665b; font-weight: 700; }
+
+      .gemini-result-fields dd { margin: 0; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
+
+      .gemini-result-fields .gemini-decision dd { font-size: 24px; font-weight: 800; }
+
+      .gemini-result-message { margin: 0; color: #52665b; }
+
+      .gemini-comparison { display: grid; gap: 14px; margin-top: 24px; padding-top: 20px; border-top: 1px solid #d8e3dc; }
+
+      .gemini-comparison h3 { margin: 0; }
+
+      .gemini-comparison-selectors { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+
+      .gemini-comparison-table-wrap { overflow-x: auto; }
+
+      .gemini-comparison-table { width: 100%; min-width: 600px; border-collapse: collapse; }
+
+      .gemini-comparison-table th,
+      .gemini-comparison-table td { padding: 12px; border: 1px solid #d8e3dc; text-align: left; vertical-align: top; white-space: pre-wrap; overflow-wrap: anywhere; }
+
+      .gemini-comparison-table thead th { background: #edf5ef; }
+
+      .gemini-comparison-table tbody th { width: 150px; color: #52665b; background: #fbfcfb; }
+
       @media (max-width: 680px) {
         .inspection-detail-grid { grid-template-columns: 1fr; }
       }
@@ -493,6 +536,16 @@
         <section id="settings-view" class="screen-view" hidden>
           <h2>저장소 상태</h2>
           <p id="storage-status" role="status">저장소 상태를 불러오는 중입니다.</p>
+          <p id="gemini-status" role="status">Gemini 판독 상태를 불러오는 중입니다.</p>
+          <div class="prompt-settings">
+            <h2>Gemini 판독 지시</h2>
+            <label for="prompt-version">버전</label>
+            <select id="prompt-version" disabled></select>
+            <label for="prompt-text">지시문</label>
+            <textarea id="prompt-text" rows="12" disabled></textarea>
+            <button id="save-prompt" type="button" disabled>수정본 저장</button>
+            <p id="prompt-message" role="status" aria-live="polite"></p>
+          </div>
         </section>
         <section id="inspection-new-view" class="screen-view" hidden>
           <form id="inspection-fields" class="inspection-fields">
@@ -564,6 +617,44 @@
                   </form>
                 </div>
               </div>
+              <section id="detail-gemini-result" class="gemini-result" hidden aria-label="AI 판독 결과">
+                <div class="gemini-result-heading">
+                  <h3>AI 판독 결과</h3>
+                  <span id="detail-gemini-badge" class="gemini-result-badge" hidden></span>
+                </div>
+                <div class="gemini-run-controls">
+                  <div>
+                    <label for="detail-gemini-revision">검사기준</label>
+                    <select id="detail-gemini-revision" disabled>
+                      <option value="Rev.A">Rev.A</option>
+                      <option value="Rev.B">Rev.B</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label for="detail-gemini-prompt">지시문</label>
+                    <select id="detail-gemini-prompt" disabled></select>
+                  </div>
+                  <button id="detail-gemini-request" type="button" disabled>AI 판독 요청</button>
+                </div>
+                <p id="detail-gemini-request-error" class="error-message" role="alert" hidden></p>
+                <p id="detail-gemini-state" class="gemini-result-message" role="status" hidden></p>
+                <p id="detail-gemini-stale" class="weight-range" hidden>검사 기록이 바뀌기 전의 결과입니다. 다시 판독해 주세요.</p>
+                <div id="detail-gemini-fields"></div>
+                <section id="detail-gemini-comparison" class="gemini-comparison" hidden aria-label="판독 이력과 결과 비교">
+                  <h3>판독 이력과 결과 비교</h3>
+                  <div class="gemini-comparison-selectors">
+                    <div>
+                      <label for="detail-gemini-compare-left">첫 번째 결과</label>
+                      <select id="detail-gemini-compare-left"></select>
+                    </div>
+                    <div>
+                      <label for="detail-gemini-compare-right">두 번째 결과</label>
+                      <select id="detail-gemini-compare-right"></select>
+                    </div>
+                  </div>
+                  <div id="detail-gemini-comparison-output" class="gemini-comparison-table-wrap"></div>
+                </section>
+              </section>
               <p id="detail-placeholder" hidden></p>
             </div>
           </div>
@@ -593,7 +684,13 @@
       const homeView = document.querySelector('#home-view');
       const settingsView = document.querySelector('#settings-view');
       const storageStatus = document.querySelector('#storage-status');
+      const geminiStatus = document.querySelector('#gemini-status');
+      const promptVersion = document.querySelector('#prompt-version');
+      const promptText = document.querySelector('#prompt-text');
+      const savePromptButton = document.querySelector('#save-prompt');
+      const promptMessage = document.querySelector('#prompt-message');
       let storageStatusRequestId = 0;
+      let promptRecords = [];
       const homeDate = document.querySelector('#home-date');
       const homeSummaryError = document.querySelector('#home-summary-error');
       const homeListError = document.querySelector('#home-list-error');
@@ -607,6 +704,19 @@
       const inspectionDetailError = document.querySelector('#inspection-detail-error');
       const detailPanel = document.querySelector('#detail-panel');
       const detailPhotoMeasurement = document.querySelector('#detail-photo-measurement');
+      const detailGeminiResult = document.querySelector('#detail-gemini-result');
+      const detailGeminiBadge = document.querySelector('#detail-gemini-badge');
+      const detailGeminiRevision = document.querySelector('#detail-gemini-revision');
+      const detailGeminiPrompt = document.querySelector('#detail-gemini-prompt');
+      const detailGeminiRequest = document.querySelector('#detail-gemini-request');
+      const detailGeminiRequestError = document.querySelector('#detail-gemini-request-error');
+      const detailGeminiState = document.querySelector('#detail-gemini-state');
+      const detailGeminiStale = document.querySelector('#detail-gemini-stale');
+      const detailGeminiFields = document.querySelector('#detail-gemini-fields');
+      const detailGeminiComparison = document.querySelector('#detail-gemini-comparison');
+      const detailGeminiCompareLeft = document.querySelector('#detail-gemini-compare-left');
+      const detailGeminiCompareRight = document.querySelector('#detail-gemini-compare-right');
+      const detailGeminiComparisonOutput = document.querySelector('#detail-gemini-comparison-output');
       const detailPlaceholder = document.querySelector('#detail-placeholder');
       const detailMainImage = document.querySelector('#detail-main-image');
       const detailThumbnails = document.querySelector('#detail-thumbnails');
@@ -627,6 +737,15 @@
       let selectedImageDataUrls = [];
       let imageSelectionVersion = 0;
       let activeDetailImages = [];
+      let activeDetailInspectionId = '';
+      let activeDetailRevision = 'Rev.A';
+      let detailPromptRecords = [];
+      let detailPromptOptionsInspectionId = '';
+      let detailPromptOptionsRequestId = 0;
+      let detailGeminiOptionsReady = false;
+      let detailGeminiComparisonResultIds = '';
+      let geminiResultRequestId = 0;
+      let geminiPollTimer = null;
 
       function readImageAsDataUrl(file) {
         return new Promise((resolve, reject) => {
@@ -693,7 +812,18 @@
           if (!response.ok || result.error) {
             throw new Error(result.error || '검사를 등록하지 못했습니다.');
           }
-          navigate(`/inspections/${encodeURIComponent(result.inspection_id)}`);
+          const inspectionRoute = `/inspections/${encodeURIComponent(result.inspection_id)}`;
+          try {
+            const geminiResponse = await fetch(`/api/inspections/${encodeURIComponent(result.inspection_id)}/gemini`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ revision: result.revision, prompt: 'v3' }),
+            });
+            await geminiResponse.json();
+          } catch {
+            // 판독 시작에 실패해도 이미 등록한 검사는 유지하고 상세 화면으로 이동합니다.
+          }
+          navigate(`${inspectionRoute}?tab=2`);
         } catch (error) {
           inspectionSubmitError.textContent = error.message || '검사를 등록하지 못했습니다.';
           inspectionSubmitError.hidden = false;
@@ -754,11 +884,70 @@
           if (!response.ok) throw new Error(result.error || '저장소 상태를 불러오지 못했습니다.');
           if (requestId !== storageStatusRequestId || window.location.pathname !== '/settings') return;
           storageStatus.textContent = `저장소: ${result.label}`;
+          geminiStatus.textContent = `Gemini 판독: ${result.gemini_label}`;
         } catch (error) {
           if (requestId !== storageStatusRequestId || window.location.pathname !== '/settings') return;
           storageStatus.textContent = error.message || '저장소 상태를 불러오지 못했습니다.';
+          geminiStatus.textContent = error.message || 'Gemini 판독 상태를 불러오지 못했습니다.';
         }
       }
+
+      async function loadPrompts(selectedName) {
+        promptMessage.textContent = '';
+        try {
+          const response = await fetch('/api/prompts');
+          const result = await response.json();
+          if (!response.ok) throw new Error(result.error || 'Gemini 지시문을 불러오지 못했습니다.');
+          if (window.location.pathname !== '/settings') return;
+          promptRecords = result.prompts;
+          promptVersion.replaceChildren(...promptRecords.map((prompt) => {
+            const option = document.createElement('option');
+            option.value = prompt.name;
+            option.textContent = prompt.name;
+            return option;
+          }));
+          promptVersion.value = selectedName || result.default;
+          showSelectedPrompt();
+          promptVersion.disabled = false;
+          promptText.disabled = false;
+          savePromptButton.disabled = false;
+        } catch (error) {
+          promptMessage.textContent = error.message || 'Gemini 지시문을 불러오지 못했습니다.';
+        }
+      }
+
+      function showSelectedPrompt() {
+        const selected = promptRecords.find((prompt) => prompt.name === promptVersion.value);
+        promptText.value = selected?.text || '';
+      }
+
+      promptVersion.addEventListener('change', showSelectedPrompt);
+
+      savePromptButton.addEventListener('click', async () => {
+        const selected = promptRecords.find((prompt) => prompt.name === promptVersion.value);
+        const base = selected?.name.match(/^v[1-3]/)?.[0];
+        if (!base) {
+          promptMessage.textContent = '저장할 지시문 버전을 확인하세요.';
+          return;
+        }
+        savePromptButton.disabled = true;
+        promptMessage.textContent = '수정본을 저장하고 있습니다.';
+        try {
+          const response = await fetch('/api/prompts', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ base, text: promptText.value }),
+          });
+          const saved = await response.json();
+          if (!response.ok) throw new Error(saved.error || '수정본을 저장하지 못했습니다.');
+          await loadPrompts(saved.name);
+          promptMessage.textContent = '수정본을 저장했습니다.';
+        } catch (error) {
+          promptMessage.textContent = error.message || '수정본을 저장하지 못했습니다.';
+        } finally {
+          savePromptButton.disabled = false;
+        }
+      });
 
       async function loadHomeInspections() {
         const requestId = ++homeListRequestId;
@@ -875,6 +1064,9 @@
       }
 
       async function loadInspectionDetail(route) {
+        geminiResultRequestId += 1;
+        clearTimeout(geminiPollTimer);
+        geminiPollTimer = null;
         inspectionDetailContent.hidden = true;
         inspectionDetailError.hidden = true;
         try {
@@ -882,6 +1074,16 @@
           const inspection = await response.json();
           if (!response.ok) throw new Error(inspection.error || '검사를 불러오지 못했습니다.');
           if (window.location.pathname !== route) return;
+          activeDetailInspectionId = inspection.inspection_id;
+          activeDetailRevision = inspection.revision;
+          if (detailPromptOptionsInspectionId !== inspection.inspection_id) {
+            detailPromptOptionsInspectionId = inspection.inspection_id;
+            detailGeminiOptionsReady = false;
+            detailGeminiRevision.disabled = true;
+            detailGeminiPrompt.disabled = true;
+            detailGeminiRequest.disabled = true;
+            void loadDetailPromptOptions(inspection.inspection_id);
+          }
 
           const productNames = {
             'P-SILVER': '텀블러 실버',
@@ -903,7 +1105,7 @@
           document.querySelector('#detail-edit-weight').value = inspection.weight_g ?? '';
           detailEditError.hidden = true;
           renderDetailImages(Array.isArray(inspection.images) ? inspection.images : []);
-          selectDetailTab(0);
+          selectDetailTab(new URLSearchParams(window.location.search).get('tab') === '2' ? 1 : 0, false);
           inspectionDetailContent.hidden = false;
         } catch (error) {
           if (window.location.pathname !== route) return;
@@ -912,14 +1114,269 @@
         }
       }
 
-      function selectDetailTab(index) {
+      function selectDetailTab(index, updateAddress = true) {
         detailTabs.forEach((tab, tabIndex) => {
           tab.setAttribute('aria-selected', String(tabIndex === index));
         });
         detailPanel.setAttribute('aria-labelledby', detailTabs[index].id);
         detailPhotoMeasurement.hidden = index !== 0;
-        detailPlaceholder.hidden = index === 0;
-        detailPlaceholder.textContent = index === 0 ? '' : '이 탭은 나중 회차에서 만듭니다.';
+        detailGeminiResult.hidden = index !== 1;
+        detailPlaceholder.hidden = index < 2;
+        detailPlaceholder.textContent = index < 2 ? '' : '이 탭은 나중 회차에서 만듭니다.';
+        if (index === 1 && activeDetailInspectionId) {
+          void loadGeminiResult(activeDetailInspectionId);
+        } else {
+          geminiResultRequestId += 1;
+          clearTimeout(geminiPollTimer);
+          geminiPollTimer = null;
+        }
+        if (updateAddress) {
+          const query = new URLSearchParams(window.location.search);
+          if (index === 1) query.set('tab', '2');
+          else query.delete('tab');
+          const search = query.toString();
+          history.replaceState({}, '', `${window.location.pathname}${search ? `?${search}` : ''}`);
+        }
+      }
+
+      async function loadGeminiResult(inspectionId) {
+        const requestId = ++geminiResultRequestId;
+        clearTimeout(geminiPollTimer);
+        geminiPollTimer = null;
+        detailGeminiFields.replaceChildren();
+        detailGeminiStale.hidden = true;
+        detailGeminiBadge.hidden = true;
+        detailGeminiState.textContent = '판독 상태를 불러오는 중입니다.';
+        detailGeminiState.hidden = false;
+
+        try {
+          const response = await fetch(`/api/inspections/${encodeURIComponent(inspectionId)}/gemini`);
+          const status = await response.json();
+          if (!response.ok) throw new Error(status.error || '판독 결과를 불러오지 못했습니다.');
+          if (
+            requestId !== geminiResultRequestId ||
+            activeDetailInspectionId !== inspectionId ||
+            detailTabs[1].getAttribute('aria-selected') !== 'true'
+          ) return;
+
+          if (status.state === 'running') {
+            detailGeminiState.textContent = '판독 중';
+            detailGeminiState.hidden = false;
+            geminiPollTimer = setTimeout(() => void loadGeminiResult(inspectionId), 3000);
+          } else if (status.state === 'failed') {
+            detailGeminiState.textContent = `판독 실패: ${status.error || '판독하지 못했습니다.'}`;
+            detailGeminiState.hidden = false;
+          } else {
+            detailGeminiState.hidden = true;
+          }
+
+          const hasResults = Array.isArray(status.results) && status.results.length > 0;
+          renderGeminiComparison(status.results || []);
+          detailGeminiRequest.textContent = hasResults ? 'AI 재판독 요청' : 'AI 판독 요청';
+          detailGeminiRequest.disabled = status.state === 'running' || !detailGeminiOptionsReady;
+          const badge = status.state === 'running'
+            ? '판독 중'
+            : status.state === 'failed'
+              ? '판독 실패'
+              : !hasResults
+                ? '결과 없음'
+                : status.stale
+                  ? '다시 판독 필요'
+                  : '확인할 결과';
+          detailGeminiBadge.textContent = badge;
+          detailGeminiBadge.hidden = false;
+
+          detailGeminiStale.hidden = !status.stale;
+          const latest = status.results?.[0];
+          if (!latest) {
+            const empty = document.createElement('p');
+            empty.className = 'gemini-result-message';
+            empty.textContent = '아직 판독한 결과가 없습니다.';
+            detailGeminiFields.append(empty);
+            return;
+          }
+
+          const labels = [
+            ['판정', latest.result['판정']],
+            ['불량유형', latest.result['불량유형']],
+            ['관찰·수치 근거', latest.result['관찰·수치 근거']],
+            ['적용 기준과 출처', latest.result['적용 기준과 출처']],
+            ['권고 조치', latest.result['권고 조치']],
+            ['사람 승인 필요 여부', latest.result['사람 승인 필요 여부']],
+          ];
+          const fields = document.createElement('dl');
+          fields.className = 'gemini-result-fields';
+          labels.forEach(([label, value], index) => {
+            const row = document.createElement('div');
+            if (index === 0) row.classList.add('gemini-decision');
+            const term = document.createElement('dt');
+            term.textContent = label;
+            const description = document.createElement('dd');
+            description.textContent = label === '판정'
+              ? ({ OK: '정상', NG: '불량', HOLD: '보류' }[value] || value)
+              : value;
+            row.append(term, description);
+            fields.append(row);
+          });
+          detailGeminiFields.replaceChildren(fields);
+        } catch (error) {
+          if (requestId !== geminiResultRequestId) return;
+          detailGeminiRequest.disabled = false;
+          detailGeminiState.textContent = error.message || '판독 결과를 불러오지 못했습니다.';
+          detailGeminiState.hidden = false;
+        }
+      }
+
+      async function loadDetailPromptOptions(inspectionId) {
+        const requestId = ++detailPromptOptionsRequestId;
+        try {
+          const response = await fetch('/api/prompts');
+          const result = await response.json();
+          if (!response.ok) throw new Error(result.error || 'Gemini 지시문을 불러오지 못했습니다.');
+          if (requestId !== detailPromptOptionsRequestId || activeDetailInspectionId !== inspectionId) return;
+          detailPromptRecords = result.prompts;
+          detailGeminiPrompt.replaceChildren(...detailPromptRecords.map((prompt) => {
+            const option = document.createElement('option');
+            option.value = prompt.name;
+            option.textContent = prompt.name;
+            return option;
+          }));
+          detailGeminiRevision.value = activeDetailRevision;
+          detailGeminiPrompt.value = result.default || 'v3';
+          detailGeminiRevision.disabled = false;
+          detailGeminiPrompt.disabled = false;
+          detailGeminiOptionsReady = true;
+          detailGeminiRequest.disabled = detailGeminiBadge.textContent === '판독 중';
+        } catch (error) {
+          if (requestId !== detailPromptOptionsRequestId || activeDetailInspectionId !== inspectionId) return;
+          detailGeminiRequestError.textContent = error.message || 'Gemini 지시문을 불러오지 못했습니다.';
+          detailGeminiRequestError.hidden = false;
+        }
+      }
+
+      detailGeminiRequest.addEventListener('click', async () => {
+        if (!activeDetailInspectionId || !detailGeminiOptionsReady) return;
+        detailGeminiRequestError.hidden = true;
+        detailGeminiRequest.disabled = true;
+        try {
+          const response = await fetch(`/api/inspections/${encodeURIComponent(activeDetailInspectionId)}/gemini`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ revision: detailGeminiRevision.value, prompt: detailGeminiPrompt.value }),
+          });
+          const result = await response.json();
+          if (!response.ok) throw new Error(result.error || '판독을 시작하지 못했습니다.');
+          await loadGeminiResult(activeDetailInspectionId);
+        } catch (error) {
+          detailGeminiRequestError.textContent = error.message || '판독을 시작하지 못했습니다.';
+          detailGeminiRequestError.hidden = false;
+        } finally {
+          if (!geminiPollTimer) detailGeminiRequest.disabled = false;
+        }
+      });
+
+      detailGeminiCompareLeft.addEventListener('change', () => {
+        if (detailGeminiCompareLeft.value === detailGeminiCompareRight.value) {
+          const other = [...detailGeminiCompareRight.options].find((option) => option.value !== detailGeminiCompareLeft.value);
+          if (other) detailGeminiCompareRight.value = other.value;
+        }
+        renderGeminiComparisonTable();
+      });
+
+      detailGeminiCompareRight.addEventListener('change', () => {
+        if (detailGeminiCompareRight.value === detailGeminiCompareLeft.value) {
+          const other = [...detailGeminiCompareLeft.options].find((option) => option.value !== detailGeminiCompareRight.value);
+          if (other) detailGeminiCompareLeft.value = other.value;
+        }
+        renderGeminiComparisonTable();
+      });
+
+      let detailGeminiComparisonResults = [];
+
+      function renderGeminiComparison(results) {
+        if (!Array.isArray(results) || results.length < 2) {
+          detailGeminiComparison.hidden = true;
+          detailGeminiComparisonResults = [];
+          detailGeminiComparisonResultIds = '';
+          detailGeminiCompareLeft.replaceChildren();
+          detailGeminiCompareRight.replaceChildren();
+          detailGeminiComparisonOutput.replaceChildren();
+          return;
+        }
+
+        const resultIds = results.map((record) => record.result_id).join('|');
+        const unchangedSelection = resultIds === detailGeminiComparisonResultIds;
+        const previousLeft = unchangedSelection ? detailGeminiCompareLeft.value : results[0].result_id;
+        const previousRight = unchangedSelection ? detailGeminiCompareRight.value : results[1].result_id;
+        detailGeminiComparisonResultIds = resultIds;
+        detailGeminiComparisonResults = results;
+        const options = results.map((record) => {
+          const option = document.createElement('option');
+          option.value = record.result_id;
+          option.textContent = `${record.instruction_name} · ${record.created_at}`;
+          return option;
+        });
+        detailGeminiCompareLeft.replaceChildren(...options.map((option) => option.cloneNode(true)));
+        detailGeminiCompareRight.replaceChildren(...options.map((option) => option.cloneNode(true)));
+        detailGeminiCompareLeft.value = results.some((record) => record.result_id === previousLeft)
+          ? previousLeft
+          : results[0].result_id;
+        detailGeminiCompareRight.value = results.some((record) => record.result_id === previousRight)
+          ? previousRight
+          : results[1].result_id;
+        if (detailGeminiCompareLeft.value === detailGeminiCompareRight.value) {
+          detailGeminiCompareRight.value = results.find((record) => record.result_id !== detailGeminiCompareLeft.value).result_id;
+        }
+        detailGeminiComparison.hidden = false;
+        renderGeminiComparisonTable();
+      }
+
+      function renderGeminiComparisonTable() {
+        const left = detailGeminiComparisonResults.find((record) => record.result_id === detailGeminiCompareLeft.value);
+        const right = detailGeminiComparisonResults.find((record) => record.result_id === detailGeminiCompareRight.value);
+        if (!left || !right) return;
+
+        const table = document.createElement('table');
+        table.className = 'gemini-comparison-table';
+        const head = document.createElement('thead');
+        const headerRow = document.createElement('tr');
+        const blankHeader = document.createElement('th');
+        blankHeader.scope = 'col';
+        headerRow.append(blankHeader);
+        [left, right].forEach((record) => {
+          const header = document.createElement('th');
+          header.scope = 'col';
+          header.textContent = `${record.instruction_name} · ${record.created_at}`;
+          headerRow.append(header);
+        });
+        head.append(headerRow);
+        const body = document.createElement('tbody');
+        const fields = [
+          ['판정', '판정'],
+          ['불량유형', '불량유형'],
+          ['관찰·수치 근거', '관찰·수치 근거'],
+          ['적용 기준과 출처', '적용 기준과 출처'],
+          ['권고 조치', '권고 조치'],
+          ['사람 승인 필요 여부', '사람 승인 필요 여부'],
+        ];
+        fields.forEach(([label, key]) => {
+          const row = document.createElement('tr');
+          const heading = document.createElement('th');
+          heading.scope = 'row';
+          heading.textContent = label;
+          row.append(heading);
+          [left, right].forEach((record) => {
+            const cell = document.createElement('td');
+            const value = record.result[key];
+            cell.textContent = key === '판정'
+              ? ({ OK: '정상', NG: '불량', HOLD: '보류' }[value] || value)
+              : value;
+            row.append(cell);
+          });
+          body.append(row);
+        });
+        table.append(head, body);
+        detailGeminiComparisonOutput.replaceChildren(table);
       }
 
       function populateDetailProductOptions(selectedProductId) {
@@ -1014,6 +1471,15 @@
         newInspectionLink.hidden = true;
         let title = '품질 현황';
         const isDetail = /^\/inspections\/[^/]+$/.test(route);
+        if (!isDetail) {
+          geminiResultRequestId += 1;
+          detailPromptOptionsRequestId += 1;
+          clearTimeout(geminiPollTimer);
+          geminiPollTimer = null;
+          activeDetailInspectionId = '';
+          detailPromptOptionsInspectionId = '';
+          detailGeminiOptionsReady = false;
+        }
         if (route === '/inspections/new') title = '검사 등록';
         else if (isDetail) title = '검사 상세';
         else if (route === '/settings') title = '설정';
@@ -1034,7 +1500,10 @@
         inspectionDetailView.hidden = !isDetail;
         notFoundView.hidden = true;
         if (isHome) loadHomeSummary();
-        if (isSettings) loadStorageStatus();
+        if (isSettings) {
+          loadStorageStatus();
+          loadPrompts();
+        }
         if (isNewInspection) loadInspectionFields();
         if (isDetail) loadInspectionDetail(route);
       }

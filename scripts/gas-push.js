@@ -1,4 +1,11 @@
 const { spawnSync } = require('node:child_process');
+const { copyFileSync, mkdirSync } = require('node:fs');
+const path = require('node:path');
+
+const sharedSource = path.join(process.cwd(), 'shared', 'gemini-result.js');
+const gasDirectory = path.join(process.cwd(), 'gas');
+mkdirSync(gasDirectory, { recursive: true });
+copyFileSync(sharedSource, path.join(gasDirectory, 'gemini-result.js'));
 
 const result = spawnSync('npx --yes @google/clasp@3.4.1 push --force', {
   shell: true,

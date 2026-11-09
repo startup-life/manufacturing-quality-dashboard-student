@@ -1,9 +1,13 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { InspectionStore } from './inspection.store';
+import { GeminiResultStore } from './gemini-result.store';
 
 @Controller('api/home')
 export class HomeController {
-  constructor(private readonly store: InspectionStore) {}
+  constructor(
+    private readonly store: InspectionStore,
+    private readonly geminiResults: GeminiResultStore,
+  ) {}
 
   @Get()
   async getHome(@Query('date') requestedDate?: string): Promise<{
@@ -21,13 +25,16 @@ export class HomeController {
     const dailyInspections = date
       ? inspections.filter((inspection) => inspection.inspected_at.slice(0, 10) === date)
       : [];
+    const inspectionIdsWithResults = await this.geminiResults.getInspectionIdsWithResults();
 
     return {
       date,
       total: dailyInspections.length,
       ng: dailyInspections.filter((inspection) => inspection.decision === 'NG').length,
       hold: dailyInspections.filter((inspection) => inspection.decision === 'HOLD').length,
-      review_pending: 0,
+      review_pending: dailyInspections.filter((inspection) =>
+        inspectionIdsWithResults.has(inspection.inspection_id),
+      ).length,
     };
   }
 }
