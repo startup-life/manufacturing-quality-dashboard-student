@@ -25,16 +25,14 @@ export class HomeController {
     const dailyInspections = date
       ? inspections.filter((inspection) => inspection.inspected_at.slice(0, 10) === date)
       : [];
-    const inspectionIdsWithResults = await this.geminiResults.getInspectionIdsWithResults();
+    const pendingIds = await this.geminiResults.getReviewPendingInspectionIds(dailyInspections);
 
     return {
       date,
       total: dailyInspections.length,
       ng: dailyInspections.filter((inspection) => inspection.decision === 'NG').length,
       hold: dailyInspections.filter((inspection) => inspection.decision === 'HOLD').length,
-      review_pending: dailyInspections.filter((inspection) =>
-        inspectionIdsWithResults.has(inspection.inspection_id),
-      ).length,
+      review_pending: dailyInspections.filter((inspection) => pendingIds.has(inspection.inspection_id)).length,
     };
   }
 }

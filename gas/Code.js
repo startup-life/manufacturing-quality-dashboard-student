@@ -17,6 +17,10 @@ function doPost(event) {
       else if (request.action === 'getPhoto') data = getPhoto(request.id);
       else if (request.action === 'saveGeminiResult') data = saveGeminiResult(spreadsheet, request.record);
       else if (request.action === 'listGeminiResults') data = listGeminiResults(spreadsheet, request.inspection_id);
+      else if (request.action === 'saveEvidenceQuery') data = saveEvidenceQuery(spreadsheet, request.record);
+      else if (request.action === 'listEvidenceQueries') data = listEvidenceQueries(spreadsheet, request.inspection_id);
+      else if (request.action === 'saveEvidenceLink') data = saveEvidenceLink(spreadsheet, request.record);
+      else if (request.action === 'listEvidenceLinks') data = listEvidenceLinks(spreadsheet, request.inspection_id);
       else if (request.action === 'runGemini') data = runGemini(request);
       else if (request.action === 'setOnePortKey') data = setOnePortKey(request.key);
       else throw new Error('지원하지 않는 일입니다.');
@@ -58,6 +62,28 @@ function setupStorage() {
     'weight_g',
     'images',
     'result',
+  ]);
+  ensureSheetHeaders(spreadsheet, 'evidence_queries', [
+    'query_id',
+    'inspection_id',
+    'draft_id',
+    'created_at',
+    'mode',
+    'revision',
+    'prompt_name',
+    'question',
+    'answer',
+    'sources',
+  ]);
+  ensureSheetHeaders(spreadsheet, 'evidence_links', [
+    'link_id',
+    'query_id',
+    'inspection_id',
+    'draft_id',
+    'status',
+    'memo',
+    'user',
+    'created_at',
   ]);
   removeEmptyDefaultSheet(spreadsheet);
 
@@ -214,6 +240,55 @@ function listGeminiResults(spreadsheet, inspectionId) {
       result: parseGeminiJsonCell(row.result, {}),
     }));
   return { results: rows };
+}
+
+function saveEvidenceQuery(spreadsheet, record) {
+  if (!record || typeof record !== 'object' || Array.isArray(record)) {
+    throw createUserError('근거 답을 확인하세요.');
+  }
+  if (typeof record.sources !== 'string') {
+    throw createUserError('근거 답의 출처는 JSON 글이어야 합니다.');
+  }
+  try {
+    JSON.parse(record.sources);
+  } catch (error) {
+    throw createUserError('근거 답의 출처를 읽을 수 없습니다.');
+  }
+  const appended = appendRows(spreadsheet, { evidence_queries: [record] });
+  return { saved: appended.added };
+}
+
+function listEvidenceQueries(spreadsheet, inspectionId) {
+  if (inspectionId !== undefined && typeof inspectionId !== 'string') {
+    throw createUserError('검사번호를 확인하세요.');
+  }
+  const sheet = spreadsheet.getSheetByName('evidence_queries');
+  if (!sheet) return { queries: [] };
+
+  const queries = readSheetRows(sheet)
+    .filter((row) => inspectionId === undefined || row.inspection_id === inspectionId)
+    .map((row) => ({ ...row, sources: parseGeminiJsonCell(row.sources, []) }));
+  return { queries: queries };
+}
+
+function saveEvidenceLink(spreadsheet, record) {
+  if (!record || typeof record !== 'object' || Array.isArray(record)) {
+    throw createUserError('대조 기록을 확인하세요.');
+  }
+  const appended = appendRows(spreadsheet, { evidence_links: [record] });
+  return { saved: appended.added };
+}
+
+function listEvidenceLinks(spreadsheet, inspectionId) {
+  if (inspectionId !== undefined && typeof inspectionId !== 'string') {
+    throw createUserError('검사번호를 확인하세요.');
+  }
+  const sheet = spreadsheet.getSheetByName('evidence_links');
+  if (!sheet) return { links: [] };
+
+  const links = readSheetRows(sheet)
+    .filter((row) => inspectionId === undefined || row.inspection_id === inspectionId);
+  return { links: links };
 }
 
 function parseGeminiJsonCell(value, fallback) {

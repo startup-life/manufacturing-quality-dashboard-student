@@ -4,6 +4,7 @@ import { randomBytes } from 'node:crypto';
 import path from 'node:path';
 import type { Inspection } from './inspection.types';
 import type { GeminiResultFields, GeminiResultRecord, GeminiRunState, GeminiRunStatus } from './gemini-result.types';
+import type { EvidenceLinkRecord } from './evidence-link.types';
 import { GoogleWebAppClient } from './google-web-app.client';
 import { getGeminiInfo, getStorageInfo } from './storage-mode';
 
@@ -26,6 +27,11 @@ interface GoogleGeminiResultRecord extends Omit<GeminiResultRecord, 'weight_g' |
   result: unknown;
 }
 
+interface GoogleStatusData {
+  gemini_results: GoogleGeminiResultRecord[];
+  evidence_links: EvidenceLinkRecord[];
+}
+
 @Injectable()
 export class GeminiResultStore {
   private readonly filePath = path.join(process.cwd(), 'runtime', 'gemini-results.json');
@@ -33,13 +39,62 @@ export class GeminiResultStore {
 
   constructor(private readonly google: GoogleWebAppClient) {}
 
-  async getInspectionIdsWithResults(): Promise<Set<string>> {
-    const results = await this.readResults();
-    return new Set(results.map((record) => record.inspection_id));
+  async getReviewPendingInspectionIds(inspections: Inspection[]): Promise<Set<string>> {
+    let results: GeminiResultRecord[];
+    let links: EvidenceLinkRecord[];
+    if (getStorageInfo().storage === 'live') {
+      const response = await this.google.call<GoogleStatusData>('read', {
+        tabs: ['gemini_results', 'evidence_links'],
+      });
+      results = this.normalizeGoogleResults(response.gemini_results ?? []);
+      links = response.evidence_links ?? [];
+    } else {
+      results = this.readLocalResults();
+      links = this.readLocalEvidenceLinks();
+    }
+
+    const inspectionsById = new Map(inspections.map((inspection) => [inspection.inspection_id, inspection]));
+    const latestByInspection = new Map<string, GeminiResultRecord>();
+    for (const result of results) {
+      const current = latestByInspection.get(result.inspection_id);
+      if (!current || result.created_at.localeCompare(current.created_at) > 0) {
+        latestByInspection.set(result.inspection_id, result);
+      }
+    }
+
+    const pending = new Set<string>();
+    for (const [inspectionId, latest] of latestByInspection) {
+      const inspection = inspectionsById.get(inspectionId);
+      if (!inspection) continue;
+      const stale = latest.product_id !== inspection.product_id ||
+        latest.weight_g !== inspection.weight_g ||
+        JSON.stringify(latest.images) !== JSON.stringify(inspection.images);
+      const latestLink = links
+        .filter((record) => record.inspection_id === inspectionId && record.draft_id === latest.result_id)
+        .sort((left, right) => right.created_at.localeCompare(left.created_at))[0];
+      const reviewedAsMatch = latestLink?.status === 'VERIFIED_BY_USER' ||
+        latestLink?.status === 'MOCK_USER_REVIEWED';
+      if (stale || !reviewedAsMatch) pending.add(inspectionId);
+    }
+    return pending;
   }
 
   async getStatus(inspection: Inspection): Promise<GeminiRunStatus> {
-    const results = (await this.readResults(inspection.inspection_id))
+    let results: GeminiResultRecord[];
+    let links: EvidenceLinkRecord[];
+    if (getStorageInfo().storage === 'live') {
+      const response = await this.google.call<GoogleStatusData>('read', {
+        tabs: ['gemini_results', 'evidence_links'],
+      });
+      results = this.normalizeGoogleResults(response.gemini_results ?? [])
+        .filter((record) => record.inspection_id === inspection.inspection_id);
+      links = (response.evidence_links ?? [])
+        .filter((record) => record.inspection_id === inspection.inspection_id);
+    } else {
+      results = this.readLocalResults().filter((record) => record.inspection_id === inspection.inspection_id);
+      links = this.readLocalEvidenceLinks().filter((record) => record.inspection_id === inspection.inspection_id);
+    }
+    results = results
       .sort((left, right) => right.created_at.localeCompare(left.created_at));
     const current = this.runStates.get(inspection.inspection_id) ?? { state: 'idle' as const };
     const latest = results[0];
@@ -49,6 +104,12 @@ export class GeminiResultStore {
           latest.weight_g !== inspection.weight_g ||
           JSON.stringify(latest.images) !== JSON.stringify(inspection.images)),
     );
+    const link = latest
+      ? links
+          .filter((record) => record.draft_id === latest.result_id)
+          .reverse()
+          .sort((left, right) => right.created_at.localeCompare(left.created_at))[0] ?? null
+      : null;
 
     return {
       mode: getGeminiInfo().gemini_mode,
@@ -56,6 +117,7 @@ export class GeminiResultStore {
       ...(current.state === 'failed' && current.error ? { error: current.error } : {}),
       results,
       stale,
+      link,
     };
   }
 
@@ -198,18 +260,7 @@ export class GeminiResultStore {
     if (getStorageInfo().storage === 'live') {
       const values = inspectionId ? { inspection_id: inspectionId } : {};
       const response = await this.google.call<GoogleGeminiResults>('listGeminiResults', values);
-      return (response.results ?? []).map((record) => {
-        const result = normalizeGeminiResult(record.result);
-        if (!result) throw new Error('저장된 판독 결과를 읽을 수 없습니다.');
-        return {
-          ...record,
-          weight_g: record.weight_g === null || record.weight_g === '' ? null : Number(record.weight_g),
-          images: Array.isArray(record.images)
-            ? record.images.filter((image): image is string => typeof image === 'string')
-            : [],
-          result,
-        };
-      });
+      return this.normalizeGoogleResults(response.results ?? []);
     }
 
     const records = this.readLocalResults();
@@ -218,10 +269,42 @@ export class GeminiResultStore {
       : records;
   }
 
+  private normalizeGoogleResults(records: GoogleGeminiResultRecord[]): GeminiResultRecord[] {
+    return records.map((record) => {
+      const result = normalizeGeminiResult(this.parseGoogleCell(record.result));
+      if (!result) throw new Error('저장된 판독 결과를 읽을 수 없습니다.');
+      const images = this.parseGoogleCell(record.images);
+      return {
+        ...record,
+        weight_g: record.weight_g === null || record.weight_g === '' ? null : Number(record.weight_g),
+        images: Array.isArray(images)
+          ? images.filter((image): image is string => typeof image === 'string')
+          : [],
+        result,
+      };
+    });
+  }
+
+  private parseGoogleCell(value: unknown): unknown {
+    if (typeof value !== 'string') return value;
+    try {
+      return JSON.parse(value) as unknown;
+    } catch {
+      return value;
+    }
+  }
+
   private readLocalResults(): GeminiResultRecord[] {
     if (!existsSync(this.filePath)) return [];
     const value: unknown = JSON.parse(readFileSync(this.filePath, 'utf8'));
     return Array.isArray(value) ? (value as GeminiResultRecord[]) : [];
+  }
+
+  private readLocalEvidenceLinks(): EvidenceLinkRecord[] {
+    const filePath = path.join(process.cwd(), 'runtime', 'evidence-links.json');
+    if (!existsSync(filePath)) return [];
+    const value: unknown = JSON.parse(readFileSync(filePath, 'utf8'));
+    return Array.isArray(value) ? value as EvidenceLinkRecord[] : [];
   }
 
   private async save(record: GeminiResultRecord): Promise<void> {

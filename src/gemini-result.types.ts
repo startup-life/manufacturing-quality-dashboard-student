@@ -1,4 +1,5 @@
 import type { GeminiMode } from './storage-mode';
+import type { EvidenceLinkRecord } from './evidence-link.types';
 
 export interface GeminiResultFields {
   판정: 'OK' | 'NG' | 'HOLD';
@@ -31,4 +32,5 @@ export interface GeminiRunStatus {
   error?: string;
   results: GeminiResultRecord[];
   stale: boolean;
+  link?: EvidenceLinkRecord | null;
 }
