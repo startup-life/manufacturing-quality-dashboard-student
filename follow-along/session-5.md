@@ -78,7 +78,6 @@ nlm login --check
 - 하는 일: NotebookLM에 노트북 "텀블러 품질 기준(교육용)"이 생겨 검사기준 원문 두 파일이 소스로 들어가고, AI가 `.env`에 근거 확인 방식(`live`), 노트북 ID, 도구 경로를 넣습니다.
 - 목표: 서버가 내 노트북에 실제로 질문할 준비를 합니다.
 - 직접 하기: 상자를 보내기 전에 1~6번을 명령 창에서 직접 하고, 7번에서 노트북 ID와 도구 경로를 위 상자에 넣어 AI에게 줍니다. 검사기준 원문 두 파일은 4회차 4-3에서 `standards` 폴더에 넣어 두었습니다. 아래 다섯 줄은 1~6번에서 하나씩 씁니다.
-
   ```powershell
   nlm notebook create "텀블러 품질 기준(교육용)"
   nlm source add <노트북 ID> --file standards\notebooklm-Rev.A.md --wait
@@ -86,7 +85,6 @@ nlm login --check
   Join-Path (uv tool dir --bin) notebooklm-mcp.exe
   Test-Path (Join-Path (uv tool dir --bin) notebooklm-mcp.exe)
   ```
-
   1. 명령 창에 첫 줄을 칩니다. 나온 글의 `notebook_id` 뒤 값(36자)을 마우스로 끌어 고른 뒤 Enter를 눌러 복사합니다. 같은 이름 노트북이 이미 있어도 새로 만들어지니, 방금 나온 값을 씁니다.
   2. 명령 창에 `notepad`를 쳐서 빈 메모장을 열고 `Ctrl+V`로 붙여 넣습니다. 이 메모장은 값을 적어 두는 곳이라 이 번호가 끝날 때까지 닫지 않습니다.
   3. 메모장에서 Enter를 한 번 누른 뒤, 위 둘째 줄과 셋째 줄을 복사해 붙여 넣습니다. 메모장 맨 윗줄의 값을 끌어 고른 뒤 `Ctrl+C`로 복사하고, 아래 두 줄의 `<노트북 ID>`를 `<`와 `>`까지 끌어 고른 뒤 `Ctrl+V`로 붙여 넣습니다. 두 줄 모두 바꿉니다.

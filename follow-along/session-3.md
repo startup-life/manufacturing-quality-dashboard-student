@@ -258,7 +258,8 @@ Google 저장일 때 검사를 등록하도록, 서버에 사진을 드라이브
 - 목표: 검사 기록과 사진을 담을 곳을 실제로 만듭니다.
 - 완료 기준:
   - 1에서: "시트와 사진 폴더를 준비했습니다."가 나옵니다.
-  - 3~4에서: 제목이 "텀블러 공장 품질관리 데이터베이스"인 시트가 수업 계정으로 열립니다. 시트 화면 왼쪽 아래에 `inspections`와 `images`가 있습니다. `inspections`의 맨 윗줄은 `inspection_id`, `product_id`, `inspected_at`, `revision`, `weight_g`, `memo`, `decision`, `content_version` 8칸, `images`의 맨 윗줄은 `inspection_id`, `position`, `image_url` 3칸입니다.
+  - 3에서: 제목이 "텀블러 공장 품질관리 데이터베이스"인 시트가 열립니다. 시트 화면 왼쪽 아래에 `inspections`와 `images`가 있습니다. `inspections`의 맨 윗줄은 `inspection_id`, `product_id`, `inspected_at`, `revision`, `weight_g`, `memo`, `decision`, `content_version` 8칸, `images`의 맨 윗줄은 `inspection_id`, `position`, `image_url` 3칸입니다.
+  - 4에서: 오른쪽 위 계정 그림에 수업 계정이 보입니다.
 - 막히면:
   - "Google에 연결하지 못했습니다…"가 나오면 3-18을 다시 하고 이 명령을 다시 칩니다.
   - 시트가 열리지 않으면 https://drive.google.com 을 엽니다. 오른쪽 위의 동그란 계정 그림을 눌러 수업 계정인지 보고, 다른 계정이면 수업 계정을 고릅니다. 그다음 내 드라이브에서 "텀블러 공장 품질관리 데이터베이스"를 찾아 엽니다. 같은 이름이 여럿이면 수정한 때가 가장 최근인 것을 엽니다.
