@@ -36,6 +36,23 @@
 - 첫 화면: `public/index.html`에 큰 제목 "텀블러 공장 제조품질관리" 하나만 둡니다. 브라우저 탭 제목도 같은 글입니다. 어느 화면 주소로 들어와도 이 첫 화면이 나옵니다.
 - 서버는 켜지 않습니다. `npm.cmd run build`로 오류가 없는지만 봅니다.
 
+## 화면 서버 켜기
+
+화면 서버는 AI가 켜고 다시 켭니다. 사용자가 "화면 서버를 켜 주세요"나 "화면 서버를 다시 켜 주세요"라고 할 때, 그리고 서버 코드(`src` 폴더)나 `.env`를 고친 답에서 서버가 켜져 있었거나 서버를 켤 때 나온 오류를 고쳐 달라는 요청이었을 때 아래대로 합니다. 고친 답에서는 먼저 `npm.cmd run build`로 오류가 없는지 봅니다.
+
+- 포트: "앱의 기본 약속"의 포트(4185)입니다. `.env`에 `PORT`가 있으면 그 값입니다.
+- 켜져 있는지 보기: `Get-NetTCPConnection -LocalPort 4185 -State Listen -ErrorAction SilentlyContinue`를 실행합니다. 줄이 나오면 그 포트를 듣는 서버가 있는 것입니다.
+- 켜기: 이미 켜져 있으면 새로 켜지 않고 "이미 켜져 있습니다"라고 알립니다. 꺼져 있으면 AI가 명령을 실행하는 터미널이 아니라 새 PowerShell 창에서 켭니다. 아래 명령을 PowerShell로 실행합니다. 새 창이 열리고 그 창에서 서버가 켜집니다. 앞부분은 새 창이 이 PC의 프로그램 경로를 다시 읽게 하는 줄입니다. 사용자가 AI 도구를 연 뒤에 설치한 프로그램(5회차의 NotebookLM 도구 등)도 서버가 찾게 하려는 것이므로 빼지 않습니다.
+
+```powershell
+Start-Process powershell -ArgumentList '-NoExit','-Command','$env:Path = [Environment]::GetEnvironmentVariable(''Path'',''Machine'') + '';'' + [Environment]::GetEnvironmentVariable(''Path'',''User''); cd C:\ai-class\tumbler-factory; npm.cmd start'
+```
+
+- 다시 켜기: 그 포트를 듣는 프로세스만 끕니다. `Get-NetTCPConnection -LocalPort 4185 -State Listen | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }`처럼 그 포트의 `OwningProcess`만 `Stop-Process`로 끄고, 프로그램 이름(`node` 등)으로 찾아 끄지 않습니다. 포트가 빈 것을 본 뒤 위 명령으로 새 창에서 켭니다. 꺼진 예전 창은 닫아도 된다고 사용자에게 알립니다.
+- 켠 뒤: `npm.cmd start`는 빌드부터 하므로 켜지는 데 수십 초 걸립니다. "켜져 있는지 보기"를 몇 초마다 다시 해서 1분쯤 기다립니다. 포트가 열리면 새 창(서버 창)에 `품질 대시보드 서버 실행 중: http://127.0.0.1:4185`가 나왔는지 보라고 사용자에게 알립니다. 1분이 지나도 열리지 않으면 서버 창의 빨간 글이나 `error TS`가 든 줄을 복사해 보내 달라고 합니다.
+- `EADDRINUSE`: 다른 프로세스가 이미 그 포트를 쓰는 것입니다. 사용자가 이 글을 붙여 넣으면 "다시 켜기"대로 그 포트의 프로세스만 끄고 새 창에서 다시 켭니다.
+- 설치, 빌드처럼 끝나는 명령은 새 창을 열지 않고 AI가 명령을 실행하는 터미널에서 합니다.
+
 ## 화면 주소
 
 - 화면은 `public/index.html` 한 페이지입니다.
@@ -78,7 +95,7 @@
 | `POST /api/login` | 로그인합니다. 요청은 `{"username": 계정, "password": 비밀번호}`이고 성공하면 `GET /api/session`과 같은 모양으로 답합니다. 계정이나 비밀번호가 틀리면 `{"error": "로그인 정보를 확인하세요."}`로 답합니다 |
 | `POST /api/logout` | 로그아웃합니다. `{"user": null}`로 답합니다 |
 
-- `POST /api/login`은 화면이 보낸 JSON 본문에서 계정과 비밀번호를 읽습니다. 서버를 켜서 확인할 수 없으므로 "앱의 기본 약속"의 서버 칸대로 컨트롤러로 만들어 본문이 읽히게 합니다.
+- `POST /api/login`은 화면이 보낸 JSON 본문에서 계정과 비밀번호를 읽습니다. 로그인은 사용자가 브라우저에서 확인하므로 "앱의 기본 약속"의 서버 칸대로 컨트롤러로 만들어 본문이 읽히게 합니다.
 
 교육용 계정입니다. 역할 값은 계정 이름과 같고 화면에는 오른쪽 칸에 적힌 한국어로 표시합니다.
 
