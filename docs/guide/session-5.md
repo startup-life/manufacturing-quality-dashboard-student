@@ -266,7 +266,20 @@ Google 쪽(Apps Script)에 필요한 일은 네 가지입니다. "답"은 `{"ok"
 
 3번 탭은 검사 상세의 "③ 검사기준과 비교하기" 탭입니다. 4회차까지 있던 안내 글은 지우고, 위에서부터 아래 순서로 놓습니다. 3번 탭을 열 때마다 `GET /api/inspections/(검사번호)/evidence`로 상태를 묻고 새로 그립니다("근거 확인 조건").
 
-3번 탭은 이 상태 주소와 `link`를 더한 2번 탭 상태(4회차 문서 "진행 상태와 잠금")를 화면에서 처음 쓰는 곳입니다. 3번 탭을 만들 때 Google 저장(`STORAGE_MODE=live`)에서 판독 결과가 있는 검사로 두 상태 주소가 오류 없이 답하는지 함께 봅니다. 오류가 나면 상태를 만드는 서버 코드가 `read`로 읽은 줄의 JSON 글 칸을 되돌리는지 확인합니다("Google 쪽 코드"의 "한 번에 읽기").
+3번 탭은 이 상태 주소와 `link`를 더한 2번 탭 상태(4회차 문서 "진행 상태와 잠금")를 화면에서 처음 쓰는 곳입니다. 접힌 원문 칸도 이 상태 답의 `revision`을 받은 뒤에 원문을 부르므로, 상태 주소가 실패하면 원문 대신 "서버에서 오류가 발생했습니다."가 나옵니다. 서버의 공통 오류 처리(`src/api-exception.filter.ts`)는 `HttpException`이 아닌 예외를 서버 창에 적지 않고 이 문장으로 바꾸므로, 서버 창에 빨간 글이 없어도 서버 코드의 예외입니다. 원문 파일 위치보다 상태 주소를 먼저 의심합니다.
+
+그래서 3번 탭을 만드는 요청에서는 화면만 더하지 않고, 2번 탭 상태를 만드는 서버 코드(`src/gemini-result.store.ts`의 `getStatus`)를 먼저 엽니다. Google 저장(`STORAGE_MODE=live`)에서 `read`로 읽은 `gemini_results` 줄의 `result`·`images`를 JSON 글 그대로 판독 결과 검사(`normalizeGeminiResult`)에 넘기고 있으면, 검사가 `null`을 돌려 "저장된 판독 결과를 읽을 수 없습니다." 예외가 납니다. 이때는 그 자리에서 글을 먼저 풀도록 함께 고칩니다("Google 쪽 코드"의 "한 번에 읽기"). 서버를 켜서 볼 수 있으면 판독 결과가 있는 검사로 `GET /api/inspections/(검사번호)/evidence`와 `GET /api/inspections/(검사번호)/gemini`가 오류 없이 답하는지 봅니다.
+
+코드 참고: 4회차 완료 코드(`class/milestone-4`)에서는 `src/gemini-result.store.ts`의 `getStatus`가 `readResults`를 거쳐 Google 쪽 `listGeminiResults`로 읽었고, JSON 글은 `gas/Code.js`의 `parseGeminiJsonCell`이 풀었습니다. `read`는 이 풀기를 하지 않으므로 서버에서 아래만큼 더합니다. 적용 범위는 `read`로 읽은 판독 결과 줄을 판독 결과 모양으로 바꾸는 한 곳이고, 화면과 Google 쪽 코드는 고치지 않습니다.
+
+```ts
+const parseCell = (value: unknown): unknown => {
+  if (typeof value !== 'string') return value;
+  try { return JSON.parse(value); } catch { return value; }
+};
+const result = normalizeGeminiResult(parseCell(record.result));
+const images = parseCell(record.images); // 목록이면 글자만 남겨 씁니다
+```
 
 | 순서 | 놓을 것 | 약속 |
 |---|---|---|
