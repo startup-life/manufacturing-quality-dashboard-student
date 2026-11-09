@@ -42,15 +42,16 @@
 
 - 포트: "앱의 기본 약속"의 포트(4185)입니다. `.env`에 `PORT`가 있으면 그 값입니다.
 - 켜져 있는지 보기: `Get-NetTCPConnection -LocalPort 4185 -State Listen -ErrorAction SilentlyContinue`를 실행합니다. 줄이 나오면 그 포트를 듣는 서버가 있는 것입니다.
-- 켜기: 이미 켜져 있으면 새로 켜지 않고 "이미 켜져 있습니다"라고 알립니다. 꺼져 있으면 AI가 명령을 실행하는 터미널이 아니라 새 PowerShell 창에서 켭니다. 아래 명령을 PowerShell로 실행합니다. 새 창이 열리고 그 창에서 서버가 켜집니다. 앞부분은 새 창이 이 PC의 프로그램 경로를 다시 읽게 하는 줄입니다. 사용자가 AI 도구를 연 뒤에 설치한 프로그램(5회차의 NotebookLM 도구 등)도 서버가 찾게 하려는 것이므로 빼지 않습니다.
+- 켜기: "다시" 없이 "켜 주세요"라는 요청에서 이미 켜져 있으면 새로 켜지 않고 "이미 켜져 있습니다"라고 알립니다. 꺼져 있으면 AI가 명령을 실행하는 터미널이 아니라 새 PowerShell 창에서 켭니다. 아래 명령을 PowerShell로 실행합니다. 새 창이 열리고 그 창에서 서버가 켜집니다. 앞부분은 새 창이 이 PC의 프로그램 경로를 다시 읽게 하는 줄입니다. 사용자가 AI 도구를 연 뒤에 설치한 프로그램(5회차의 NotebookLM 도구 등)도 서버가 찾게 하려는 것이므로 빼지 않습니다.
 
 ```powershell
 Start-Process powershell -ArgumentList '-NoExit','-Command','$env:Path = [Environment]::GetEnvironmentVariable(''Path'',''Machine'') + '';'' + [Environment]::GetEnvironmentVariable(''Path'',''User''); cd C:\ai-class\tumbler-factory; npm.cmd start'
 ```
 
-- 다시 켜기: 그 포트를 듣는 프로세스만 끕니다. `Get-NetTCPConnection -LocalPort 4185 -State Listen | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }`처럼 그 포트의 `OwningProcess`만 `Stop-Process`로 끄고, 프로그램 이름(`node` 등)으로 찾아 끄지 않습니다. 포트가 빈 것을 본 뒤 위 명령으로 새 창에서 켭니다. 꺼진 예전 창은 닫아도 된다고 사용자에게 알립니다.
+- 다시 켜기: "다시 켜 주세요"라는 요청이면 이미 켜져 있어도 "이미 켜져 있습니다"로 끝내지 않고 다시 켭니다. 그 포트를 듣는 프로세스만 끕니다. `Get-NetTCPConnection -LocalPort 4185 -State Listen | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }`처럼 그 포트의 `OwningProcess`만 `Stop-Process`로 끄고, 프로그램 이름(`node` 등)으로 찾아 끄지 않습니다. 끄기 전에 그 프로세스가 이 앱의 서버인지 봅니다(아래 "이 앱의 서버인지 보기"). 포트가 빈 것을 본 뒤 위 명령으로 새 창에서 켭니다. 꺼진 예전 창은 닫아도 된다고 사용자에게 알립니다.
+- 이 앱의 서버인지 보기: `Get-CimInstance Win32_Process -Filter "ProcessId=(OwningProcess 번호)" | Select-Object Name, CommandLine`으로 이름과 명령 줄을 봅니다. 이름이 `node.exe`이고 명령 줄에 이 앱 `package.json`의 `start` 명령이 켜는 파일(예: `dist/main.js`)이 들어 있으면 이 앱 폴더에서 켠 서버입니다. 아니면 끄지 않고, 그 프로그램 이름을 사용자에게 알리고 멈춥니다. 다른 포트로 바꾸지 않습니다.
 - 켠 뒤: `npm.cmd start`는 빌드부터 하므로 켜지는 데 수십 초 걸립니다. "켜져 있는지 보기"를 몇 초마다 다시 해서 1분쯤 기다립니다. 포트가 열리면 새 창(서버 창)에 `품질 대시보드 서버 실행 중: http://127.0.0.1:4185`가 나왔는지 보라고 사용자에게 알립니다. 1분이 지나도 열리지 않으면 서버 창의 빨간 글이나 `error TS`가 든 줄을 복사해 보내 달라고 합니다.
-- `EADDRINUSE`: 다른 프로세스가 이미 그 포트를 쓰는 것입니다. 사용자가 이 글을 붙여 넣으면 "다시 켜기"대로 그 포트의 프로세스만 끄고 새 창에서 다시 켭니다.
+- `EADDRINUSE`: 다른 프로세스가 이미 그 포트를 쓰는 것입니다. 사용자가 이 글을 붙여 넣으면 그 포트의 프로세스가 이 앱의 서버인지 봅니다. 이 앱의 서버(이 앱 폴더에서 켠 npm 또는 node)면 "다시 켜기"대로 그 프로세스만 끄고 새 창에서 다시 켭니다. 아니면 끄지 않고, 무엇이 그 포트를 쓰는지 사용자에게 알리고 멈춥니다. 다른 포트로 바꾸지 않습니다.
 - 설치, 빌드처럼 끝나는 명령은 새 창을 열지 않고 AI가 명령을 실행하는 터미널에서 합니다.
 
 ## 화면 주소
