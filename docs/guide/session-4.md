@@ -126,6 +126,8 @@ Google 쪽 코드에 더하는 일은 아래 네 가지입니다. 3회차 코드
 
 ## 실제 Gemini 판독
 
+4-18 단계를 수행할 때는 [단계 보충](steps/session-4/4-18.md)도 함께 읽습니다. 다른 번호의 기능은 앞당기지 않습니다.
+
 실제 판독은 OnePort를 거쳐 Gemini 모델을 부릅니다. OnePort는 여러 AI 모델을 한 키로 부르게 해 주는 서비스이고, 요청과 답은 Chat Completions 모양입니다(문서: https://oneport.kr/docs ).
 
 | 항목 | 약속 |
