@@ -12,7 +12,7 @@
 
 ## 스위치와 연동 상태 줄
 
-NotebookLM 근거 대조 스위치는 `.env`의 `NOTEBOOKLM_MODE`입니다. 서버를 켤 때 한 번 읽습니다. 프롬프트의 "근거 확인이 꺼져 있으면"은 `NOTEBOOKLM_MODE=off`, "근거 확인이 연습용이면"은 `NOTEBOOKLM_MODE=mock`, "근거 확인 설정 값"은 `NOTEBOOKLM_MODE` 값을 말합니다.
+NotebookLM 근거 대조 스위치는 `.env`의 `NOTEBOOKLM_MODE`입니다. 서버를 켤 때 한 번 읽습니다. 프롬프트의 "근거 확인 방식"은 `NOTEBOOKLM_MODE` 값, "근거 확인을 끄거나"는 `NOTEBOOKLM_MODE=off`, "연습용 근거 확인"과 "연습용으로 돌리도록"은 `NOTEBOOKLM_MODE=mock`을 말합니다. 이 문서의 "근거 확인 설정 값"도 `NOTEBOOKLM_MODE` 값입니다.
 
 | 값 | 뜻 |
 |---|---|
@@ -103,7 +103,7 @@ NotebookLM에 올리는 검사기준 원문은 `standards/notebooklm-Rev.A.md`, 
 
 | 프롬프트에서 부르는 이름 | 종류 | 파일 | 쓰는 법 |
 |---|---|---|---|
-| 안전 문구, 조회 줄 | 참고 | `docs/guide/files/reference/notebooklm-fixed-text.md` | 코드 속 글로 씁니다. 이름표를 뺀 글은 글자 그대로 씁니다 |
+| 안전 문구, 조회 줄 | 참고 | `docs/guide/files/reference/notebooklm-fixed-text.md` | 서버가 질문 글을 만들 때 이 파일에서 이름표 뒤의 글을 읽어 씁니다. 이름표를 뺀 글은 글자 그대로 씁니다 |
 
 ## 근거 질문 저장
 
@@ -191,7 +191,7 @@ Rev.A 표준서 원문: "…" (출하 승인 없음, 담당자 대조 확인 필
 | `evidence_queries` | `query_id`, `inspection_id`, `draft_id`, `created_at`, `mode`, `revision`, `prompt_name`, `question`, `answer`, `sources` |
 | `evidence_links` | `link_id`, `query_id`, `inspection_id`, `draft_id`, `status`, `memo`, `user`, `created_at` |
 
-대조 기록에는 어느 답(`query_id`)과 어느 판독 결과(`draft_id`)를 대조했는지, 대조 결과, 메모, 로그인한 사용자 이름, 저장 시각을 남깁니다.
+대조 기록에는 어느 답(`query_id`)과 어느 판독 결과(`draft_id`)를 대조했는지와 대조 결과, 메모, 로그인한 사용자 이름, 저장 시각을 남깁니다.
 
 - 기록은 자기가 대조한 답에만 붙고, 같은 판독 결과로 새로 물은 답은 아직 대조 전입니다.
 - 마지막 대조 기록은 최신 판독 결과에 붙은 기록입니다.
@@ -272,7 +272,7 @@ Google 쪽(Apps Script)에 필요한 일은 네 가지입니다. "답"은 `{"ok"
 
 3번 탭은 이 상태 주소와 `link`를 더한 2번 탭 상태(4회차 문서 "진행 상태와 잠금")를 화면에서 처음 쓰는 곳입니다. 접힌 원문 칸도 이 상태 답의 `revision`을 받은 뒤에 원문을 부르므로, 상태 주소가 실패하면 원문 대신 "서버에서 오류가 발생했습니다."가 나옵니다. 서버의 공통 오류 처리(`src/api-exception.filter.ts`)는 `HttpException`이 아닌 예외를 서버 창에 적지 않고 이 문장으로 바꾸므로, 서버 창에 빨간 글이 없어도 서버 코드의 예외입니다. 원문 파일 위치보다 상태 주소를 먼저 의심합니다.
 
-그래서 3번 탭 제목과 원문 칸을 만드는 요청의 첫 일은 화면이 아니라 상태 읽기 점검입니다. 화면을 고치기 전에 아래 두 가지를 차례로 합니다. 이 점검은 이번 번호의 완료 기준(펼치면 원문이 보임)에 필요한 일이라 뒤 번호 기능이 아닙니다. 5-7에서 상태 읽기를 `read`로 바꿀 때 빠졌을 수 있는 일을 채우는 것입니다.
+그래서 3번 탭 제목과 원문 칸을 만드는 요청의 첫 일은 화면이 아니라 상태 읽기 점검입니다. 화면을 고치기 전에 아래 두 가지를 차례로 합니다. 이 점검은 이번 번호의 완료 기준(펼치면 원문이 보임)에 필요한 일이라 뒤 번호 기능이 아닙니다. 근거 답과 대조 기록을 저장하고 꺼내는 요청에서 상태 읽기를 `read`로 바꿀 때 빠졌을 수 있는 일을 채우는 것입니다.
 
 1. `src/gemini-result.store.ts`를 열어 `getStatus`가 Google `read` 답의 `gemini_results` 줄을 판독 결과로 바꾸는 곳(앱에 따라 `normalizeGoogleResults` 같은 이름)을 찾습니다. 그곳이 `result`·`images`를 글자 그대로 판독 결과 검사(`normalizeGeminiResult`)나 목록 검사에 넘기면, Google 저장(`STORAGE_MODE=live`)에서 검사가 `null`을 돌려 "저장된 판독 결과를 읽을 수 없습니다." 예외가 납니다. 그러면 아래 코드 참고에 나온 만큼 글을 먼저 풀도록 고칩니다("Google 쪽 코드"의 "한 번에 읽기"). 이미 풀고 있으면 그대로 둡니다.
 2. 끝났다고 알릴 때 1에서 본 것(글을 푸는 처리를 더했는지, 이미 있었는지)을 한 줄로 함께 적습니다. 서버를 켜서 볼 수 있으면 판독 결과가 있는 검사로 `GET /api/inspections/(검사번호)/evidence`와 `GET /api/inspections/(검사번호)/gemini`가 오류 없이 답하는지 봅니다.
@@ -292,7 +292,7 @@ const images = parseCell(record.images); // 목록이면 글자만 남겨 씁니
 |---|---|---|
 | 1 | 제목 "검사기준과 비교하기" | |
 | 2 | 접힌 "검사기준 원문 읽기 · Rev.A" | Rev.A 자리에는 상태 답의 `revision`을 넣습니다. 펼치면 "원문 파일"의 주소로 받은 그 기준 버전의 원문 글을 보여 줍니다 |
-| 3 | "NotebookLM 근거 질문" 고르는 칸 | `GET /api/prompts?kind=notebooklm`의 목록입니다("근거 질문 저장"). 처음 값은 v3 기본 원문입니다. 이름은 설정 화면의 고르는 칸과 같게 보입니다 |
+| 3 | "NotebookLM 근거 질문" 고르는 칸 | `GET /api/prompts?kind=notebooklm`의 목록입니다("근거 질문 저장"). 처음 값은 v3 기본 원문입니다. 이름은 설정 화면의 고르는 칸에 보이는 이름과 같습니다 |
 | 4 | "근거 확인" 버튼 | 누르면 고른 근거 질문 이름으로 `POST /api/inspections/(검사번호)/evidence`를 보냅니다 |
 | 5 | 안내 글 | 버튼을 끈 까닭을 보여 줍니다. 버튼이 켜져 있으면 비워 둡니다 |
 | 6 | 답 상자 | 근거 답의 `answer`를 글자로 넣습니다("화면 안전"). 그 아래에 인용한 소스 개수를 "인용한 소스 2개"처럼 적습니다. 모의 답이면 노란 "모의 응답 — 실제 NotebookLM 연결 아님"을 함께 보여 줍니다("모의 답") |
