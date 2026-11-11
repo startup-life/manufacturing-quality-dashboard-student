@@ -56,7 +56,7 @@ git clone https://github.com/startup-life/manufacturing-quality-student-images.g
 ## 2-3. 검사 기록 저장
 
 ```text
-검사 기록이 서버를 껐다 켜도 남도록, 서버에 검사를 내 컴퓨터에 저장하고 등록·조회·수정하는 기능을 추가해 주세요.
+검사 기록이 서버를 껐다 켜도 남도록, 서버가 검사를 내 컴퓨터에 저장하고 등록·조회·수정하는 기능을 추가해 주세요.
 화면과 검사 목록은 뒤 번호에서 만듭니다.
 자세한 내용은 docs/guide/session-2.md를 참고해 주세요.
 ```

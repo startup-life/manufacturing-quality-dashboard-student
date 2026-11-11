@@ -1,7 +1,7 @@
 # manufacturing-quality-dashboard-student
 
 텀블러 공장 품질관리 사이트를 6회차 수업에서 AI 도구와 함께 만듭니다.
-이 브랜치(`milestone-0`)는 1회차를 시작하는 출발점입니다. 코드는 없고, AI 도구가 읽을 규칙(`AGENTS.md`)과 1회차 문서(`docs/guide/`)만 있습니다.
+`milestone-0` 브랜치는 1회차를 시작하는 출발점입니다. 그 브랜치에는 코드가 없고, AI 도구가 읽을 규칙(`AGENTS.md`)과 1회차 문서(`docs/guide/`)만 있습니다.
 수강생은 이 저장소를 내려받지(clone) 않습니다. 빈 폴더에서 시작하고, 1회차 1-2에서 AI가 이 저장소를 `class`라는 이름으로 더해 필요한 파일만 가져옵니다.
 
 ## 따라하기 자료
@@ -18,6 +18,7 @@
 | `milestone-3` | 3회차 완료 | 검사는 Google 시트에, 사진은 Google 드라이브에 저장 | 1~4회차 |
 | `milestone-4` | 4회차 완료 | OnePort로 Gemini 사진 판독, 2번 탭 결과와 배지 | 1~5회차 |
 | `milestone-5` | 5회차 완료 | NotebookLM으로 검사기준 근거 확인, 3번 탭 출처 대조 | 1~6회차 |
+| `milestone-6` | 6회차 완료 | `main`과 같은 완성 코드(따라하기 `follow-along/` 폴더만 없음) | 1~6회차 |
 | `main` | 6회차 완료 | 4번 탭 내 판단 기록과 변경 이력(완성본) | 1~6회차 |
 
 ## 학습 사진
