@@ -150,9 +150,9 @@ Start-Process powershell -ArgumentList '-NoExit','-Command','$env:Path = [Enviro
 
 회차마다 마지막 프롬프트에서 AI가 그 회차에 만든 것을 커밋합니다. 2회차부터도 이 절을 따릅니다.
 
-- 먼저 앱 폴더에서 `git status`로 바뀐 파일을 봅니다. `.env`, `.clasp.json`, `runtime` 폴더가 목록에 있거나 `AGENTS.md`가 바뀌었다고 나오면 커밋하지 않습니다. 그 파일 이름과 "강사에게 알려 주세요."만 답합니다.
+- 먼저 앱 폴더에서 `git status`로 바뀐 파일을 봅니다. `.env`, `.clasp.json`, `runtime` 폴더가 목록에 있으면 커밋하지 않습니다. 그 파일 이름과 "강사에게 알려 주세요."만 답합니다.
 - 이 앱 폴더에 커밋할 이름과 메일 주소가 없으면 프롬프트에 적힌 이름과 메일 주소를 `git config user.name`, `git config user.email`로 이 앱 폴더에만 넣습니다. `--global`은 쓰지 않습니다. 프롬프트에도 없으면 커밋하지 않고 이름과 메일 주소를 물어봅니다.
-- 문제가 없으면 `git add -A`를 한 뒤 프롬프트에 적힌 커밋 메시지로 `git commit -m`을 합니다. push와 브랜치 바꾸기는 하지 않습니다.
+- 문제가 없으면 `git add -A`를 한 뒤 프롬프트에 적힌 커밋 메시지로 `git commit -m`을 합니다. 수업 저장소(class)에는 push하지 않습니다.
 - 커밋한 뒤 `git status`를 다시 치고, 커밋 메시지와 그 결과(예: "nothing to commit")를 알려 줍니다.
 
 ## 만들지 않는 것
