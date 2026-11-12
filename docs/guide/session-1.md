@@ -30,7 +30,7 @@
 빈 앱 폴더에 처음 만드는 것입니다. 로그인, 머리 부분, 주소마다 다른 화면은 뒤 프롬프트에서 더하므로 여기서 만들지 않습니다.
 
 - 프로그램: "추가 정보"의 프로젝트 설정 파일과 서버 코드 설정 파일을 앱 폴더 맨 위에 복사한 뒤 `npm.cmd install`로 받습니다. 함께 생기는 `package-lock.json`은 그대로 둡니다. 설치가 끝날 때 `vulnerabilities` 안내가 나와도 `npm audit fix`는 실행하지 않습니다.
-- `.gitignore`: 앱 폴더 맨 위에 만들고 `node_modules`, `dist`, `.env`, `.clasp.json`, `runtime` 다섯 줄을 적습니다. 수강생이 회차를 마치고 커밋할 때 비밀 값과 기록이 들어가지 않게 하는 파일입니다. `AGENTS.md`와 `docs` 폴더는 적지 않습니다.
+- `.gitignore`: 앱 폴더 맨 위에 만들고 `node_modules`, `dist`, `.env`, `.clasp.json`, `runtime` 다섯 줄을 적습니다. 회차를 마치고 커밋할 때 비밀 값과 기록이 들어가지 않게 하는 파일입니다. `AGENTS.md`와 `docs` 폴더는 적지 않습니다.
 - 서버: `npm.cmd start`로 켜지게 합니다("앱의 기본 약속"의 시작 명령). "앱의 기본 약속"의 포트와 켜질 때 안내를 따릅니다. 화면 파일은 "화면 주소"대로 보냅니다.
 - 브라우저가 옛 화면을 기억하지 않게 서버의 모든 답에 `Cache-Control: no-store`를 붙입니다. 화면 파일을 고친 뒤 새로고침(F5)만 하면 고친 화면이 보이게 하려는 것입니다.
 - 첫 화면: `public/index.html`에 큰 제목 "텀블러 공장 제조품질관리" 하나만 둡니다. 브라우저 탭 제목도 같은 글입니다. 어느 화면 주소로 들어와도 이 첫 화면이 나옵니다.
@@ -145,6 +145,15 @@ Start-Process powershell -ArgumentList '-NoExit','-Command','$env:Path = [Enviro
 | 프로젝트 설정 파일 | 복사 | `docs/guide/files/copy/package.json` | 앱 폴더 맨 위에 `package.json`으로 복사합니다. 패키지 버전은 이 파일로 고정합니다 |
 | 서버 코드 설정 파일 | 복사 | `docs/guide/files/copy/tsconfig.json` | 앱 폴더 맨 위에 `tsconfig.json`으로 복사합니다 |
 | 노란 안내 글 | 참고 | `docs/guide/files/reference/yellow-notice.md` | 파일에 적힌 한 줄을 글자 그대로 화면에 넣습니다 |
+
+## 회차 끝 커밋
+
+회차마다 마지막 프롬프트에서 AI가 그 회차에 만든 것을 커밋합니다. 2회차부터도 이 절을 따릅니다.
+
+- 먼저 앱 폴더에서 `git status`로 바뀐 파일을 봅니다. `.env`, `.clasp.json`, `runtime` 폴더가 목록에 있거나 `AGENTS.md`가 바뀌었다고 나오면 커밋하지 않습니다. 그 파일 이름과 "강사에게 알려 주세요."만 답합니다.
+- 이 앱 폴더에 커밋할 이름과 메일 주소가 없으면 프롬프트에 적힌 이름과 메일 주소를 `git config user.name`, `git config user.email`로 이 앱 폴더에만 넣습니다. `--global`은 쓰지 않습니다. 프롬프트에도 없으면 커밋하지 않고 이름과 메일 주소를 물어봅니다.
+- 문제가 없으면 `git add -A`를 한 뒤 프롬프트에 적힌 커밋 메시지로 `git commit -m`을 합니다. push와 브랜치 바꾸기는 하지 않습니다.
+- 커밋한 뒤 `git status`를 다시 치고, 커밋 메시지와 그 결과(예: "nothing to commit")를 알려 줍니다.
 
 ## 만들지 않는 것
 
