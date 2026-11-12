@@ -33,7 +33,7 @@
 - 화면 확인은 ego 브라우저로 합니다. 사용자가 화면이나 완료 기준을 확인해 달라고 하면 ego 브라우저로 화면을 열어 확인해도 됩니다.
 - Google 로그인, 권한 승인, 따라하기의 "직접 하기"에 적힌 일은 사용자가 합니다.
 - 요청에 없는 패키지는 더하지 말고 버전을 바꾸지 마세요. npm audit fix도 실행하지 마세요.
-- 수업 저장소(원격 이름 class, startup-life/manufacturing-quality-dashboard-student)에는 push하지 마세요. 사용자가 만든 개인 원격 저장소(예: 사용자 GitHub 계정의 저장소)에는 사용자가 push를 부탁할 때 push해도 됩니다. 브랜치 바꾸기는 하지 마세요. 커밋은 회차 끝 프롬프트가 시킬 때만 docs/guide/session-1.md의 "회차 끝 커밋"대로 합니다. git으로는 프롬프트가 시킨 일(이 폴더를 git 저장소로 만들기, 수업 저장소 더하기·받기·파일 가져오기, 회차 끝 커밋), 완료 브랜치 코드 읽기(git fetch class, git show), 사용자가 부탁한 개인 원격 저장소 push만 하세요.
+- 수업 저장소(원격 이름 class, startup-life/manufacturing-quality-dashboard-student)에는 push하지 마세요. 그 밖의 커밋과 push(사용자가 만든 개인 원격 저장소 등)는 사용자가 부탁하면 그대로 합니다.
 
 ## 비밀 값
 - 사용자가 채팅으로 준 키, 주소, ID, 경로는 .env에 넣으세요. 같은 이름의 줄이 있으면 값만 바꾸고 다른 줄은 그대로 둡니다.
