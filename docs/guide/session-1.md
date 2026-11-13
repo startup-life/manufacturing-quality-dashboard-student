@@ -146,15 +146,6 @@ Start-Process powershell -ArgumentList '-NoExit','-Command','$env:Path = [Enviro
 | 서버 코드 설정 파일 | 복사 | `docs/guide/files/copy/tsconfig.json` | 앱 폴더 맨 위에 `tsconfig.json`으로 복사합니다 |
 | 노란 안내 글 | 참고 | `docs/guide/files/reference/yellow-notice.md` | 파일에 적힌 한 줄을 글자 그대로 화면에 넣습니다 |
 
-## 회차 끝 커밋
-
-커밋을 부탁받으면 이렇게 합니다.
-
-- 먼저 앱 폴더에서 `git status`로 바뀐 파일을 봅니다. `.env`, `.clasp.json`, `runtime` 폴더가 목록에 있으면 `.gitignore`에 빠진 줄을 더해 커밋에서 빠지게 합니다.
-- 이 앱 폴더에 커밋할 이름과 메일 주소가 없으면 프롬프트에 적힌 이름과 메일 주소를 `git config user.name`, `git config user.email`로 이 앱 폴더에만 넣습니다. `--global`은 쓰지 않습니다. 프롬프트에도 없으면 이름과 메일 주소를 물어봅니다.
-- `git add -A`를 한 뒤 프롬프트에 적힌 커밋 메시지로 `git commit -m`을 합니다.
-- 커밋한 뒤 `git status`를 다시 치고, 커밋 메시지와 그 결과(예: "nothing to commit")를 알려 줍니다.
-
 ## 만들지 않는 것
 
 - 요청마다 보안 확인 값(CSRF 토큰)을 주고받아 검사하는 기능: 혼자 쓰는 연습용 앱이라 만들지 않습니다.
