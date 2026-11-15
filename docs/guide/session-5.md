@@ -60,6 +60,7 @@ NotebookLM 근거 대조 스위치는 `.env`의 `NOTEBOOKLM_MODE`입니다. 서�
 | 넘기는 값 | `notebook_query`에는 `notebook_id`(노트북 ID)와 `query`(질문 글)를 넘깁니다 |
 | 쓰는 값 | 돌아온 결과의 `answer`(답 글)와 `sources_used`(인용한 소스)를 씁니다. `sources_used`는 긴 번호로 오므로 화면에는 개수만 보여 줍니다 |
 | 환경 변수 | 실행 파일에는 컴퓨터 기본 환경 변수(`PATH`, `USERPROFILE`, `APPDATA` 등)를 그대로 넘기고, 서버의 비밀값 셋(`ONEPORT_API_KEY`, `GAS_WEBAPP_URL`, `SESSION_SECRET`)만 뺍니다. `NOTEBOOKLM_HL=ko`와 `NOTEBOOKLM_RATE_LIMIT_MAX_RETRIES=0`(한도에 걸려도 다시 시도하지 않기)을 넘깁니다 |
+| TypeScript 환경 변수 타입 | 환경 변수 객체를 만든 뒤 비밀값을 `delete`로 뺄 때는 `const env: NodeJS.ProcessEnv = { ...process.env, ... }`처럼 타입을 명시합니다. 타입 추론 결과에 비밀값 속성이 없으면 빌드에서 TS2339가 납니다 |
 | 기다리는 시간 | 서버는 답을 150초까지 기다립니다 |
 
 줄 단위 JSON-RPC는 이 순서입니다.
