@@ -42,7 +42,7 @@
 
 서버는 `node --watch`로 켭니다("앱의 기본 약속"의 시작 명령). 빌드로 `dist` 폴더의 파일이 바뀌거나 `.env`가 바뀌면 서버가 같은 창에서 알아서 다시 켜지므로, AI는 서버를 다시 켜려고 서버를 끄거나 새 창을 열지 않습니다. 서버 창은 하나만 둡니다.
 
-- 시작 명령 확인: 앱 폴더의 `package.json`에서 `start`가 `node --watch --watch-preserve-output --env-file-if-exists=.env dist/main.js`인지 봅니다. `--watch`나 `--watch-preserve-output`이 없으면 이 값으로 고칩니다. `--watch-preserve-output`은 다시 켤 때 서버 창의 앞 줄을 지우지 않게 합니다. 완료 브랜치 코드의 `package.json`에 `--watch`가 없더라도 그 값을 따라 `--watch`를 빼지 않습니다. nodemon 같은 패키지는 더하지 않습니다.
+- 시작 명령 확인: 앱 폴더의 `package.json`에서 `start`가 `node --watch --env-file-if-exists=.env dist/main.js`인지 봅니다. 다르면 이 값으로 고칩니다. 다시 켤 때 서버 창의 앞 줄은 지워지고 새로 찍힙니다. 완료 브랜치 코드의 `package.json`에 `--watch`가 없더라도 그 값을 따라 `--watch`를 빼지 않습니다. nodemon 같은 패키지는 더하지 않습니다.
 - 포트: "앱의 기본 약속"의 포트(4185)입니다. `.env`에 `PORT`가 있으면 그 값입니다.
 - 켜져 있는지 보기: `Get-NetTCPConnection -LocalPort 4185 -State Listen -ErrorAction SilentlyContinue`를 실행합니다. 줄이 나오면 그 포트에서 요청을 받는 서버가 있는 것입니다.
 - 감시 확인: `Get-CimInstance Win32_Process -Filter "Name='node.exe'" | Where-Object { $_.CommandLine -like '* --watch *dist/main.js*' } | Select-Object ProcessId, CommandLine`을 실행합니다. 줄이 나오면 서버 창에서 `--watch`로 도는 Node 프로세스가 있는 것입니다. 포트를 듣는 것은 이 프로세스가 띄운 서버이고, 이 프로세스는 서버가 오류로 멈춰도 창과 함께 남아 있습니다.
