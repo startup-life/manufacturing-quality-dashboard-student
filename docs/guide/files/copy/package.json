@@ -8,7 +8,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "prestart": "npm run build",
-    "start": "node --env-file-if-exists=.env dist/main.js"
+    "start": "node --watch --watch-preserve-output --env-file-if-exists=.env dist/main.js"
   },
   "dependencies": {
     "@nestjs/common": "11.2.7",
