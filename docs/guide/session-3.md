@@ -33,7 +33,6 @@ Google에 실제로 저장하는 코드("서버가 Google을 쓰는 법")는 뒤
 | 항목 | 약속 |
 |---|---|
 | 화면과 창 | 화면, 서버 창, 안내 문장에도 웹앱 주소를 넣지 않습니다 |
-| Google 로그인과 권한 승인 | 사용자가 직접 합니다. 이 화면은 AI가 대신 조작하지 않습니다 |
 | `.env`, `.clasp.json` | 사용자가 채팅으로 준 값은 `.env`에 넣습니다. 두 파일은 Git에 올리지 않습니다. `.gitignore`에 없으면 더합니다 |
 
 ## Google 쪽 코드의 틀
@@ -97,15 +96,15 @@ Google 쪽 코드(Apps Script)는 `gas` 폴더에 둡니다. 코드는 `gas/Code
 2. 통과한 뒤에만 사진(고른 사진 그대로)을 `savePhoto`로 올립니다.
 3. 검사 줄과 사진 줄을 `append` 한 번으로 함께 저장합니다.
 
-## 수강생이 치는 명령
+## Google 명령
 
-`package.json`의 `npm.cmd run gas:…` 명령입니다. AI는 이 명령을 만들거나 고치기만 하고 실행하지 않습니다. 사용자가 명령 창에서 직접 칩니다.
+`package.json`의 `npm.cmd run gas:…` 명령입니다.
 
 - clasp는 `npx --yes @google/clasp@3.4.1` 로 부릅니다. 질문 없이 명령이 끝나게 만듭니다. 스크립트 파일에서 clasp를 부를 때는 Windows에서도 동작하도록 셸 명령 한 줄로 부릅니다.
 - 스크립트 파일은 `.env` 내용을 출력하지 않고 `node --env-file-if-exists=.env` 로 값만 읽습니다(`gas:deploy`는 `.env`에 줄을 적기만 합니다).
 - `gas:redeploy`, `gas:open`, `gas:init`은 `.env`에 웹앱 주소가 없으면 ".env에 웹앱 주소가 없습니다. 먼저 npm.cmd run gas:deploy를 실행하세요."로 끝냅니다.
 - `gas:deploy`와 `gas:redeploy`는 clasp 출력을 터미널에 보여 주지 않습니다.
-- Google 쪽 코드를 고친 뒤에는 `gas:push`, `gas:redeploy`를 차례로 쳐야 반영됩니다. `gas:push`가 실패하면 `gas:deploy`나 `gas:redeploy`를 치지 않습니다. 사용자가 보낸 오류를 고치느라 Google 쪽 코드를 고쳤으면 직접 치지 말고, 답에 "명령 창에서 `npm.cmd run gas:push`와 `npm.cmd run gas:redeploy`를 차례로 쳐 주세요."를 적습니다.
+- Google 쪽 코드를 고친 뒤에는 `gas:push`, `gas:redeploy`를 차례로 쳐야 반영됩니다. `gas:push`가 실패하면 `gas:deploy`나 `gas:redeploy`를 치지 않습니다. 사용자가 보낸 오류를 고치느라 Google 쪽 코드를 고쳤으면 `npm.cmd run gas:push`와 `npm.cmd run gas:redeploy`를 차례로 실행합니다.
 
 | 명령 | 하는 일 | 성공할 때 | 그 밖의 경우 |
 |---|---|---|---|
