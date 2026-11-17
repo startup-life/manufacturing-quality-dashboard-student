@@ -64,8 +64,8 @@ Google에 실제로 저장하는 기능은 뒤 번호에서 만듭니다.
 
 ```text
 명령 창에서 Google 쪽 코드를 다루기 위해, 앱에 gas:login, gas:create, gas:push 명령을 추가해 주세요.
-만들기만 하고 실행하지 않습니다.
-자세한 내용은 docs/guide/session-3.md의 "수강생이 치는 명령"을 참고해 주세요.
+지금은 만들기만 합니다.
+자세한 내용은 docs/guide/session-3.md의 "Google 명령"을 참고해 주세요.
 ```
 - 하는 일: 앱에 `gas:login`, `gas:create`, `gas:push` 명령이 생깁니다. 아직 실행하지 않습니다.
 - 목표: 명령 창에서 Google에 로그인하고, Google 쪽 프로젝트를 만들고, 코드를 올리게 합니다.
@@ -76,8 +76,8 @@ Google에 실제로 저장하는 기능은 뒤 번호에서 만듭니다.
 
 ```text
 서버가 Google 쪽 코드에 일을 시킬 주소를 만들기 위해, 앱에 gas:deploy, gas:redeploy 명령을 추가해 주세요.
-만들기만 하고 실행하지 않습니다.
-자세한 내용은 docs/guide/session-3.md의 "수강생이 치는 명령"을 참고해 주세요.
+지금은 만들기만 합니다.
+자세한 내용은 docs/guide/session-3.md의 "Google 명령"을 참고해 주세요.
 ```
 - 하는 일: 앱에 `gas:deploy`, `gas:redeploy` 명령이 생깁니다. 아직 실행하지 않습니다.
 - 목표: 서버가 Google 쪽 코드에 일을 시킬 웹앱 주소를 만들고, 코드를 고친 뒤 같은 주소를 새 버전으로 바꾸게 합니다.
@@ -88,8 +88,8 @@ Google에 실제로 저장하는 기능은 뒤 번호에서 만듭니다.
 
 ```text
 권한 승인과 시트 준비를 명령 한 줄로 하기 위해, 앱에 gas:open, gas:init 명령을 추가해 주세요.
-만들기만 하고 실행하지 않습니다.
-자세한 내용은 docs/guide/session-3.md의 "수강생이 치는 명령"을 참고해 주세요.
+지금은 만들기만 합니다.
+자세한 내용은 docs/guide/session-3.md의 "Google 명령"을 참고해 주세요.
 ```
 - 하는 일: 앱에 `gas:open`, `gas:init` 명령이 생깁니다. 웹앱 주소가 아직 없어 지금 치면 안내만 나옵니다.
 - 목표: 권한 승인과 시트 준비를 명령 한 줄로 하게 합니다.
