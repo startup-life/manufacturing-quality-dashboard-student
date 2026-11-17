@@ -268,7 +268,7 @@ Google 저장일 때 검사를 등록하도록, 서버에 사진을 드라이브
   - `gas:deploy`가 "웹앱 번호를 찾지 못했습니다. …"로 끝나면 3-7을 다시 하고 1번부터 다시 칩니다. 그래도 같은 글이 나오면 다시 치지 말고 강사에게 알립니다. "이미 웹앱 주소가 있습니다. …"로 끝나면 이미 주소를 만든 것입니다. `npm.cmd run gas:redeploy`를 치고 3-18로 넘어갑니다.
 - 알아 두기:
   - 첫 줄에 `> tumbler-factory@… gas:push` 같은 줄이 나오는 것은 정상입니다. 처음 올릴 때는 `Pushed 2 files`와 파일 목록이, 바뀐 곳이 없으면 `Script is already up to date.`가 영어로 먼저 나옵니다. 마지막 줄이 "Google에 코드를 올렸습니다."이면 됩니다. `gas:deploy`에서 `.env not found. Continuing without it.` 영어 줄이 먼저 나와도 정상입니다.
-  - Google 쪽 코드를 고친 뒤에는 명령 창에서 `npm.cmd run gas:push`와 `npm.cmd run gas:redeploy`를 차례로 쳐야 반영됩니다. `gas:push` 마지막 줄이 "Google에 코드를 올렸습니다."가 아니면 `gas:redeploy`를 치지 않습니다. 주소는 그대로라 `.env`는 바뀌지 않습니다.
+  - Google 쪽 코드를 고친 뒤에는 `npm.cmd run gas:push`와 `npm.cmd run gas:redeploy`를 차례로 쳐야 반영됩니다. `gas:push` 마지막 줄이 "Google에 코드를 올렸습니다."가 아니면 `gas:redeploy`를 치지 않습니다. 주소는 그대로라 `.env`는 바뀌지 않습니다.
 
 ## 3-18. 권한 승인 (직접 하기)
 
