@@ -32,7 +32,7 @@ Google에 실제로 저장하는 코드("서버가 Google을 쓰는 법")는 뒤
 
 | 항목 | 약속 |
 |---|---|
-| 화면과 창 | 화면, 서버 창, 안내 문장에도 웹앱 주소를 넣지 않습니다 |
+| 화면과 창 | 앱의 화면, 서버 창, 앱의 안내 문장에는 웹앱 주소를 넣지 않습니다 |
 | `.env`, `.clasp.json` | 사용자가 채팅으로 준 값은 `.env`에 넣습니다 |
 
 ## Google 쪽 코드의 틀
@@ -105,7 +105,7 @@ Google 쪽 코드(Apps Script)는 `gas` 폴더에 둡니다. 코드는 `gas/Code
 - `gas:redeploy`, `gas:open`, `gas:init`은 `.env`에 웹앱 주소가 없으면 ".env에 웹앱 주소가 없습니다. 먼저 npm.cmd run gas:deploy를 실행하세요."로 끝냅니다.
 - `gas:deploy`와 `gas:redeploy`는 clasp 출력을 터미널에 보여 주지 않습니다.
 - Google 쪽 코드를 고친 뒤에는 `gas:push`, `gas:redeploy`를 차례로 쳐야 반영됩니다. `gas:push`가 실패하면 `gas:deploy`나 `gas:redeploy`를 치지 않습니다. 사용자가 보낸 오류를 고치느라 Google 쪽 코드를 고쳤으면 `npm.cmd run gas:push`와 `npm.cmd run gas:redeploy`를 차례로 실행합니다.
-- 사용자가 이 명령 실행이나 Google 로그인, 권한 승인을 맡기면 AI가 합니다. `gas:login`이나 `gas:open`이 기본 브라우저를 열면, 그 창에서 하거나 같은 주소(clasp가 보여 준 로그인 주소, `.env`의 웹앱 주소 끝에 `?authuser=0`을 붙인 주소)를 ego 브라우저에서 열어 진행합니다. 웹앱 주소는 채팅 답에 적지 않습니다.
+- 사용자가 이 명령 실행이나 Google 로그인, 권한 승인을 맡기면 AI가 합니다. `gas:login`이나 `gas:open`이 기본 브라우저를 열면, 그 창에서 하거나 같은 주소(clasp가 보여 준 로그인 주소, `.env`의 웹앱 주소 끝에 `?authuser=0`을 붙인 주소)를 ego 브라우저에서 열어 진행합니다. 따로 부탁이 없으면 웹앱 주소는 채팅 답에 적지 않습니다.
 
 | 명령 | 하는 일 | 성공할 때 | 그 밖의 경우 |
 |---|---|---|---|
