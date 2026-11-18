@@ -35,7 +35,7 @@ Google 쪽 코드는 명령 창에서 `npm.cmd run gas:`로 시작하는 명령�
 ## 3-1. 지침 세팅
 
 ```text
-이번 회차 문서를 이 프로젝트로 가져오기 위해, 수업 저장소(class)를 다시 받아 class/milestone-2의 AGENTS.md와 docs/guide를 이 프로젝트로 가져와 주세요(파일만 가져옵니다).
+이번 회차 문서를 이 프로젝트로 가져오기 위해, 수업 저장소(class)를 다시 받아 class/milestone-2의 AGENTS.md와 docs/guide를 이 프로젝트로 가져와 주세요(지금 브랜치는 그대로 두고 그 파일과 폴더만 가져옵니다).
 그다음 AGENTS.md를 작업 지침으로 삼아 주세요. 프롬프트에 없는 상세 구현은 docs/guide의 회차 문서와 그 회차 완료 브랜치 코드(class/milestone-3)에서 확인합니다.
 지금은 AGENTS.md와 docs/guide의 session-1.md부터 session-3.md까지를 읽기만 하고, 읽은 문서의 끝 표시를 모두 한 줄로 이어서 알려 주세요.
 ```
@@ -385,4 +385,4 @@ Google 저장일 때 검사를 등록하도록, 서버에 사진을 드라이브
   4. `/exec`로 끝나는 웹앱 주소를 복사합니다.
   5. AI 입력 칸에 "Google에 저장하기 위해, .env에 STORAGE_MODE=live와 웹앱 주소(GAS_WEBAPP_URL)를 넣어 주세요. 주소: "를 적고, 바로 뒤에 4번에서 복사한 주소를 붙여 넣어 보냅니다. 그다음 3-19부터 이어서 합니다.
 
-  이 방법으로 했으면 `.clasp.json`이 없어 `gas:` 명령 가운데 `gas:push`, `gas:redeploy`를 쓸 수 없습니다. Google 쪽 코드를 고쳐야 하면 강사에게 알립니다.
+  이 방법으로 했으면 `.clasp.json`이 없어 `gas:` 명령 가운데 `gas:push`, `gas:redeploy`를 쓸 수 없습니다. Google 쪽 코드를 고쳐야 하면 AI에게 Google 쪽 코드를 올려 달라고 맡겨 보고, 안 되면 강사에게 알립니다.

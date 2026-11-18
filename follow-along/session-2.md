@@ -33,7 +33,7 @@ cd C:\ai-class
 git clone https://github.com/startup-life/manufacturing-quality-student-images.git
 ```
 
-4. 사진 수 확인(AI에게 맡겨도 됩니다): 명령 창에서 아래 한 줄을 칩니다. `128`이 나와야 합니다. 다른 숫자가 나오면 강사에게 알립니다.
+4. 사진 수 확인(AI에게 맡겨도 됩니다): 명령 창에서 아래 한 줄을 칩니다. `128`이 나와야 합니다. 다른 숫자가 나오면 폴더를 지우고 다시 받은 뒤 셉니다. 그래도 다르면 강사에게 알립니다.
 
 ```powershell
 (Get-ChildItem C:\ai-class\manufacturing-quality-student-images\assets\dataset\images -Filter *.jpg).Count
@@ -42,7 +42,7 @@ git clone https://github.com/startup-life/manufacturing-quality-student-images.g
 ## 2-1. 지침 세팅
 
 ```text
-이번 회차 문서를 이 프로젝트로 가져오기 위해, 수업 저장소(class)를 다시 받아 class/milestone-1의 AGENTS.md와 docs/guide를 이 프로젝트로 가져와 주세요(파일만 가져옵니다).
+이번 회차 문서를 이 프로젝트로 가져오기 위해, 수업 저장소(class)를 다시 받아 class/milestone-1의 AGENTS.md와 docs/guide를 이 프로젝트로 가져와 주세요(지금 브랜치는 그대로 두고 그 파일과 폴더만 가져옵니다).
 그다음 AGENTS.md를 작업 지침으로 삼아 주세요. 프롬프트에 없는 상세 구현은 docs/guide의 회차 문서와 그 회차 완료 브랜치 코드(class/milestone-2)에서 확인합니다.
 지금은 AGENTS.md와 docs/guide의 session-1.md부터 session-2.md까지를 읽기만 하고, 읽은 문서의 끝 표시를 모두 한 줄로 이어서 알려 주세요.
 ```
@@ -136,7 +136,7 @@ git clone https://github.com/startup-life/manufacturing-quality-student-images.g
 ```
 - 하는 일: 상세 화면 위쪽에 검사번호, 제품, 판정, 검사 기록 버전이 보이고, 그 아래에 탭 네 개가 생깁니다.
 - 목표: 검사 한 건을 탭으로 나눠 봅니다. 검사 기록 버전은 검사 내용을 고쳐 저장할 때마다 1씩 오르는 번호입니다.
-- 할 일: 2-6에서 넘어간 상세 화면을 새로고침(F5)하고, 로그인 상자가 나오면 다시 로그인합니다. 그 화면을 닫았으면 「시작 전에」대로 검사를 하나 새로 등록합니다.
+- 할 일: 2-6에서 넘어간 상세 화면을 새로고침(F5)하고, 로그인 상자가 나오면 다시 로그인합니다. 그 화면을 닫았으면 2-6처럼 검사를 하나 새로 등록합니다.
 - 완료 기준: `INSP-20261104-3fa9c1d2`처럼 `INSP-`로 시작하는 검사번호, 제품, "미판정", "검사 기록 버전: 0"이 보입니다. 번호의 가운데 숫자는 등록한 날짜이고 맨 뒤 글자는 사람마다 다릅니다. 그 아래에 "① 사진·측정값"부터 "④ 내 판단 기록"까지 탭 네 개가 있고 처음엔 1번 탭이 골라져 있습니다. 2~4번 탭을 누르면 "이 탭은 나중 회차에서 만듭니다."가 나옵니다.
 
 ![2-7 미판정·검사 기록 버전 0과 탭 네 개](images/session-2/10-419394a4-2-7.png)
