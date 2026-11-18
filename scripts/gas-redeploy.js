@@ -16,10 +16,9 @@ const result = spawnSync(`npx --yes @google/clasp@3.4.1 deploy --deploymentId ${
   shell: true,
   encoding: 'utf8',
 });
-const output = `${result.stdout ?? ''}${result.stderr ?? ''}`;
-const deploymentIds = output.match(/AKfyc[A-Za-z0-9_-]+/g) ?? [];
+const deployments = [...(result.stdout ?? '').matchAll(/^Deployed (AKfyc[A-Za-z0-9_-]+) @(?:\d+|HEAD)\s*$/gm)];
 
-if (deploymentIds.length === 1) {
+if (result.status === 0 && deployments.length === 1 && deployments[0][1] === deploymentId) {
   console.log('같은 웹앱을 새 버전으로 바꿨습니다. 주소는 그대로입니다.');
 } else {
   console.error('웹앱을 바꾸지 못했습니다. 로그인이 만료됐으면 npm.cmd run gas:login을 다시 하고 gas:push부터 다시 하세요.');
