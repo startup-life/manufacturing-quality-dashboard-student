@@ -10,10 +10,9 @@ const result = spawnSync('npx --yes @google/clasp@3.4.1 deploy', {
   shell: true,
   encoding: 'utf8',
 });
-const output = `${result.stdout ?? ''}${result.stderr ?? ''}`;
-const deploymentIds = output.match(/AKfyc[A-Za-z0-9_-]+/g) ?? [];
+const deployments = [...(result.stdout ?? '').matchAll(/^Deployed (AKfyc[A-Za-z0-9_-]+) @(?:\d+|HEAD)\s*$/gm)];
 
-if (deploymentIds.length !== 1) {
+if (result.status !== 0 || deployments.length !== 1) {
   console.error('웹앱 번호를 찾지 못했습니다. 로그인이 만료됐으면 npm.cmd run gas:login을 다시 하세요.');
   process.exitCode = 1;
 } else {
@@ -23,7 +22,7 @@ if (deploymentIds.length !== 1) {
   const lines = existing ? existing.split(/\r?\n/) : [];
   if (existing.endsWith('\n')) lines.pop();
   const values = {
-    GAS_WEBAPP_URL: `https://script.google.com/macros/s/${deploymentIds[0]}/exec`,
+    GAS_WEBAPP_URL: `https://script.google.com/macros/s/${deployments[0][1]}/exec`,
     STORAGE_MODE: 'live',
   };
   const seen = new Set();
