@@ -508,18 +508,18 @@ function getOnePortErrorMessage(statusCode, responseBody, apiKey) {
   const safeMessage = sanitizeOnePortText(error.message || '요청에 실패했습니다.', apiKey);
 
   if (statusCode === 401 && error.reason === 'key_revoked') {
-    return '이 OnePort 키는 꺼져 있습니다(코드 401). 강사에게 알려 주세요.';
+    return '이 OnePort 키는 꺼져 있습니다(코드 401). 다른 키로 바꿔 주세요.';
   }
   if (statusCode === 401) return 'OnePort 키가 맞지 않습니다(코드 401). 키를 다시 넣어 주세요.';
-  if (statusCode === 402) return 'OnePort 잔액이 부족해 판독하지 못했습니다(코드 402). 강사에게 알려 주세요.';
-  if (statusCode === 403) return '이 OnePort 키로는 판독 모델을 쓸 수 없습니다(코드 403). 강사에게 알려 주세요.';
-  if (statusCode === 404) return 'OnePort에서 판독 모델을 찾지 못했습니다(코드 404). 강사에게 알려 주세요.';
+  if (statusCode === 402) return 'OnePort 잔액이 부족해 판독하지 못했습니다(코드 402). 다른 키로 바꿔 주세요.';
+  if (statusCode === 403) return '이 OnePort 키로는 판독 모델을 쓸 수 없습니다(코드 403). 다른 키로 바꿔 주세요.';
+  if (statusCode === 404) return 'OnePort에서 판독 모델을 찾지 못했습니다(코드 404). 모델 이름을 확인해 주세요.';
   if (statusCode === 413) return '사진이 너무 커서 판독할 수 없습니다(코드 413).';
   if (
     statusCode === 429 &&
     (error.code === 'key_limit_exceeded' || error.type === 'key_limit_exceeded')
   ) {
-    return 'OnePort 키의 사용 한도를 다 썼습니다(코드 429). 강사에게 알려 주세요.';
+    return 'OnePort 키의 사용 한도를 다 썼습니다(코드 429). 다른 키로 바꿔 주세요.';
   }
   if ([429, 500, 502, 503, 504].includes(statusCode)) {
     return `AI 판독 서버가 붐빕니다(코드 ${statusCode}). 2분쯤 뒤 다시 눌러 주세요.`;
