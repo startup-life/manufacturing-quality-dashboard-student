@@ -18,7 +18,7 @@
 
 - 시작 상태: 1회차를 끝낸 앱 폴더 `C:\ai-class\tumbler-factory`에서 시작합니다.
 - 준비물: AI 도구에서 연 앱 폴더, ego 브라우저, 학습 사진 저장소(`C:\ai-class\manufacturing-quality-student-images`, 아래 3번에서 받습니다).
-- 이 회차에 새로 나오는 말: **학습 사진 저장소**는 강사가 공개한 연습용 텀블러 사진 모음입니다. 앱 폴더 옆 `manufacturing-quality-student-images` 폴더에 받아 두고, 검사를 등록할 때 사진을 고르기만 합니다. 화면의 **NG**는 불량, **HOLD**는 보류, **미판정**은 아직 판정이 없다는 뜻입니다. 이번 회차에는 판정을 넣는 기능이 없어 모든 검사가 미판정입니다.
+- 이 회차에 새로 나오는 말: **학습 사진 저장소**는 강사가 공개한 연습용 텀블러 사진 모음입니다. 앱 폴더 옆 `manufacturing-quality-student-images` 폴더에 받아 두고, 검사를 등록할 때 사진을 고릅니다. 화면의 **NG**는 불량, **HOLD**는 보류, **미판정**은 아직 판정이 없다는 뜻입니다. 이번 회차에는 판정을 넣는 기능이 없어 모든 검사가 미판정입니다.
 - 등록 화면에서 고르는 "은색 텀블러"와 상세 화면·홈 카드에 보이는 "텀블러 실버"는 같은 제품입니다. 흰색은 "텀블러 화이트", 검정은 "텀블러 블랙"으로도 보입니다.
 - 2-12에서 홈 검사 카드를 만들기 전까지는 홈에서 상세 화면으로 가는 길이 없습니다. 상세 화면을 닫았으면 홈의 "사진 등록"에서 사진 두 장으로 검사를 하나 새로 등록합니다. 등록하면 그 상세 화면이 열립니다.
 
@@ -26,7 +26,7 @@
 
 1. AI 도구에서 앱 폴더 `C:\ai-class\tumbler-factory`를 열고 새 대화를 시작합니다.
 2. 서버 켜기: 서버 창이 없거나 서버가 꺼져 있으면 2-1(지침 세팅)을 보낸 뒤 AI 도구에 "화면 서버를 켜 주세요."라고 보냅니다. 그다음 ego 브라우저에서 http://127.0.0.1:4185 를 엽니다. 1회차 로그인 화면이 보이면 됩니다.
-3. 사진 저장소 받기(AI에게 맡겨도 됩니다): `C:\ai-class` 안에 `manufacturing-quality-student-images` 폴더가 이미 있으면 건너뜁니다. 없으면 PowerShell 창을 하나 열고(이 창이 명령 창입니다. 서버 창에는 치지 않습니다) 아래 두 줄을 한 줄씩 칩니다. ZIP으로 받지 말고 꼭 이 명령으로 받고, 폴더 이름은 바꾸지 않습니다.
+3. 사진 저장소 받기(AI에게 맡겨도 됩니다): `C:\ai-class` 안에 `manufacturing-quality-student-images` 폴더가 이미 있으면 건너뜁니다. 없으면 PowerShell 창을 하나 열고(이 창이 명령 창입니다) 아래 두 줄을 한 줄씩 칩니다. ZIP으로 받지 말고 꼭 이 명령으로 받고, 폴더 이름은 바꾸지 않습니다.
 
 ```powershell
 cd C:\ai-class
@@ -42,7 +42,7 @@ git clone https://github.com/startup-life/manufacturing-quality-student-images.g
 ## 2-1. 지침 세팅
 
 ```text
-이번 회차 문서를 이 프로젝트로 가져오기 위해, 수업 저장소(class)를 다시 받아 class/milestone-1의 AGENTS.md와 docs/guide를 이 프로젝트로 가져와 주세요(브랜치는 옮기지 않습니다).
+이번 회차 문서를 이 프로젝트로 가져오기 위해, 수업 저장소(class)를 다시 받아 class/milestone-1의 AGENTS.md와 docs/guide를 이 프로젝트로 가져와 주세요(파일만 가져옵니다).
 그다음 AGENTS.md를 작업 지침으로 삼아 주세요. 프롬프트에 없는 상세 구현은 docs/guide의 회차 문서와 그 회차 완료 브랜치 코드(class/milestone-2)에서 확인합니다.
 지금은 AGENTS.md와 docs/guide의 session-1.md부터 session-2.md까지를 읽기만 하고, 읽은 문서의 끝 표시를 모두 한 줄로 이어서 알려 주세요.
 ```
