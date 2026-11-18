@@ -24,9 +24,9 @@
 |---|---|
 | `GEMINI_MODE`가 없음, `STORAGE_MODE=mock` | `off`로 봅니다 |
 | `GEMINI_MODE`가 없음, `STORAGE_MODE=live` | `live`로 봅니다 |
-| `off`·`mock`·`live`가 아닌 값 | 서버를 켜지 말고 고칠 방법을 한 줄로 알려 줍니다 |
-| `STORAGE_MODE=mock`에 `live`를 적음 | 서버를 켜지 말고 고칠 방법을 한 줄로 알려 줍니다 |
-| `STORAGE_MODE=live`에 `mock`을 적음 | 서버를 켜지 말고 고칠 방법을 한 줄로 알려 줍니다 |
+| `off`·`mock`·`live`가 아닌 값 | 서버 코드는 켜지지 않고 서버 창에 고칠 방법을 한 줄로 보여 줍니다 |
+| `STORAGE_MODE=mock`에 `live`를 적음 | 서버 코드는 켜지지 않고 서버 창에 고칠 방법을 한 줄로 보여 줍니다 |
+| `STORAGE_MODE=live`에 `mock`을 적음 | 서버 코드는 켜지지 않고 서버 창에 고칠 방법을 한 줄로 보여 줍니다 |
 
 `GET /api/operations`의 답에 `"gemini_mode": 값`과 `"gemini_label": 화면에 쓰는 이름` 두 항목을 더합니다. 앞의 항목은 그대로 둡니다.
 
@@ -114,7 +114,7 @@ Google 쪽 코드에 더할 일은 아래 네 가지입니다. 3회차 코드의
 | 그 파일의 모양 | Google 쪽 코드 문법으로 쓰고, `module`이 있을 때만 `module.exports`로 내보냅니다. 서버는 이 파일을 실행할 때 `require`로 읽습니다. `tsconfig.json`의 `src` 밖에 있으므로 `dist` 폴더에서 한 칸 위로 찾습니다 |
 | 올리기 | Google 쪽에 올릴 파일을 모으는 단계가 있으면 거기에 그 파일을 더합니다. 그런 단계가 없으면 `npm.cmd run gas:push`가 그 파일을 `gas` 폴더로 복사한 뒤 올리게 합니다 |
 | 새 파일 | 새로 만든 Google 쪽 파일도 올릴 때 빠지지 않게 합니다 |
-| 권한 설정 | Google 쪽 권한 설정(`appsscript.json`)은 바꾸지 않습니다(외부 연결 권한은 3회차에 넣었습니다) |
+| 권한 설정 | 따로 부탁이 없으면 Google 쪽 권한 설정(`appsscript.json`)은 바꾸지 않습니다(외부 연결 권한은 3회차에 넣었습니다) |
 
 ## 연습용 판독
 
@@ -132,7 +132,7 @@ Google 쪽 코드에 더할 일은 아래 네 가지입니다. 3회차 코드의
 |---|---|
 | 부르는 곳 | `live` 판독은 Google 쪽 코드(Apps Script)가 `UrlFetchApp`으로 `POST https://oneport.kr/v1/chat/completions`를 부릅니다 |
 | 키 보내는 법 | 키는 Google 쪽 설정(스크립트 속성 `ONEPORT_API_KEY`, 이 문서의 "OnePort 키")에서 읽습니다. 키는 주소에 넣지 않고 `Authorization: Bearer (OnePort 키)` 머리글로 보냅니다. `contentType`은 `application/json`입니다. `muteHttpExceptions: true`를 주어 오류 코드를 직접 읽습니다 |
-| 모델 | 요청의 `model`에 `gemini-3.8-flash`를 넣습니다. 이 모델 하나만 씁니다. 실패해도 다른 모델로 바꿔 보내지 않습니다 |
+| 모델 | 요청의 `model`에 `gemini-3.8-flash`를 넣습니다. 앱은 이 모델 하나만 씁니다. 판독이 실패해도 앱이 저절로 다른 모델로 바꿔 보내지 않습니다 |
 | 함께 보내는 것 | 고른 지시문, 검사 정보(제품 이름 또는 "제품 미지정", 중량 "352g" 또는 "미측정", 적용 검사기준 버전), 검사기준 원문, 드라이브에 있는 그 검사의 사진 |
 | 요청 모양 | `{"model": "gemini-3.8-flash", "messages": [{"role": "user", "content": [글 조각, 사진 조각, ...]}], "response_format": {"type": "json_object"}, "max_tokens": 8192}`. `response_format`은 JSON 하나로만 답하게 하고, `max_tokens`는 답이 중간에 잘리지 않게 넉넉히 줍니다. 글 조각은 `{"type": "text", "text": 글}`이고 지시문, 검사 정보, 검사기준 원문을 담습니다. 사진 조각은 한 장에 하나씩 `{"type": "image_url", "image_url": {"url": "data:(사진 형식);base64,(사진 base64 글)"}}`입니다. 사진 형식은 드라이브 파일의 형식(예: `image/jpeg`)입니다 |
 | 답하게 하는 모양 | 6항목 JSON으로만 답하게 합니다 |
