@@ -49,7 +49,7 @@ git clone https://github.com/startup-life/manufacturing-quality-student-images.g
 - 하는 일: 앱 폴더에 2회차 보충 문서가 들어오고, AI가 1~2회차 문서를 읽었다는 끝 표시를 알려 줍니다.
 - 목표: AI가 이번 회차의 세부 조건을 보충 문서와 완료 코드에서 찾아 따르게 합니다. 새 대화를 열 때마다 이 프롬프트를 먼저 보냅니다.
 - 완료 기준: 탐색기의 `docs\guide` 폴더에 `session-2.md`가 새로 생깁니다(`files` 폴더가 함께 있어도 맞습니다). AI 답의 마지막 줄에 `1회차-은색컵-4185 2회차-저울눈금-354`가 한 줄로 이어 보입니다. 끝 표시는 AI가 문서를 읽었는지 보는 글자라서, 숫자가 서버 주소의 숫자와 같아도 서버와는 상관없습니다.
-- 막히면: 보이지 않거나 글자가 다르면 한 번 더 보냅니다. 그래도 같으면 AI에게 "지침을 다시 맞추기 위해, class/milestone-1의 AGENTS.md와 docs/guide를 다시 가져와(지금 브랜치는 그대로 둡니다) AGENTS.md와 docs/guide의 session-1.md부터 session-2.md까지를 처음부터 다시 읽고, 읽은 문서의 끝 표시를 모두 한 줄로 이어서 알려 주세요."라고 보냅니다.
+- 막히면: 보이지 않거나 글자가 다르면 한 번 더 보냅니다. 그래도 같으면 AI에게 "지침을 다시 맞추기 위해, `class/milestone-1`의 `AGENTS.md`와 `docs/guide`를 다시 가져와(지금 브랜치는 그대로 둡니다) `AGENTS.md`와 `docs/guide`의 `session-1.md`부터 `session-2.md`까지를 처음부터 다시 읽고, 읽은 문서의 끝 표시를 모두 한 줄로 이어서 알려 주세요."라고 보냅니다.
 
 ## 2-2. 제품과 검사기준
 
