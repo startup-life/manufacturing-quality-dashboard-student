@@ -35,7 +35,7 @@ Google 쪽 코드는 명령 창에서 `npm.cmd run gas:`로 시작하는 명령�
 ## 3-1. 지침 세팅
 
 ```text
-이번 회차 문서를 이 프로젝트로 가져오기 위해, 수업 저장소(class)를 다시 받아 class/milestone-2의 AGENTS.md와 docs/guide를 이 프로젝트로 가져와 주세요(브랜치는 옮기지 않습니다).
+이번 회차 문서를 이 프로젝트로 가져오기 위해, 수업 저장소(class)를 다시 받아 class/milestone-2의 AGENTS.md와 docs/guide를 이 프로젝트로 가져와 주세요(파일만 가져옵니다).
 그다음 AGENTS.md를 작업 지침으로 삼아 주세요. 프롬프트에 없는 상세 구현은 docs/guide의 회차 문서와 그 회차 완료 브랜치 코드(class/milestone-3)에서 확인합니다.
 지금은 AGENTS.md와 docs/guide의 session-1.md부터 session-3.md까지를 읽기만 하고, 읽은 문서의 끝 표시를 모두 한 줄로 이어서 알려 주세요.
 ```
@@ -63,7 +63,7 @@ Google에 실제로 저장하는 기능은 뒤 번호에서 만듭니다.
 ## 3-3. Google 명령 1: 로그인·만들기·올리기
 
 ```text
-명령 창에서 Google 쪽 코드를 다루기 위해, 앱에 gas:login, gas:create, gas:push 명령을 추가해 주세요.
+Google 쪽 코드를 명령 한 줄로 다루기 위해, 앱에 gas:login, gas:create, gas:push 명령을 추가해 주세요.
 지금은 만들기만 합니다.
 자세한 내용은 docs/guide/session-3.md의 "Google 명령"을 참고해 주세요.
 ```
@@ -88,7 +88,6 @@ Google에 실제로 저장하는 기능은 뒤 번호에서 만듭니다.
 
 ```text
 권한 승인과 시트 준비를 명령 한 줄로 하기 위해, 앱에 gas:open, gas:init 명령을 추가해 주세요.
-지금은 만들기만 합니다.
 자세한 내용은 docs/guide/session-3.md의 "Google 명령"을 참고해 주세요.
 ```
 - 하는 일: 앱에 `gas:open`, `gas:init` 명령이 생깁니다. 웹앱 주소가 아직 없어 지금 치면 안내만 나옵니다.

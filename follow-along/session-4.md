@@ -33,7 +33,7 @@
 ## 4-1. 지침 세팅
 
 ```text
-이번 회차 문서를 이 프로젝트로 가져오기 위해, 수업 저장소(class)를 다시 받아 class/milestone-3의 AGENTS.md와 docs/guide를 이 프로젝트로 가져와 주세요(브랜치는 옮기지 않습니다).
+이번 회차 문서를 이 프로젝트로 가져오기 위해, 수업 저장소(class)를 다시 받아 class/milestone-3의 AGENTS.md와 docs/guide를 이 프로젝트로 가져와 주세요(파일만 가져옵니다).
 그다음 AGENTS.md를 작업 지침으로 삼아 주세요. 프롬프트에 없는 상세 구현은 docs/guide의 회차 문서와 그 회차 완료 브랜치 코드(class/milestone-4)에서 확인합니다.
 지금은 AGENTS.md와 docs/guide의 session-1.md부터 session-4.md까지를 읽기만 하고, 읽은 문서의 끝 표시를 모두 한 줄로 이어서 알려 주세요.
 ```
