@@ -24,8 +24,8 @@ NotebookLM 근거 대조 스위치는 `.env`의 `NOTEBOOKLM_MODE`입니다. 서�
 |---|---|
 | `NOTEBOOKLM_MODE` 줄이 없음, `STORAGE_MODE=mock` | `mock`으로 봅니다 |
 | `NOTEBOOKLM_MODE` 줄이 없음, `STORAGE_MODE=live` | `off`로 봅니다 |
-| `STORAGE_MODE=live`에 `mock`을 적음 | `STORAGE_MODE=live`에서는 `mock`을 쓰지 않습니다(모의 근거가 실제 기록에 섞이지 않게). 서버를 켜지 말고 고칠 방법을 한국어 한 줄로 알립니다 |
-| `off`·`mock`·`live`가 아닌 값 | 서버를 켜지 말고 고칠 방법을 한국어 한 줄로 알립니다 |
+| `STORAGE_MODE=live`에 `mock`을 적음 | `STORAGE_MODE=live`에서는 서버 코드가 `mock`을 받아들이지 않습니다(모의 근거가 실제 기록에 섞이지 않게). 서버 코드는 켜지지 않고 서버 창에 고칠 방법을 한국어 한 줄로 보여 줍니다 |
+| `off`·`mock`·`live`가 아닌 값 | 서버 코드는 켜지지 않고 서버 창에 고칠 방법을 한국어 한 줄로 보여 줍니다 |
 
 서버를 켤 때 서버 창에 아래 모양의 한 줄을 보여 줍니다. 이 줄은 이 절에서 새로 만듭니다. 저장소 줄은 그대로 둡니다. Gemini를 따로 알리는 줄이 있으면 그것도 그대로 둡니다.
 
@@ -49,8 +49,8 @@ NotebookLM 근거 대조 스위치는 `.env`의 `NOTEBOOKLM_MODE`입니다. 서�
 | 항목 | 약속 |
 |---|---|
 | 도구와 버전 | `notebooklm-mcp-cli` 0.15.6으로 고정합니다 |
-| 노트북 ID와 경로 받기 | 사용자가 채팅으로 준 노트북 ID와 도구 실행 파일 경로는 `.env`의 아래 두 줄에 넣습니다. 앞뒤에 공백이나 따옴표를 넣지 않습니다 |
-| 서버 창에 내지 않는 값 | 노트북 ID, 도구 실행 파일 경로, `nlm` 출력은 서버 창과 화면에 옮겨 적지 않습니다 |
+| 노트북 ID와 경로 받기 | 사용자가 채팅으로 준 노트북 ID와 도구 실행 파일 경로는 `.env`의 아래 두 줄에 넣습니다. 앞뒤에 공백이나 따옴표를 넣지 않습니다. 상자의 괄호 자리가 비었거나 안내 글 그대로면 AI가 찾아 넣습니다. 노트북 ID는 `nlm notebook list`에서 Title이 "텀블러 품질 기준(교육용)"이고 소스(Src)가 2인 줄의 ID이고(여럿이면 맨 위), 경로는 `Join-Path (uv tool dir --bin) notebooklm-mcp.exe`가 보여 주는 값입니다 |
+| 서버 창에 내지 않는 값 | 노트북 ID, 도구 실행 파일 경로, `nlm` 출력은 서버 창과 앱 화면에 옮겨 적지 않습니다 |
 | 노트북 ID | `.env`의 `NOTEBOOKLM_NOTEBOOK_ID` |
 | 도구 실행 파일 | `.env`의 `NOTEBOOKLM_MCP_COMMAND`(`notebooklm-mcp.exe` 전체 경로) |
 | 패키지 | 따로 부탁이 없으면 더하지 않습니다 |
