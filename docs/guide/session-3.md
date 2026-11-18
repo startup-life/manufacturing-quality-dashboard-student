@@ -117,6 +117,19 @@ Google 쪽 코드(Apps Script)는 `gas` 폴더에 둡니다. 코드는 `gas/Code
 | `gas:open` | `.env`의 웹앱 주소 끝에 `?authuser=0`을 붙여 기본 브라우저로 엽니다. 주소는 출력하지 않습니다 | | |
 | `gas:init` | 서버를 켜지 않고 Google에 `setup`을 시킵니다 | "시트와 사진 폴더를 준비했습니다." 한 줄과 그 아래에 `시트: (시트 주소)`, `폴더: (폴더 주소)` 두 줄을 보여 줍니다 | 실패하면 서버와 같은 한 줄 안내(이 문서의 "서버가 Google을 쓰는 법")로 끝냅니다 |
 
+3-3에서 `gas:create`는 실제로 앱 폴더에 `.clasp.json`이 생겼는지, `gas:push`는 위 표의 성공 문구가 있는지 확인합니다. clasp가 종료 코드 0을 줘도 이 확인에 실패하면 이유를 보여 주고 0이 아닌 코드로 끝냅니다.
+
+3-5에서 Windows용 `gas:open`을 만들 때는 웹앱 주소에서 검증한 배포 번호로 Google 주소를 다시 조립한 뒤, 아래처럼 엽니다. `start`의 첫 번째 따옴표 쌍은 빈 창 제목입니다. `windowsVerbatimArguments`를 켜야 Node가 따옴표 앞에 역슬래시를 붙이지 않습니다. macOS와 Linux에서는 기존처럼 주소를 각각 `open`, `xdg-open`에 인수 하나로 넘깁니다.
+
+```js
+result = spawnSync('cmd.exe', ['/d', '/s', '/c', `start "" "${url}"`], {
+  windowsVerbatimArguments: true,
+  stdio: 'ignore',
+});
+```
+
+3-5에서는 주소가 없을 때의 안내를 확인합니다. 배포가 끝난 3-18에서는 `npm.cmd run gas:open`을 실행해 기본 브라우저에 Google 로그인, 권한 검토 또는 승인 완료 화면이 실제로 열리는지 확인합니다.
+
 ## 만들지 않는 것
 
 아래 기능은 혼자 쓰는 연습용 앱이라 기본으로는 만들지 않습니다. 사용자가 부탁하면 만듭니다.
