@@ -6,6 +6,12 @@
 - 앞 회차 문서와 다르면 번호가 큰 문서를 따릅니다. 이 회차가 바꾸는 앞 회차 약속: 서버 창의 저장소 문장(2회차 문서의 "저장")은 이 문서 "저장 방식 고르기"의 문장으로 바꿉니다. 저장 방식 답(2회차 문서 "서버 기능 목록"의 `GET /api/operations`)은 이제 이 문서 "저장 방식 고르기"의 둘 가운데 하나입니다. 등록한 사진의 저장 위치와 `images` 주소(2회차 문서의 "저장"과 "서버 기능 목록")는 `live`일 때 이 문서의 "서버가 Google을 쓰는 법"을 따릅니다.
 - 맨 끝의 끝 표시를 만들어 `AGENTS.md`가 말한 대로 답의 마지막 줄에 적습니다.
 
+## 따라하기 단계와 도구 전환
+
+단계 번호는 [3회차 따라하기 교재](https://github.com/startup-life/manufacturing-quality-dashboard-student/blob/main/follow-along/session-3.md)를 기준으로 합니다. 3-1~3-5는 Cline Desktop에서 준비하고 3-6은 Ego에서 Apps Script API 설정을 확인합니다. 3-7~3-8은 Antigravity, 3-9~3-12는 Cline Desktop, 3-13~3-20은 다시 Antigravity에서 같은 앱 폴더를 사용합니다.
+
+3-7, 3-9, 3-13의 프롬프트에서 `---` 아래 두 줄은 앞 도구에서 마친 일과 현재 교재 위치입니다. 해당 파일과 설정을 이어 쓰고 구분선 위의 요청을 진행합니다. 3-9에서는 3-8에서 만든 `.clasp.json`을 사용하고, 3-13에서는 3-12까지 만든 `gas/Code.js`와 `gas/appsscript.json`을 이어 씁니다.
+
 ## 이번 회차가 끝나면 되는 것
 
 등록한 검사는 내 Google 시트에, 사진은 내 Google 드라이브에 저장됩니다. 상세 화면의 사진도 드라이브에서 읽어 옵니다. `.env`의 `STORAGE_MODE`로 저장 방식을 고릅니다. 내 컴퓨터는 연습용(`mock`), Google은 실제 연결(`live`)입니다. 화면 기능은 2회차와 같습니다.
@@ -98,6 +104,8 @@ Google 쪽 코드(Apps Script)는 `gas` 폴더에 둡니다. 코드는 `gas/Code
 ## Google 명령
 
 `package.json`의 `npm.cmd run gas:…` 명령입니다.
+
+3-7에서 clasp를 처음 쓰면 npx로 수업 버전 3.4.1을 받습니다. 설치 이력이나 실패 이력이 있으면 clasp의 npx 캐시만 정리합니다. 해당 캐시를 구분하기 어려우면 이번 실습용 새 npm 캐시 폴더를 지정합니다. 버전 확인(`npx.cmd --yes @google/clasp@3.4.1 --version`)과 `npm.cmd run gas:login`은 같은 캐시를 사용합니다. 새 캐시를 지정했다면 두 명령에 같은 `npm_config_cache` 값을 전달합니다.
 
 - clasp는 `npx --yes @google/clasp@3.4.1` 로 부릅니다. 질문 없이 명령이 끝나게 만듭니다. 스크립트 파일에서 clasp를 부를 때는 Windows에서도 동작하도록 셸 명령 한 줄로 부릅니다.
 - 스크립트 파일은 `.env` 내용을 출력하지 않고 `node --env-file-if-exists=.env` 로 값만 읽습니다(`gas:deploy`는 `.env`에 줄을 적기만 합니다).
