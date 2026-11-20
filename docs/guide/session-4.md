@@ -3,7 +3,7 @@
 이 문서는 AI 도구가 코드를 만들 때 읽는 자료입니다. 수강생은 이해하지 않아도 됩니다.
 
 - 따로 부탁이 없으면 프롬프트가 말한 기능만 만듭니다. 프롬프트가 이 문서 전체를 가리켜도 같습니다. 사용자가 여러 기능을 한꺼번에 만들어 달라고 하거나 이 문서에 없는 일을 부탁하면 그대로 합니다.
-- 앞 회차 문서와 다르면 번호가 큰 문서를 따릅니다. 이 회차가 바꾸는 앞 회차 약속: 보고서 검토 대기 숫자와 거르기(2회차 문서 "서버 기능 목록"의 `GET /api/home`의 "지금은 늘 0"과 `review=pending`의 "지금은 하나도 나오지 않습니다")는 이 문서 "다시 판독 필요와 검토 대기"의 "검토 대기" 기준으로 바꿉니다. Google 쪽 일 목록(3회차 문서의 "Google 쪽 일 여섯 가지")에 이 문서 "Google 쪽에 더할 일"의 네 가지를 더합니다. 시트의 탭 목록(3회차 문서의 "Google 쪽 일 여섯 가지"와 "서버가 Google을 쓰는 법")에 이 문서 "판독 결과와 저장"의 탭을 더합니다. `gas:init`(3회차 문서의 "Google 명령")은 하던 일을 마친 뒤 이 문서 "OnePort 키"의 키 넣기까지 합니다. `gas:push`(3회차 문서의 "Google 명령")와 `gas/Code.js` 한 파일(3회차 문서의 "Google 쪽 코드의 틀")에는 이 문서 "Google 쪽에 더할 일"의 함께 쓰는 코드가 더해집니다. 저장 방식 답(3회차 문서 "저장 방식 고르기"의 `GET /api/operations`)에는 이 문서 "판독 방식 고르기"의 두 항목을 더합니다.
+- 앞 회차 문서와 다르면 번호가 큰 문서를 따릅니다. 이 회차가 바꾸는 앞 회차 약속: 보고서 검토 대기 숫자와 거르기(2회차 문서 "서버 기능 목록"의 `GET /api/home`의 "지금은 늘 0"과 `review=pending`의 "지금은 하나도 나오지 않습니다")는 이 문서 "다시 판독 필요와 검토 대기"의 "검토 대기" 기준으로 바꿉니다. Apps Script 코드(Google에서 돌아가는 코드)의 일 목록(3회차 문서의 "Apps Script 코드의 일 여섯 가지")에 이 문서 "Apps Script 코드에 더할 일"의 네 가지를 더합니다. Google 시트(내 Google 계정의 표 문서)의 탭 목록(3회차 문서의 "Apps Script 코드의 일 여섯 가지"와 "서버가 Google을 쓰는 법")에 이 문서 "판독 결과와 저장"의 탭을 더합니다. `gas:init`(3회차 문서의 "Apps Script 명령")은 하던 일을 마친 뒤 이 문서 "OnePort 키"의 키 넣기까지 합니다. `gas:push`(3회차 문서의 "Apps Script 명령")와 `gas/Code.js` 한 파일(3회차 문서의 "Apps Script 코드의 틀")에는 이 문서 "Apps Script 코드에 더할 일"의 함께 쓰는 코드가 더해집니다. 저장 방식 답(3회차 문서 "저장 방식 고르기"의 `GET /api/operations`)에는 이 문서 "판독 방식 고르기"의 두 항목을 더합니다.
 - 맨 끝의 끝 표시를 만들어 `AGENTS.md`가 말한 대로 답의 마지막 줄에 적습니다.
 
 ## 이번 회차가 끝나면 되는 것
@@ -91,11 +91,11 @@
 
 `gemini_results` 탭의 머리글은 `result_id`, `inspection_id`, `created_at`, `mode`, `revision`, `instruction_name`, `instruction_text`, `product_id`, `weight_g`, `images`, `result`입니다. `images`와 `result` 칸에는 값을 JSON 글로 적고, 읽을 때 위 모양으로 되돌립니다.
 
-이 탭과 머리글을 Google 쪽 시트 만들기(`setup`) 목록에 더해, `npm.cmd run gas:init`을 다시 실행하면 빠진 탭·칸이 생기게 합니다(이미 있으면 그대로). Google 쪽 저장 담당 코드가 쓸 수 있는 탭·칸이 정해져 있으면 이 탭과 칸도 쓸 수 있게 넓힙니다.
+이 탭과 머리글을 Apps Script 코드의 시트 만들기(`setup`) 목록에 더해, `npm.cmd run gas:init`을 다시 실행하면 빠진 탭·칸이 생기게 합니다(이미 있으면 그대로). Apps Script 저장 담당 코드가 쓸 수 있는 탭·칸이 정해져 있으면 이 탭과 칸도 쓸 수 있게 넓힙니다.
 
-## Google 쪽에 더할 일
+## Apps Script 코드에 더할 일
 
-Google 쪽 코드에 더할 일은 아래 네 가지입니다. 3회차 코드의 일 이름·탭 이름에 기대지 말고, Google 쪽 코드에 이미 있는 요청·답 방식(3회차 문서의 "Google 쪽 코드의 틀")을 그대로 따라 일을 더합니다. "답"은 `{"ok": true, "data": 결과}`의 `data`입니다.
+Apps Script 코드에 더할 일은 아래 네 가지입니다. 3회차 코드의 일 이름·탭 이름에 기대지 말고, Apps Script 코드에 이미 있는 요청·답 방식(3회차 문서의 "Apps Script 코드의 틀")을 그대로 따라 일을 더합니다. "답"은 `{"ok": true, "data": 결과}`의 `data`입니다.
 
 | 일 이름 | 요청에 더하는 값 | 하는 일 | 답 |
 |---|---|---|---|
@@ -106,15 +106,15 @@ Google 쪽 코드에 더할 일은 아래 네 가지입니다. 3회차 코드의
 
 `gemini_results` 탭의 이름과 머리글, 시트 만들기(`setup`)에 더하는 일은 이 문서 "판독 결과와 저장"을 따릅니다.
 
-서버가 사진의 드라이브 파일 ID를 보낼 때는 사진 주소 `/api/drive/(파일 ID)`(3회차 문서의 "서버가 Google을 쓰는 법")에서 ID를 꺼냅니다.
+서버가 사진의 Google 드라이브(내 Google 계정의 파일 보관함) 파일 ID를 보낼 때는 사진 주소 `/api/drive/(파일 ID)`(3회차 문서의 "서버가 Google을 쓰는 법")에서 ID를 꺼냅니다.
 
 | 항목 | 약속 |
 |---|---|
-| 함께 쓰는 코드 | 서버와 Google 쪽이 함께 쓰는 코드(6항목 이름과 Gemini 답의 통과 검사)는 한 파일로 둡니다. 파일은 `shared/gemini-result.js`입니다 |
-| 그 파일의 모양 | Google 쪽 코드 문법으로 쓰고, `module`이 있을 때만 `module.exports`로 내보냅니다. 서버는 이 파일을 실행할 때 `require`로 읽습니다. `tsconfig.json`의 `src` 밖에 있으므로 `dist` 폴더에서 한 칸 위로 찾습니다 |
-| 올리기 | Google 쪽에 올릴 파일을 모으는 단계가 있으면 거기에 그 파일을 더합니다. 그런 단계가 없으면 `npm.cmd run gas:push`가 그 파일을 `gas` 폴더로 복사한 뒤 올리게 합니다 |
-| 새 파일 | 새로 만든 Google 쪽 파일도 올릴 때 빠지지 않게 합니다 |
-| 권한 설정 | 따로 부탁이 없으면 Google 쪽 권한 설정(`appsscript.json`)은 바꾸지 않습니다(외부 연결 권한은 3회차에 넣었습니다) |
+| 함께 쓰는 코드 | 서버와 Apps Script가 함께 쓰는 코드(6항목 이름과 Gemini 답의 통과 검사)는 한 파일로 둡니다. 파일은 `shared/gemini-result.js`입니다 |
+| 그 파일의 모양 | Apps Script 코드 문법으로 쓰고, `module`이 있을 때만 `module.exports`로 내보냅니다. 서버는 이 파일을 실행할 때 `require`로 읽습니다. `tsconfig.json`의 `src` 밖에 있으므로 `dist` 폴더에서 한 칸 위로 찾습니다 |
+| 올리기 | Apps Script에 올릴 파일을 모으는 단계가 있으면 거기에 그 파일을 더합니다. 그런 단계가 없으면 `npm.cmd run gas:push`가 그 파일을 `gas` 폴더로 복사한 뒤 올리게 합니다 |
+| 새 파일 | 새로 만든 Apps Script 파일도 올릴 때 빠지지 않게 합니다 |
+| 권한 설정 | 따로 부탁이 없으면 Apps Script 권한 설정(`appsscript.json`)은 바꾸지 않습니다(외부 연결 권한은 3회차에 넣었습니다) |
 
 ## 연습용 판독
 
@@ -130,8 +130,8 @@ Google 쪽 코드에 더할 일은 아래 네 가지입니다. 3회차 코드의
 
 | 항목 | 약속 |
 |---|---|
-| 부르는 곳 | `live` 판독은 Google 쪽 코드(Apps Script)가 `UrlFetchApp`으로 `POST https://oneport.kr/v1/chat/completions`를 부릅니다 |
-| 키 보내는 법 | 키는 Google 쪽 설정(스크립트 속성 `ONEPORT_API_KEY`, 이 문서의 "OnePort 키")에서 읽습니다. 키는 주소에 넣지 않고 `Authorization: Bearer (OnePort 키)` 머리글로 보냅니다. `contentType`은 `application/json`입니다. `muteHttpExceptions: true`를 주어 오류 코드를 직접 읽습니다 |
+| 부르는 곳 | `live` 판독은 Apps Script 코드(Google에서 돌아가는 코드)가 `UrlFetchApp`으로 `POST https://oneport.kr/v1/chat/completions`를 부릅니다 |
+| 키 보내는 법 | 키는 Apps Script 스크립트 속성(Google에 저장해 두는 설정)의 `ONEPORT_API_KEY`에서 읽습니다(이 문서의 "OnePort 키"). 키는 주소에 넣지 않고 `Authorization: Bearer (OnePort 키)` 머리글로 보냅니다. `contentType`은 `application/json`입니다. `muteHttpExceptions: true`를 주어 오류 코드를 직접 읽습니다 |
 | 모델 | 요청의 `model`에 `gemini-3.8-flash`를 넣습니다. 웹 서비스는 이 모델 하나만 씁니다. 판독이 실패해도 웹 서비스가 저절로 다른 모델로 바꿔 보내지 않습니다 |
 | 함께 보내는 것 | 고른 지시문, 검사 정보(제품 이름 또는 "제품 미지정", 중량 "352g" 또는 "미측정", 적용 검사기준 버전), 검사기준 원문, 드라이브에 있는 그 검사의 사진 |
 | 요청 모양 | `{"model": "gemini-3.8-flash", "messages": [{"role": "user", "content": [글 조각, 사진 조각, ...]}], "response_format": {"type": "json_object"}, "max_tokens": 8192}`. `response_format`은 JSON 하나로만 답하게 하고, `max_tokens`는 답이 중간에 잘리지 않게 넉넉히 줍니다. 글 조각은 `{"type": "text", "text": 글}`이고 지시문, 검사 정보, 검사기준 원문을 담습니다. 사진 조각은 한 장에 하나씩 `{"type": "image_url", "image_url": {"url": "data:(사진 형식);base64,(사진 base64 글)"}}`입니다. 사진 형식은 드라이브 파일의 형식(예: `image/jpeg`)입니다 |
@@ -164,12 +164,12 @@ OnePort가 오류를 돌려주면 판독 실패의 이유를 아래 문장으로
 | 진행 | 판독은 서버가 뒤에서 진행합니다 |
 | 상태 기억 | 진행 상태("판독 중", "판독 실패")는 서버가 검사마다 기억합니다 |
 | 2번 탭 | 열 때 그 상태를 묻고 판독 중이면 3초마다 다시 묻습니다. 판독이 끝나면 결과를 보여 줍니다. 상세 2번 탭은 주소 끝의 `?tab=2`로 엽니다 |
-| 기다리는 시간 | 판독 한 번은 1~3분 걸릴 수 있으니 Google 쪽을 부를 때 그보다 짧게 끊지 않습니다. OnePort는 첫 응답까지 120초가 지나면 끊고, 그때는 "실제 Gemini 판독"의 오류 표대로 판독 실패를 남깁니다 |
+| 기다리는 시간 | 판독 한 번은 1~3분 걸릴 수 있으니 Apps Script를 부를 때 그보다 짧게 끊지 않습니다. OnePort는 첫 응답까지 120초가 지나면 끊고, 그때는 "실제 Gemini 판독"의 오류 표대로 판독 실패를 남깁니다 |
 | 서버를 다시 켜면 | 진행 중이던 "판독 중"·"판독 실패" 표시는 사라져도 됩니다(저장된 판독 결과는 남습니다) |
-| 다른 요청 | OnePort를 부르는 동안 다른 요청을 막지 않습니다. Google 쪽 코드에 잠금(`LockService` 등)이 있으면 OnePort 부르기는 잠금 밖에서 하고, 그동안에도 2번 탭 상태 확인·홈·목록 요청에 바로 답합니다 |
+| 다른 요청 | OnePort를 부르는 동안 다른 요청을 막지 않습니다. Apps Script 코드에 잠금(`LockService` 등)이 있으면 OnePort 부르기는 잠금 밖에서 하고, 그동안에도 2번 탭 상태 확인·홈·목록 요청에 바로 답합니다 |
 | 등록하면 | 검사 등록이 끝나면 바로 판독을 시작합니다. 검사기준은 등록 때 고른 것, 지시문은 v3입니다. 서버가 판독 시작 요청에 오류로 답하거나 판독이 실패해도 등록은 그대로 둡니다 |
 | 등록 뒤 화면 | 등록이 끝나면 그 검사의 상세 2번 탭(`?tab=2`)을 엽니다 |
-| 실제 판독 | `live`면 서버가 Google 쪽 일 `runGemini`(이 문서 "Google 쪽에 더할 일")를 불러 판독을 맡기고, 받은 6항목이 통과하면 판독 결과 한 건을 만들어 `saveGeminiResult`로 시트에 저장합니다 |
+| 실제 판독 | `live`면 서버가 Apps Script 코드의 일 `runGemini`(이 문서 "Apps Script 코드에 더할 일")를 불러 판독을 맡기고, 받은 6항목이 통과하면 판독 결과 한 건을 만들어 `saveGeminiResult`로 시트에 저장합니다 |
 
 | 주소 | 하는 일과 요청 | 답 |
 |---|---|---|
@@ -211,10 +211,10 @@ OnePort가 오류를 돌려주면 판독 실패의 이유를 아래 문장으로
 
 | 항목 | 약속 |
 |---|---|
-| 저장 위치 | OnePort 키(`ONEPORT_API_KEY`)는 `.env`와 Google 쪽 설정(Apps Script 스크립트 속성 `ONEPORT_API_KEY`)에만 둡니다 |
+| 저장 위치 | OnePort 키(`ONEPORT_API_KEY`)는 `.env`와 Apps Script 스크립트 속성(Google에 저장해 두는 설정) `ONEPORT_API_KEY`에만 둡니다 |
 | 받는 법 | 사용자가 채팅으로 준 키를 `.env`의 `ONEPORT_API_KEY` 줄에 넣습니다. 같은 이름 줄이 있으면 값만 바꿉니다. 앞뒤에 공백이나 따옴표를 넣지 않습니다 |
-| 넣는 법 | `npm.cmd run gas:init`이 하던 일을 마친 뒤 `setOnePortKey`로 `.env`의 키를 Google 쪽 설정에 넣습니다. 넣었으면 "OnePort 키를 넣었습니다.", `.env`에 키가 없으면 "OnePort 키가 .env에 없습니다."로 끝냅니다 |
-| 키가 없을 때 | `live` 판독에서 Google 쪽 설정에 키가 없으면 OnePort를 부르지 않고 "OnePort 키가 없습니다."로 판독 실패를 남깁니다 |
+| 넣는 법 | `npm.cmd run gas:init`이 하던 일을 마친 뒤 `setOnePortKey`로 `.env`의 키를 스크립트 속성에 넣습니다. 넣었으면 "OnePort 키를 넣었습니다.", `.env`에 키가 없으면 "OnePort 키가 .env에 없습니다."로 끝냅니다 |
+| 키가 없을 때 | `live` 판독에서 스크립트 속성에 키가 없으면 OnePort를 부르지 않고 "OnePort 키가 없습니다."로 판독 실패를 남깁니다 |
 | 내보내지 않기 | 웹 서비스 코드와 `gas:` 명령은 키 값을 화면, 서버 창, 로그에 내보내지 않습니다. OnePort에 보내는 `Authorization` 머리글도 로그와 판독 실패 이유에 적지 않습니다. 오류 이유에 붙이는 OnePort 설명에 `Bearer` 뒤의 글이나 키 값이 들어 있으면 그 부분을 `[가림]`으로 바꿉니다 |
 
 ## 다시 판독 필요와 검토 대기
@@ -231,7 +231,7 @@ OnePort가 오류를 돌려주면 판독 실패의 이유를 아래 문장으로
 - 5회차에 출처 대조 기록이 생기면, 가장 최근 판독 결과가 "다시 판독 필요"가 아니고 그 결과의 마지막 대조 기록이 "일치"인 검사만 세지 않습니다.
 - `GET /api/home`의 `review_pending`과 `GET /api/inspections`의 `review=pending`이 이 기준을 씁니다.
 
-**Google 쪽 계산**: Google 저장일 때 Google 쪽 코드가 홈 숫자나 카드 목록을 계산하는 구조면, 그 계산도 시트의 판독 결과를 읽어 위 "검토 대기" 기준을 따릅니다.
+**Apps Script 계산**: Google 저장일 때 Apps Script 코드가 홈 숫자나 카드 목록을 계산하는 구조면, 그 계산도 시트의 판독 결과를 읽어 위 "검토 대기" 기준을 따릅니다.
 
 ## 추가 정보
 
