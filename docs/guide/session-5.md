@@ -3,14 +3,14 @@
 이 문서는 AI 도구가 코드를 만들 때 읽는 자료입니다. 수강생은 이해하지 않아도 됩니다.
 
 - 따로 부탁이 없으면 프롬프트가 말한 기능만 만듭니다. 프롬프트가 이 문서 전체를 가리켜도 같습니다. 사용자가 여러 기능을 한꺼번에 만들어 달라고 하거나 이 문서에 없는 일을 부탁하면 그대로 합니다.
-- 앞 회차 문서와 다르면 번호가 큰 문서를 따릅니다. 이 회차가 바꾸는 앞 회차 약속: 보고서 검토 대기 기준(4회차 문서 "다시 판독 필요와 검토 대기"의 "검토 대기")은 이 문서 "홈과 2번 탭 배지"의 기준으로 바꿉니다. 2번 탭 배지(4회차에 만든 배지)는 이 문서 "홈과 2번 탭 배지"의 순서를 따릅니다. Google 쪽 일 목록(3회차 문서의 "Google 쪽 일 여섯 가지", 4회차 문서의 "Google 쪽에 더할 일")에 이 문서 "Google 쪽 코드"의 네 가지를 더합니다. 시트의 탭 목록(3회차 문서의 "Google 쪽 일 여섯 가지"와 "서버가 Google을 쓰는 법", 4회차 문서의 "판독 결과와 저장")에 이 문서 "근거 답과 대조 기록 저장"의 두 탭을 더합니다. 지시문 주소와 수정본 파일(4회차 문서의 "원문 파일과 수정본")은 이 문서 "근거 질문 저장"의 종류 이름을 받습니다. 2번 탭 상태 답(4회차 문서 "진행 상태와 잠금"의 `GET /api/inspections/(검사번호)/gemini`)과 판독 시작의 답에는 이 문서 "홈과 2번 탭 배지"의 `link` 항목을 더합니다. 4회차까지 안내 글만 있던 3번 탭은 이 문서 "3번 탭: 근거 확인"과 "3번 탭: 출처 대조"대로 채웁니다. Google 쪽 계산(4회차 문서의 "다시 판독 필요와 검토 대기")은 이 문서 "Google 쪽 코드"의 "다른 일"을 따릅니다.
+- 앞 회차 문서와 다르면 번호가 큰 문서를 따릅니다. 이 회차가 바꾸는 앞 회차 약속: 보고서 검토 대기 기준(4회차 문서 "다시 판독 필요와 검토 대기"의 "검토 대기")은 이 문서 "홈과 2번 탭 배지"의 기준으로 바꿉니다. 2번 탭 배지(4회차에 만든 배지)는 이 문서 "홈과 2번 탭 배지"의 순서를 따릅니다. Apps Script 코드(Google에서 돌아가는 코드)의 일 목록(3회차 문서의 "Apps Script 코드의 일 여섯 가지", 4회차 문서의 "Apps Script 코드에 더할 일")에 이 문서 "Apps Script 코드"의 네 가지를 더합니다. Google 시트(내 Google 계정의 표 문서)의 탭 목록(3회차 문서의 "Apps Script 코드의 일 여섯 가지"와 "서버가 Google을 쓰는 법", 4회차 문서의 "판독 결과와 저장")에 이 문서 "근거 답과 대조 기록 저장"의 두 탭을 더합니다. 지시문 주소와 수정본 파일(4회차 문서의 "원문 파일과 수정본")은 이 문서 "근거 질문 저장"의 종류 이름을 받습니다. 2번 탭 상태 답(4회차 문서 "진행 상태와 잠금"의 `GET /api/inspections/(검사번호)/gemini`)과 판독 시작의 답에는 이 문서 "홈과 2번 탭 배지"의 `link` 항목을 더합니다. 4회차까지 안내 글만 있던 3번 탭은 이 문서 "3번 탭: 근거 확인"과 "3번 탭: 출처 대조"대로 채웁니다. Apps Script 계산(4회차 문서의 "다시 판독 필요와 검토 대기")은 이 문서 "Apps Script 코드"의 "다른 일"을 따릅니다.
 - 맨 끝의 끝 표시를 만들어 `AGENTS.md`가 말한 대로 답의 마지막 줄에 적습니다.
 
 ## 따라하기 단계와 도구 전환
 
-단계 번호는 [5회차 따라하기 교재](https://github.com/startup-life/manufacturing-quality-dashboard-student/blob/main/follow-along/session-5.md)를 기준으로 합니다. 5-1은 Cline Desktop에서 지침과 문서를 가져오고, 5-2~5-3은 Antigravity에서 NotebookLM 도구 설치·로그인과 노트북 준비를 하고, 5-4~5-18은 다시 Cline Desktop에서 같은 웹 서비스 폴더를 사용합니다.
+단계 번호는 [5회차 따라하기 교재](https://github.com/startup-life/manufacturing-quality-dashboard-student/blob/main/follow-along/session-5.md)를 기준으로 합니다. 5-1은 Cline Desktop에서 지침과 문서를 가져오고, 5-2~5-3은 Antigravity에서 nlm(NotebookLM을 부르는 도구) 설치·로그인과 NotebookLM 노트북(문서를 모아 두는 곳) 준비를 하고, 5-4~5-18은 다시 Cline Desktop에서 같은 웹 서비스 폴더를 사용합니다.
 
-5-2와 5-4의 프롬프트에서 `---` 아래 두 줄은 앞 도구에서 마친 일과 현재 교재 위치입니다. 해당 파일과 설정을 이어 쓰고 구분선 위의 요청을 진행합니다. 5-4에서는 `.env`의 `NOTEBOOKLM_MODE`, 노트북 ID, 도구 경로를 지금 값 그대로 씁니다. `NOTEBOOKLM_MODE=off`이면 노트북 ID와 도구 경로가 비어 있어도 채우지 않습니다.
+5-2와 5-4의 프롬프트에서 `---` 아래 두 줄은 앞 도구에서 마친 일과 현재 교재 위치입니다. 해당 파일과 설정을 이어 쓰고 구분선 위의 요청을 진행합니다. 5-4에서는 `.env`의 `NOTEBOOKLM_MODE`, 노트북 ID, notebooklm-mcp 실행 파일 경로를 지금 값 그대로 씁니다. `NOTEBOOKLM_MODE=off`이면 노트북 ID와 도구 경로가 비어 있어도 채우지 않습니다.
 
 ## 이번 회차가 끝나면 되는 것
 
@@ -50,11 +50,11 @@ NotebookLM 근거 대조 스위치는 `.env`의 `NOTEBOOKLM_MODE`입니다. 서�
 | NotebookLM | `mock` | 모의 응답 |
 | NotebookLM | `live` | 실제 질의 |
 
-## NotebookLM 도구 설치와 로그인
+## nlm 설치와 로그인
 
 | 항목 | 약속 |
 |---|---|
-| 설치 | `uv --version`으로 uv가 있는지 보고, 없으면 표 아래 상자의 명령으로 설치합니다. 그다음 `uv tool install notebooklm-mcp-cli==0.15.6`으로 NotebookLM 도구를 설치하고 `nlm --version`이 `nlm version 0.15.6`인지 봅니다. 다른 버전이 이미 있으면 `uv tool install --force notebooklm-mcp-cli==0.15.6`으로 바꿉니다. `Update available`이나 `uv tool upgrade` 안내가 나와도 올리지 않습니다 |
+| 설치 | `uv --version`으로 uv가 있는지 보고, 없으면 표 아래 상자의 명령으로 설치합니다. 그다음 `uv tool install notebooklm-mcp-cli==0.15.6`으로 notebooklm-mcp-cli 0.15.6(NotebookLM 도구)을 설치하고 `nlm --version`이 `nlm version 0.15.6`인지 봅니다. 다른 버전이 이미 있으면 `uv tool install --force notebooklm-mcp-cli==0.15.6`으로 바꿉니다. `Update available`이나 `uv tool upgrade` 안내가 나와도 올리지 않습니다 |
 | 명령을 찾지 못할 때 | 설치 뒤 `uv`나 `nlm`을 찾지 못하면 1회차 문서 "오래 걸리는 명령"의 경로 다시 읽기 줄을 같은 명령 맨 앞에 붙여 다시 부릅니다. `nlm`을 그래도 찾지 못하면 `uv tool update-shell`을 실행한 뒤, 경로 다시 읽기 줄을 붙여 `nlm`을 다시 부릅니다. 그래도 찾지 못하면 실행 파일 전체 경로(보통 `$env:USERPROFILE\.local\bin` 아래)로 부릅니다 |
 | 로그인 | `nlm login --storage protected`를 실행합니다. 이 명령은 NotebookLM 로그인용 Chrome 창을 띄우고 로그인이 끝날 때까지 최대 5분 기다립니다. 그 창은 AI 도구로 누를 수 없으니 사용자에게 그 창에서 수업 계정으로 로그인해 달라고 알립니다. 사용자가 마쳤다고 하면 `nlm login --check`가 `Authentication valid!`를 보이는지 봅니다. 이 출력에는 메일 주소가 들어 있으니 답에는 확인한 결과만 적습니다 |
 | 다시 로그인 | 5분이 지나 로그인 명령이 끝났거나 `nlm login --check`가 `Authentication failed`를 보이면 로그인 명령을 다시 실행합니다 |
@@ -64,7 +64,7 @@ NotebookLM 근거 대조 스위치는 `.env`의 `NOTEBOOKLM_MODE`입니다. 서�
 powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
 ```
 
-## NotebookLM 도구 부르기
+## nlm과 notebooklm-mcp 부르기
 
 | 항목 | 약속 |
 |---|---|
@@ -264,9 +264,9 @@ Rev.A 표준서 원문: "…" (출하 승인 없음, 담당자 대조 확인 필
 
 3번 탭이 쓰는 연결 정보는 지금 근거 확인 설정 값 하나입니다. `GET /api/inspections/(검사번호)/evidence` 답의 `mode`에 `NOTEBOOKLM_MODE` 값(`off`, `mock`, `live`)을 넣고, 3번 탭은 이 값이 `off`면 "근거 확인"을 끕니다("3번 탭: 근거 확인"). 실제 질의가 되는지는 답 상자와 실패 문장으로 봅니다.
 
-## Google 쪽 코드
+## Apps Script 코드
 
-Google 쪽(Apps Script)에 필요한 일은 네 가지입니다. "답"은 `{"ok": true, "data": 결과}`의 `data`입니다.
+Apps Script 코드(Google에서 돌아가는 코드)에 필요한 일은 네 가지입니다. "답"은 `{"ok": true, "data": 결과}`의 `data`입니다.
 
 | 일 | 일 이름 | 요청에 더하는 값 | 하는 일 | 답 |
 |---|---|---|---|---|
@@ -278,13 +278,13 @@ Google 쪽(Apps Script)에 필요한 일은 네 가지입니다. "답"은 `{"ok"
 | 항목 | 약속 |
 |---|---|
 | 이미 있는 일 | 같은 일을 하는 것이 이미 있으면(예: 판독 결과별 대조 기록 꺼내기) 새로 만들지 말고 그것을 씁니다 |
-| 한 번에 읽기 | 2번 탭 상태처럼 판독 결과와 대조 기록을 함께 쓰는 요청은 Google을 한 번만 부릅니다(여러 탭을 한 번에 읽는 일, 3회차 문서 "Google 쪽 일 여섯 가지"의 `read`로 함께 읽습니다). `read`는 칸에 적힌 글을 그대로 돌려줍니다. 그래서 `read`로 읽은 `gemini_results`의 `images`·`result`와 `evidence_queries`의 `sources`는 JSON 글이고, 서버에서 목록과 객체로 되돌린 뒤 씁니다(`listGeminiResults`로 읽은 판독 결과와 같은 모양) |
-| 이름 짓는 방식 | 새 일 이름은 Google 쪽 코드에 이미 있는 이름 짓는 방식을 따릅니다. 3회차와 4회차 문서의 이름(`savePhoto`, `saveGeminiResult`, `listGeminiResults`)대로면 위 표의 이름입니다. 점으로 나누는 방식이면 `evidence.queries.save`처럼 그 방식을 따릅니다. 이미 있는 방식이 없을 때만 `evidenceQuerySave`, `evidenceQueryList`, `evidenceSave`, `evidenceList` 같은 이름을 예로 씁니다 |
-| 요청 방식 | 새 일은 Google 쪽 코드에 이미 있는 요청 방식(일 이름을 받아 나눠 처리하는 곳)을 그대로 따라 더합니다 |
+| 한 번에 읽기 | 2번 탭 상태처럼 판독 결과와 대조 기록을 함께 쓰는 요청은 Google을 한 번만 부릅니다(여러 탭을 한 번에 읽는 일, 3회차 문서 "Apps Script 코드의 일 여섯 가지"의 `read`로 함께 읽습니다). `read`는 칸에 적힌 글을 그대로 돌려줍니다. 그래서 `read`로 읽은 `gemini_results`의 `images`·`result`와 `evidence_queries`의 `sources`는 JSON 글이고, 서버에서 목록과 객체로 되돌린 뒤 씁니다(`listGeminiResults`로 읽은 판독 결과와 같은 모양) |
+| 이름 짓는 방식 | 새 일 이름은 Apps Script 코드에 이미 있는 이름 짓는 방식을 따릅니다. 3회차와 4회차 문서의 이름(`savePhoto`, `saveGeminiResult`, `listGeminiResults`)대로면 위 표의 이름입니다. 점으로 나누는 방식이면 `evidence.queries.save`처럼 그 방식을 따릅니다. 이미 있는 방식이 없을 때만 `evidenceQuerySave`, `evidenceQueryList`, `evidenceSave`, `evidenceList` 같은 이름을 예로 씁니다 |
+| 요청 방식 | 새 일은 Apps Script 코드에 이미 있는 요청 방식(일 이름을 받아 나눠 처리하는 곳)을 그대로 따라 더합니다 |
 | 앞 회차 이름 | 앞 회차의 일 이름·탭 이름·파일 이름은 바꾸지 않습니다 |
-| 시트 만들기 | 두 탭과 머리글("근거 답과 대조 기록 저장")을 Google 쪽 시트 만들기(`setup`) 목록에 더해, `npm.cmd run gas:init`을 다시 실행하면 빠진 탭·칸이 생기게 합니다(이미 있으면 그대로) |
-| 올리기 | Google 쪽 코드를 올리는 명령(`npm.cmd run gas:push`)에 새 코드가 빠지지 않게, 지금 올라가고 있는 Google 쪽 코드에 더합니다. 새 파일을 만들었다면 올리는 명령에 그 파일이 들어가는지 확인합니다 |
-| 다른 일 | 화면과 서버의 다른 일은 Google 쪽 코드를 더 고치지 않고 만듭니다. 답에 대조 기록 붙이기, 2번 탭 상태, 검토 대기 세기는 위 네 가지 일과 `read`로 읽은 줄을 서버에서 걸러 만듭니다 |
+| 시트 만들기 | 두 탭과 머리글("근거 답과 대조 기록 저장")을 Apps Script 코드의 시트 만들기(`setup`) 목록에 더해, `npm.cmd run gas:init`을 다시 실행하면 빠진 탭·칸이 생기게 합니다(이미 있으면 그대로) |
+| 올리기 | Apps Script 코드를 올리는 명령(`npm.cmd run gas:push`)에 새 코드가 빠지지 않게, 지금 올라가고 있는 Apps Script 코드에 더합니다. 새 파일을 만들었다면 올리는 명령에 그 파일이 들어가는지 확인합니다 |
+| 다른 일 | 화면과 서버의 다른 일은 Apps Script 코드를 더 고치지 않고 만듭니다. 답에 대조 기록 붙이기, 2번 탭 상태, 검토 대기 세기는 위 네 가지 일과 `read`로 읽은 줄을 서버에서 걸러 만듭니다 |
 
 ## 3번 탭: 근거 확인
 
@@ -294,10 +294,10 @@ Google 쪽(Apps Script)에 필요한 일은 네 가지입니다. "답"은 `{"ok"
 
 그래서 3번 탭 제목과 원문 칸을 만드는 요청의 첫 일은 화면이 아니라 상태 읽기 점검입니다. 화면을 고치기 전에 아래 두 가지를 차례로 합니다. 이 점검은 이번 번호의 완료 기준(펼치면 원문이 보임)에 필요한 일이라 뒤 번호 기능이 아닙니다. 근거 답과 대조 기록을 저장하고 꺼내는 요청에서 상태 읽기를 `read`로 바꿀 때 빠졌을 수 있는 일을 채우는 것입니다.
 
-1. `src/gemini-result.store.ts`를 열어 `getStatus`가 Google `read` 답의 `gemini_results` 줄을 판독 결과로 바꾸는 곳(웹 서비스에 따라 `normalizeGoogleResults` 같은 이름)을 찾습니다. 그곳이 `result`·`images`를 글자 그대로 판독 결과 검사(`normalizeGeminiResult`)나 목록 검사에 넘기면, Google 저장(`STORAGE_MODE=live`)에서 검사가 `null`을 돌려 "저장된 판독 결과를 읽을 수 없습니다." 예외가 납니다. 그러면 아래 코드 참고에 나온 만큼 글을 먼저 풀도록 고칩니다("Google 쪽 코드"의 "한 번에 읽기"). 이미 풀고 있으면 그대로 둡니다.
+1. `src/gemini-result.store.ts`를 열어 `getStatus`가 Google `read` 답의 `gemini_results` 줄을 판독 결과로 바꾸는 곳(웹 서비스에 따라 `normalizeGoogleResults` 같은 이름)을 찾습니다. 그곳이 `result`·`images`를 글자 그대로 판독 결과 검사(`normalizeGeminiResult`)나 목록 검사에 넘기면, Google 저장(`STORAGE_MODE=live`)에서 검사가 `null`을 돌려 "저장된 판독 결과를 읽을 수 없습니다." 예외가 납니다. 그러면 아래 코드 참고에 나온 만큼 글을 먼저 풀도록 고칩니다("Apps Script 코드"의 "한 번에 읽기"). 이미 풀고 있으면 그대로 둡니다.
 2. 끝났다고 알릴 때 1에서 본 것(글을 푸는 처리를 더했는지, 이미 있었는지)을 한 줄로 함께 적습니다. 서버를 켜서 볼 수 있으면 판독 결과가 있는 검사로 `GET /api/inspections/(검사번호)/evidence`와 `GET /api/inspections/(검사번호)/gemini`가 오류 없이 답하는지 봅니다.
 
-코드 참고: 4회차 완료 코드(`class/milestone-4`)에서는 `src/gemini-result.store.ts`의 `getStatus`가 `readResults`를 거쳐 Google 쪽 `listGeminiResults`로 읽었고, JSON 글은 `gas/Code.js`의 `parseGeminiJsonCell`이 풀었습니다. `read`는 이 풀기를 하지 않으므로 서버에서 아래만큼 더합니다. 적용 범위는 `read`로 읽은 판독 결과 줄을 판독 결과 모양으로 바꾸는 한 곳이고, 화면과 Google 쪽 코드는 고치지 않습니다.
+코드 참고: `class/milestone-4`(4회차 완료 코드)에서는 `src/gemini-result.store.ts`의 `getStatus`가 `readResults`를 거쳐 Apps Script 코드의 `listGeminiResults`로 읽었고, JSON 글은 `gas/Code.js`의 `parseGeminiJsonCell`이 풀었습니다. `read`는 이 풀기를 하지 않으므로 서버에서 아래만큼 더합니다. 적용 범위는 `read`로 읽은 판독 결과 줄을 판독 결과 모양으로 바꾸는 한 곳이고, 화면과 Apps Script 코드는 고치지 않습니다.
 
 ```ts
 const parseCell = (value: unknown): unknown => {
@@ -376,4 +376,4 @@ AI·NotebookLM이 준 글은 HTML로 넣지 말고 글자로 넣습니다.
 - 2번 탭 배지 "확인하는 중"(불러오는 동안): 혼자 쓰는 연습용 웹 서비스라 기본으로는 만들지 않습니다.
 - 판독 중이거나 상태를 불러오기 전에 "근거 확인"을 끄고 "판독이 끝나면 누를 수 있다"고 안내하기, 3번 탭 상태 답(`GET /api/inspections/(검사번호)/evidence`)의 `running`: 혼자 쓰는 연습용 웹 서비스라 기본으로는 만들지 않습니다.
 
-끝 표시: `5회차-종이노트-` 뒤에 "NotebookLM 도구 부르기"의 도구 버전을 붙입니다.
+끝 표시: `5회차-종이노트-` 뒤에 "nlm과 notebooklm-mcp 부르기"의 도구 버전을 붙입니다.
