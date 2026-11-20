@@ -8,7 +8,7 @@
 
 ## 따라하기 단계와 도구 전환
 
-단계 번호는 [3회차 따라하기 교재](https://github.com/startup-life/manufacturing-quality-dashboard-student/blob/main/follow-along/session-3.md)를 기준으로 합니다. 3-1~3-5는 Cline Desktop에서 준비하고 3-6은 Ego에서 Apps Script API 설정을 확인합니다. 3-7~3-8은 Antigravity, 3-9~3-12는 Cline Desktop, 3-13~3-20은 다시 Antigravity에서 같은 웹 서비스 폴더를 사용합니다.
+단계 번호는 [3회차 따라하기 교재](https://github.com/startup-life/manufacturing-quality-dashboard-student/blob/main/follow-along/session-3.md)를 기준으로 합니다. 3-1~3-5는 Cline Desktop에서 준비하고 3-6은 ego (lite) 브라우저에서 Apps Script API 설정을 확인합니다. 3-7~3-8은 Antigravity, 3-9~3-12는 Cline Desktop, 3-13~3-20은 다시 Antigravity에서 같은 웹 서비스 폴더를 사용합니다.
 
 3-7, 3-9, 3-13의 프롬프트에서 `---` 아래 두 줄은 앞 도구에서 마친 일과 현재 교재 위치입니다. 해당 파일과 설정을 이어 쓰고 구분선 위의 요청을 진행합니다. 3-9에서는 3-8에서 만든 `.clasp.json`을 사용하고, 3-13에서는 3-12까지 만든 `gas/Code.js`와 `gas/appsscript.json`을 이어 씁니다.
 
@@ -112,8 +112,8 @@ Apps Script 코드(Google에서 돌아가는 코드)는 `gas` 폴더에 둡니�
 - `gas:redeploy`, `gas:open`, `gas:init`은 `.env`에 웹앱 주소가 없으면 ".env에 웹앱 주소가 없습니다. 먼저 npm.cmd run gas:deploy를 실행하세요."로 끝냅니다.
 - `gas:deploy`와 `gas:redeploy`는 clasp 출력을 터미널에 보여 주지 않습니다.
 - Apps Script 코드를 고친 뒤에는 `gas:push`, `gas:redeploy`를 차례로 쳐야 반영됩니다. `gas:push`가 실패하면 `gas:deploy`나 `gas:redeploy`를 치지 않습니다. 사용자가 보낸 오류를 고치느라 Apps Script 코드를 고쳤고 `.env`에 웹앱 주소가 있으면 `npm.cmd run gas:push`와 `npm.cmd run gas:redeploy`를 차례로 실행합니다.
-- 사용자가 이 명령 실행이나 Google 로그인, 권한 승인을 맡기면 AI가 합니다. `gas:login`이나 `gas:open`이 기본 브라우저를 열면, 그 창에서 하거나 같은 주소(clasp가 보여 준 로그인 주소, `.env`의 웹앱 주소 끝에 `?authuser=0`을 붙인 주소)를 ego 브라우저에서 열어 진행합니다. 따로 부탁이 없으면 웹앱 주소는 채팅 답에 적지 않습니다.
-- `.clasp.json`이 없는데(3회차 참고의 Apps Script 편집기 방법으로 연결한 경우) Apps Script 코드를 올려야 하면, AI가 ego 브라우저에서 그 프로젝트 편집기 주소의 `/d/`와 `/edit` 사이 글자(스크립트 ID)를 찾아 웹 서비스 폴더 맨 위에 `{"scriptId": "(스크립트 ID)", "rootDir": "gas"}` 모양의 `.clasp.json`을 만들고, `gas:login` 뒤에 `gas:push`, `gas:redeploy`를 써 봅니다. 그래도 안 되면 한 일과 나온 글을 답에 적습니다.
+- 사용자가 이 명령 실행이나 Google 로그인, 권한 승인을 맡기면 AI가 합니다. `gas:login`이나 `gas:open`이 기본 브라우저를 열면, 그 창에서 하거나 같은 주소(clasp가 보여 준 로그인 주소, `.env`의 웹앱 주소 끝에 `?authuser=0`을 붙인 주소)를 ego (lite) 브라우저에서 열어 진행합니다. 따로 부탁이 없으면 웹앱 주소는 채팅 답에 적지 않습니다.
+- `.clasp.json`이 없는데(3회차 참고의 Apps Script 편집기 방법으로 연결한 경우) Apps Script 코드를 올려야 하면, AI가 ego (lite) 브라우저에서 그 프로젝트 편집기 주소의 `/d/`와 `/edit` 사이 글자(스크립트 ID)를 찾아 웹 서비스 폴더 맨 위에 `{"scriptId": "(스크립트 ID)", "rootDir": "gas"}` 모양의 `.clasp.json`을 만들고, `gas:login` 뒤에 `gas:push`, `gas:redeploy`를 써 봅니다. 그래도 안 되면 한 일과 나온 글을 답에 적습니다.
 
 | 명령 | 하는 일 | 성공할 때 | 그 밖의 경우 |
 |---|---|---|---|
