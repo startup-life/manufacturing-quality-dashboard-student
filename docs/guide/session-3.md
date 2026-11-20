@@ -8,7 +8,7 @@
 
 ## 따라하기 단계와 도구 전환
 
-단계 번호는 [3회차 따라하기 교재](https://github.com/startup-life/manufacturing-quality-dashboard-student/blob/main/follow-along/session-3.md)를 기준으로 합니다. 3-1~3-5는 Cline Desktop에서 준비하고 3-6은 Ego에서 Apps Script API 설정을 확인합니다. 3-7~3-8은 Antigravity, 3-9~3-12는 Cline Desktop, 3-13~3-20은 다시 Antigravity에서 같은 앱 폴더를 사용합니다.
+단계 번호는 [3회차 따라하기 교재](https://github.com/startup-life/manufacturing-quality-dashboard-student/blob/main/follow-along/session-3.md)를 기준으로 합니다. 3-1~3-5는 Cline Desktop에서 준비하고 3-6은 Ego에서 Apps Script API 설정을 확인합니다. 3-7~3-8은 Antigravity, 3-9~3-12는 Cline Desktop, 3-13~3-20은 다시 Antigravity에서 같은 웹 서비스 폴더를 사용합니다.
 
 3-7, 3-9, 3-13의 프롬프트에서 `---` 아래 두 줄은 앞 도구에서 마친 일과 현재 교재 위치입니다. 해당 파일과 설정을 이어 쓰고 구분선 위의 요청을 진행합니다. 3-9에서는 3-8에서 만든 `.clasp.json`을 사용하고, 3-13에서는 3-12까지 만든 `gas/Code.js`와 `gas/appsscript.json`을 이어 씁니다.
 
@@ -38,7 +38,7 @@ Google에 실제로 저장하는 코드("서버가 Google을 쓰는 법")는 뒤
 
 | 항목 | 약속 |
 |---|---|
-| 화면과 창 | 앱의 화면, 서버 창, 앱의 안내 문장에는 웹앱 주소를 넣지 않습니다 |
+| 화면과 창 | 웹 서비스의 화면, 서버 창, 웹 서비스의 안내 문장에는 웹앱 주소를 넣지 않습니다 |
 
 ## Google 쪽 코드의 틀
 
@@ -113,19 +113,19 @@ Google 쪽 코드(Apps Script)는 `gas` 폴더에 둡니다. 코드는 `gas/Code
 - `gas:deploy`와 `gas:redeploy`는 clasp 출력을 터미널에 보여 주지 않습니다.
 - Google 쪽 코드를 고친 뒤에는 `gas:push`, `gas:redeploy`를 차례로 쳐야 반영됩니다. `gas:push`가 실패하면 `gas:deploy`나 `gas:redeploy`를 치지 않습니다. 사용자가 보낸 오류를 고치느라 Google 쪽 코드를 고쳤고 `.env`에 웹앱 주소가 있으면 `npm.cmd run gas:push`와 `npm.cmd run gas:redeploy`를 차례로 실행합니다.
 - 사용자가 이 명령 실행이나 Google 로그인, 권한 승인을 맡기면 AI가 합니다. `gas:login`이나 `gas:open`이 기본 브라우저를 열면, 그 창에서 하거나 같은 주소(clasp가 보여 준 로그인 주소, `.env`의 웹앱 주소 끝에 `?authuser=0`을 붙인 주소)를 ego 브라우저에서 열어 진행합니다. 따로 부탁이 없으면 웹앱 주소는 채팅 답에 적지 않습니다.
-- `.clasp.json`이 없는데(3회차 참고의 Google 편집기 방법으로 연결한 경우) Google 쪽 코드를 올려야 하면, AI가 ego 브라우저에서 그 프로젝트 편집기 주소의 `/d/`와 `/edit` 사이 글자(스크립트 ID)를 찾아 앱 폴더 맨 위에 `{"scriptId": "(스크립트 ID)", "rootDir": "gas"}` 모양의 `.clasp.json`을 만들고, `gas:login` 뒤에 `gas:push`, `gas:redeploy`를 써 봅니다. 그래도 안 되면 한 일과 나온 글을 답에 적습니다.
+- `.clasp.json`이 없는데(3회차 참고의 Google 편집기 방법으로 연결한 경우) Google 쪽 코드를 올려야 하면, AI가 ego 브라우저에서 그 프로젝트 편집기 주소의 `/d/`와 `/edit` 사이 글자(스크립트 ID)를 찾아 웹 서비스 폴더 맨 위에 `{"scriptId": "(스크립트 ID)", "rootDir": "gas"}` 모양의 `.clasp.json`을 만들고, `gas:login` 뒤에 `gas:push`, `gas:redeploy`를 써 봅니다. 그래도 안 되면 한 일과 나온 글을 답에 적습니다.
 
 | 명령 | 하는 일 | 성공할 때 | 그 밖의 경우 |
 |---|---|---|---|
 | `gas:login` | Google 로그인. clasp가 낸 글을 그대로 보여 줍니다 | | |
-| `gas:create` | 내 계정에 "tumbler-factory" Apps Script 프로젝트를 만들고 `gas` 폴더와 연결합니다(`.clasp.json`이 생깁니다). `.clasp.json`은 앱 폴더 맨 위에 만들고 코드 폴더는 `gas`로 지정합니다. clasp에는 `create --type standalone --title tumbler-factory --rootDir gas`를 줍니다. clasp가 `gas/appsscript.json`을 덮어쓸 수 있으니 이 파일은 Google 쪽 코드의 틀을 만들 때(이 문서의 "Google 쪽 코드의 틀") 새로 씁니다 | `.clasp.json`이 생겼으면 마지막 줄에 "프로젝트를 만들었습니다."를 보여 줍니다 | `.clasp.json`이 이미 있으면 실행하지 않고 "이미 프로젝트가 있습니다. 다시 만들지 않습니다."를 보여 줍니다. clasp가 실패하면 clasp가 낸 글을 줄이지 않고 그대로 보여 줍니다 |
+| `gas:create` | 내 계정에 "tumbler-factory" Apps Script 프로젝트를 만들고 `gas` 폴더와 연결합니다(`.clasp.json`이 생깁니다). `.clasp.json`은 웹 서비스 폴더 맨 위에 만들고 코드 폴더는 `gas`로 지정합니다. clasp에는 `create --type standalone --title tumbler-factory --rootDir gas`를 줍니다. clasp가 `gas/appsscript.json`을 덮어쓸 수 있으니 이 파일은 Google 쪽 코드의 틀을 만들 때(이 문서의 "Google 쪽 코드의 틀") 새로 씁니다 | `.clasp.json`이 생겼으면 마지막 줄에 "프로젝트를 만들었습니다."를 보여 줍니다 | `.clasp.json`이 이미 있으면 실행하지 않고 "이미 프로젝트가 있습니다. 다시 만들지 않습니다."를 보여 줍니다. clasp가 실패하면 clasp가 낸 글을 줄이지 않고 그대로 보여 줍니다 |
 | `gas:push` | `gas` 폴더의 코드를 Google에 덮어써서 올립니다(`--force`) | clasp 출력에서 `Pushed`를 찾았거나 바뀐 곳이 없어 `Script is already up to date`가 나왔을 때만 성공입니다(clasp가 실패로 끝나도 이 글이 있으면 성공으로 봅니다). 성공하면 마지막 줄에 "Google에 코드를 올렸습니다."를 보여 줍니다 | 로그인 문제(`invalid_grant`)로 실패하면 긴 오류 대신 "구글 로그인이 만료됐을 수 있습니다. npm.cmd run gas:login을 다시 하세요." 한 줄을 보여 줍니다. 그 밖의 실패는 clasp가 낸 글을 줄이지 않고 그대로 보여 줍니다 |
 | `gas:deploy` | 웹앱을 새로 배포합니다. clasp는 실패해도 성공처럼 끝날 수 있으니, 종료 코드가 0이고 표준 출력에 clasp 3.4.1의 성공 줄(`Deployed AKfyc… @버전`)이 딱 하나 있을 때만 성공입니다. 오류 글에 들어 있는 번호는 쓰지 않습니다 | `.env`에 `GAS_WEBAPP_URL=https://script.google.com/macros/s/(그 번호)/exec` 와 `STORAGE_MODE=live`를 적습니다(같은 이름의 줄은 바꾸고 다른 줄은 그대로 둡니다. `.env`가 없으면 만듭니다). 마지막 두 줄은 ".env에 웹앱 주소를 적었습니다."와 "다음: npm.cmd run gas:open"입니다 | `.env`에 웹앱 주소가 이미 있으면 배포하지 않고 "이미 웹앱 주소가 있습니다. npm.cmd run gas:redeploy를 쓰세요."로 끝냅니다. 번호를 못 찾으면 `.env`를 건드리지 않고 "웹앱 번호를 찾지 못했습니다. 로그인이 만료됐으면 npm.cmd run gas:login을 다시 하세요."로 끝냅니다 |
 | `gas:redeploy` | `.env`에 적힌 주소의 번호로 같은 웹앱을 새 버전으로 바꿉니다(주소는 그대로) | `gas:deploy`처럼 성공 줄을 확인하고, 그 번호가 요청한 배포 번호와 같을 때만 마지막 줄 "같은 웹앱을 새 버전으로 바꿨습니다. 주소는 그대로입니다."를 보여 줍니다 | 번호를 못 찾으면 "웹앱을 바꾸지 못했습니다. 로그인이 만료됐으면 npm.cmd run gas:login을 다시 하고 gas:push부터 다시 하세요." 한 줄로 끝냅니다 |
 | `gas:open` | `.env`의 웹앱 주소 끝에 `?authuser=0`을 붙여 기본 브라우저로 엽니다. 주소는 출력하지 않습니다 | | |
 | `gas:init` | 서버를 켜지 않고 Google에 `setup`을 시킵니다 | "시트와 사진 폴더를 준비했습니다." 한 줄과 그 아래에 `시트: (시트 주소)`, `폴더: (폴더 주소)` 두 줄을 보여 줍니다 | 실패하면 서버와 같은 한 줄 안내(이 문서의 "서버가 Google을 쓰는 법")로 끝냅니다 |
 
-3-3에서 `gas:create`는 실제로 앱 폴더에 `.clasp.json`이 생겼는지, `gas:push`는 위 표의 성공 문구가 있는지 확인합니다. clasp가 종료 코드 0을 줘도 이 확인에 실패하면 이유를 보여 주고 0이 아닌 코드로 끝냅니다.
+3-3에서 `gas:create`는 실제로 웹 서비스 폴더에 `.clasp.json`이 생겼는지, `gas:push`는 위 표의 성공 문구가 있는지 확인합니다. clasp가 종료 코드 0을 줘도 이 확인에 실패하면 이유를 보여 주고 0이 아닌 코드로 끝냅니다.
 
 3-5에서 Windows용 `gas:open`을 만들 때는 웹앱 주소에서 검증한 배포 번호로 Google 주소를 다시 조립한 뒤, 아래처럼 엽니다. `start`의 첫 번째 따옴표 쌍은 빈 창 제목입니다. `windowsVerbatimArguments`를 켜야 Node가 따옴표 앞에 역슬래시를 붙이지 않습니다. macOS와 Linux에서는 기존처럼 주소를 각각 `open`, `xdg-open`에 인수 하나로 넘깁니다.
 
@@ -140,9 +140,9 @@ result = spawnSync('cmd.exe', ['/d', '/s', '/c', `start "" "${url}"`], {
 
 ## 만들지 않는 것
 
-아래 기능은 혼자 쓰는 연습용 앱이라 기본으로는 만들지 않습니다. 사용자가 부탁하면 만듭니다.
+아래 기능은 혼자 쓰는 연습용 웹 서비스라 기본으로는 만들지 않습니다. 사용자가 부탁하면 만듭니다.
 
-- 설정 화면 아래에 저장 방식에 따라 달라지는 설명 한 줄: 혼자 쓰는 연습용 앱이라 기본으로는 만들지 않습니다. 저장 방식은 설정 화면의 저장소 줄("저장 방식 고르기")로 봅니다.
-- 바닥글에 저장 방식에 따라 달라지는 글: 혼자 쓰는 연습용 앱이라 기본으로는 만들지 않습니다.
+- 설정 화면 아래에 저장 방식에 따라 달라지는 설명 한 줄: 혼자 쓰는 연습용 웹 서비스라 기본으로는 만들지 않습니다. 저장 방식은 설정 화면의 저장소 줄("저장 방식 고르기")로 봅니다.
+- 바닥글에 저장 방식에 따라 달라지는 글: 혼자 쓰는 연습용 웹 서비스라 기본으로는 만들지 않습니다.
 
 끝 표시: `3회차-초록시트-` 뒤에 "Google 쪽 코드의 틀"의 `appsscript.json` timeZone을 붙입니다.
