@@ -55,7 +55,7 @@ NotebookLM 근거 대조 스위치는 `.env`의 `NOTEBOOKLM_MODE`입니다. 서�
 | 항목 | 약속 |
 |---|---|
 | 설치 | `uv --version`으로 uv가 있는지 보고, 없으면 표 아래 상자의 명령으로 설치합니다. 그다음 `uv tool install notebooklm-mcp-cli==0.15.6`으로 NotebookLM 도구를 설치하고 `nlm --version`이 `nlm version 0.15.6`인지 봅니다. 다른 버전이 이미 있으면 `uv tool install --force notebooklm-mcp-cli==0.15.6`으로 바꿉니다. `Update available`이나 `uv tool upgrade` 안내가 나와도 올리지 않습니다 |
-| 명령을 찾지 못할 때 | 설치 뒤 `uv`나 `nlm`을 찾지 못하면 1회차 문서 "화면 서버 켜기"의 경로 다시 읽기 한 줄(`$env:Path = …`)을 실행한 뒤 다시 부릅니다. `nlm`을 그래도 찾지 못하면 `uv tool update-shell`을 실행하고 그 한 줄을 다시 실행합니다. 그래도 찾지 못하면 실행 파일 전체 경로(보통 `$env:USERPROFILE\.local\bin` 아래)로 부릅니다 |
+| 명령을 찾지 못할 때 | 설치 뒤 `uv`나 `nlm`을 찾지 못하면 1회차 문서 "오래 걸리는 명령"의 경로 다시 읽기 줄을 같은 명령 맨 앞에 붙여 다시 부릅니다. `nlm`을 그래도 찾지 못하면 `uv tool update-shell`을 실행한 뒤, 경로 다시 읽기 줄을 붙여 `nlm`을 다시 부릅니다. 그래도 찾지 못하면 실행 파일 전체 경로(보통 `$env:USERPROFILE\.local\bin` 아래)로 부릅니다 |
 | 로그인 | `nlm login --storage protected`를 실행합니다. 이 명령은 NotebookLM 로그인용 Chrome 창을 띄우고 로그인이 끝날 때까지 최대 5분 기다립니다. 그 창은 AI 도구로 누를 수 없으니 사용자에게 그 창에서 수업 계정으로 로그인해 달라고 알립니다. 사용자가 마쳤다고 하면 `nlm login --check`가 `Authentication valid!`를 보이는지 봅니다. 이 출력에는 메일 주소가 들어 있으니 답에는 확인한 결과만 적습니다 |
 | 다시 로그인 | 5분이 지나 로그인 명령이 끝났거나 `nlm login --check`가 `Authentication failed`를 보이면 로그인 명령을 다시 실행합니다 |
 | 서버 다시 켜기 | 설치와 로그인을 마치면 1회차 문서 "화면 서버 켜기"의 "프로그램을 새로 설치한 뒤"대로 서버를 끄고 새 창에서 켭니다. 새로 설치한 프로그램을 서버가 찾게 하려는 것입니다 |
