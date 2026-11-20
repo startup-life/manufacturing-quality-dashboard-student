@@ -8,7 +8,7 @@
 
 ## 따라하기 단계와 도구 전환
 
-단계 번호는 [5회차 따라하기 교재](https://github.com/startup-life/manufacturing-quality-dashboard-student/blob/main/follow-along/session-5.md)를 기준으로 합니다. 5-1은 Cline Desktop에서 지침과 문서를 가져오고, 5-2~5-3은 Antigravity에서 NotebookLM 도구 설치·로그인과 노트북 준비를 하고, 5-4~5-18은 다시 Cline Desktop에서 같은 앱 폴더를 사용합니다.
+단계 번호는 [5회차 따라하기 교재](https://github.com/startup-life/manufacturing-quality-dashboard-student/blob/main/follow-along/session-5.md)를 기준으로 합니다. 5-1은 Cline Desktop에서 지침과 문서를 가져오고, 5-2~5-3은 Antigravity에서 NotebookLM 도구 설치·로그인과 노트북 준비를 하고, 5-4~5-18은 다시 Cline Desktop에서 같은 웹 서비스 폴더를 사용합니다.
 
 5-2와 5-4의 프롬프트에서 `---` 아래 두 줄은 앞 도구에서 마친 일과 현재 교재 위치입니다. 해당 파일과 설정을 이어 쓰고 구분선 위의 요청을 진행합니다. 5-4에서는 `.env`의 `NOTEBOOKLM_MODE`, 노트북 ID, 도구 경로를 지금 값 그대로 씁니다. `NOTEBOOKLM_MODE=off`이면 노트북 ID와 도구 경로가 비어 있어도 채우지 않습니다.
 
@@ -71,7 +71,7 @@ powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | ie
 | 도구와 버전 | `notebooklm-mcp-cli` 0.15.6으로 고정합니다 |
 | 노트북 만들기 | 프롬프트가 노트북을 만들어 달라고 하면 `nlm notebook create "텀블러 품질 기준(교육용)"`로 만들고, 나온 `notebook_id` 값으로 `nlm source add (노트북 ID) --file standards\notebooklm-Rev.A.md --wait`와 `nlm source add (노트북 ID) --file standards\notebooklm-Rev.B.md --wait`를 하나씩 실행합니다. 같은 제목의 노트북이 이미 있어도 새로 만들어지니 방금 만든 노트북의 ID를 씁니다 |
 | 노트북 ID와 경로 받기 | 노트북 ID와 도구 실행 파일 경로는 `.env`의 아래 두 줄에 넣습니다. 앞뒤에 공백이나 따옴표를 넣지 않습니다. 노트북 ID는 방금 만든 노트북의 ID를 쓰고, 만들지 않았으면 사용자가 채팅으로 준 ID를, 그것도 없으면 `nlm notebook list`에서 Title이 "텀블러 품질 기준(교육용)"이고 소스(Src)가 2인 줄의 ID를 씁니다(여럿이면 맨 위). 경로는 `Join-Path (uv tool dir --bin) notebooklm-mcp.exe`가 보여 주는 값이고, 넣기 전에 `Test-Path`로 `True`인지 봅니다 |
-| 서버 창에 내지 않는 값 | 노트북 ID, 도구 실행 파일 경로, `nlm` 출력은 서버 창과 앱 화면에 옮겨 적지 않습니다 |
+| 서버 창에 내지 않는 값 | 노트북 ID, 도구 실행 파일 경로, `nlm` 출력은 서버 창과 웹 서비스 화면에 옮겨 적지 않습니다 |
 | 노트북 ID | `.env`의 `NOTEBOOKLM_NOTEBOOK_ID` |
 | 도구 실행 파일 | `.env`의 `NOTEBOOKLM_MCP_COMMAND`(`notebooklm-mcp.exe` 전체 경로) |
 | 패키지 | 따로 부탁이 없으면 더하지 않습니다 |
@@ -119,7 +119,7 @@ NotebookLM에 올리는 검사기준 원문은 `standards/notebooklm-Rev.A.md`, 
 
 안전 문구와 조회 줄의 글은 아래 추가 정보 파일에 있습니다. "안전 문구:", "조회 줄:"은 이름표입니다. 질문 글과 화면에는 이름표를 빼고 이름표 뒤의 글만 넣습니다. 조회 줄 글은 "조회할 원문: TUM-QC-STD-001 Rev.A."로 시작하고, Rev.A 자리에는 그 검사의 기준 버전을 넣습니다.
 
-안전 문구와 조회 줄이 든 추가 정보 파일은 아래 표와 같습니다. 파일은 `docs/guide/files/reference/`에 있고 프롬프트나 이 문서가 가리킬 때 엽니다. 앱 폴더로 복사하지 않습니다.
+안전 문구와 조회 줄이 든 추가 정보 파일은 아래 표와 같습니다. 파일은 `docs/guide/files/reference/`에 있고 프롬프트나 이 문서가 가리킬 때 엽니다. 웹 서비스 폴더로 복사하지 않습니다.
 
 | 프롬프트에서 부르는 이름 | 종류 | 파일 | 쓰는 법 |
 |---|---|---|---|
@@ -294,7 +294,7 @@ Google 쪽(Apps Script)에 필요한 일은 네 가지입니다. "답"은 `{"ok"
 
 그래서 3번 탭 제목과 원문 칸을 만드는 요청의 첫 일은 화면이 아니라 상태 읽기 점검입니다. 화면을 고치기 전에 아래 두 가지를 차례로 합니다. 이 점검은 이번 번호의 완료 기준(펼치면 원문이 보임)에 필요한 일이라 뒤 번호 기능이 아닙니다. 근거 답과 대조 기록을 저장하고 꺼내는 요청에서 상태 읽기를 `read`로 바꿀 때 빠졌을 수 있는 일을 채우는 것입니다.
 
-1. `src/gemini-result.store.ts`를 열어 `getStatus`가 Google `read` 답의 `gemini_results` 줄을 판독 결과로 바꾸는 곳(앱에 따라 `normalizeGoogleResults` 같은 이름)을 찾습니다. 그곳이 `result`·`images`를 글자 그대로 판독 결과 검사(`normalizeGeminiResult`)나 목록 검사에 넘기면, Google 저장(`STORAGE_MODE=live`)에서 검사가 `null`을 돌려 "저장된 판독 결과를 읽을 수 없습니다." 예외가 납니다. 그러면 아래 코드 참고에 나온 만큼 글을 먼저 풀도록 고칩니다("Google 쪽 코드"의 "한 번에 읽기"). 이미 풀고 있으면 그대로 둡니다.
+1. `src/gemini-result.store.ts`를 열어 `getStatus`가 Google `read` 답의 `gemini_results` 줄을 판독 결과로 바꾸는 곳(웹 서비스에 따라 `normalizeGoogleResults` 같은 이름)을 찾습니다. 그곳이 `result`·`images`를 글자 그대로 판독 결과 검사(`normalizeGeminiResult`)나 목록 검사에 넘기면, Google 저장(`STORAGE_MODE=live`)에서 검사가 `null`을 돌려 "저장된 판독 결과를 읽을 수 없습니다." 예외가 납니다. 그러면 아래 코드 참고에 나온 만큼 글을 먼저 풀도록 고칩니다("Google 쪽 코드"의 "한 번에 읽기"). 이미 풀고 있으면 그대로 둡니다.
 2. 끝났다고 알릴 때 1에서 본 것(글을 푸는 처리를 더했는지, 이미 있었는지)을 한 줄로 함께 적습니다. 서버를 켜서 볼 수 있으면 판독 결과가 있는 검사로 `GET /api/inspections/(검사번호)/evidence`와 `GET /api/inspections/(검사번호)/gemini`가 오류 없이 답하는지 봅니다.
 
 코드 참고: 4회차 완료 코드(`class/milestone-4`)에서는 `src/gemini-result.store.ts`의 `getStatus`가 `readResults`를 거쳐 Google 쪽 `listGeminiResults`로 읽었고, JSON 글은 `gas/Code.js`의 `parseGeminiJsonCell`이 풀었습니다. `read`는 이 풀기를 하지 않으므로 서버에서 아래만큼 더합니다. 적용 범위는 `read`로 읽은 판독 결과 줄을 판독 결과 모양으로 바꾸는 한 곳이고, 화면과 Google 쪽 코드는 고치지 않습니다.
@@ -365,15 +365,15 @@ AI·NotebookLM이 준 글은 HTML로 넣지 말고 글자로 넣습니다.
 
 ## 만들지 않는 것
 
-아래 기능은 혼자 쓰는 연습용 앱이라 기본으로는 만들지 않습니다. 사용자가 부탁하면 만듭니다.
+아래 기능은 혼자 쓰는 연습용 웹 서비스라 기본으로는 만들지 않습니다. 사용자가 부탁하면 만듭니다.
 
-- 근거 질문의 접힌 "전달 내용 보기"(묻기 전에 보낼 글을 미리 보기): 혼자 쓰는 연습용 앱이라 기본으로는 만들지 않습니다. 물은 뒤의 "NotebookLM에 보낸 질문 보기"로 같은 글을 봅니다.
-- 지난 근거 답 목록 주소(답마다 마지막 대조 기록 붙이기): 혼자 쓰는 연습용 앱이라 기본으로는 만들지 않습니다. 쓰는 화면이 없습니다.
-- NotebookLM "연결됨" 추적(첫 성공 뒤에만 "정상 연결"), 연결 상태 주소(`GET /api/notebooklm/status`), 설정 화면의 "NotebookLM 연결 상태" 카드, 3번 탭의 연결 정보: 혼자 쓰는 연습용 앱이라 기본으로는 만들지 않습니다. 3번 탭은 `mode` 하나만 씁니다("연결 상태").
-- 답 글 꾸미기(굵은 글, 목록, 인용, 기울임, 소제목, 구분선을 기호 없이 보이기): 혼자 쓰는 연습용 앱이라 기본으로는 만들지 않습니다. 답은 받은 글자 그대로 보여 줍니다("화면 안전").
-- 2번 탭 배지 "대조 기록 확인 실패"와 2번 탭 상태 답의 `link_error`: 혼자 쓰는 연습용 앱이라 기본으로는 만들지 않습니다.
-- 2번 탭 배지 "검토 필요(이전 버전)": 혼자 쓰는 연습용 앱이라 기본으로는 만들지 않습니다. 그때는 "다시 판독 필요"를 보여 줍니다.
-- 2번 탭 배지 "확인하는 중"(불러오는 동안): 혼자 쓰는 연습용 앱이라 기본으로는 만들지 않습니다.
-- 판독 중이거나 상태를 불러오기 전에 "근거 확인"을 끄고 "판독이 끝나면 누를 수 있다"고 안내하기, 3번 탭 상태 답(`GET /api/inspections/(검사번호)/evidence`)의 `running`: 혼자 쓰는 연습용 앱이라 기본으로는 만들지 않습니다.
+- 근거 질문의 접힌 "전달 내용 보기"(묻기 전에 보낼 글을 미리 보기): 혼자 쓰는 연습용 웹 서비스라 기본으로는 만들지 않습니다. 물은 뒤의 "NotebookLM에 보낸 질문 보기"로 같은 글을 봅니다.
+- 지난 근거 답 목록 주소(답마다 마지막 대조 기록 붙이기): 혼자 쓰는 연습용 웹 서비스라 기본으로는 만들지 않습니다. 쓰는 화면이 없습니다.
+- NotebookLM "연결됨" 추적(첫 성공 뒤에만 "정상 연결"), 연결 상태 주소(`GET /api/notebooklm/status`), 설정 화면의 "NotebookLM 연결 상태" 카드, 3번 탭의 연결 정보: 혼자 쓰는 연습용 웹 서비스라 기본으로는 만들지 않습니다. 3번 탭은 `mode` 하나만 씁니다("연결 상태").
+- 답 글 꾸미기(굵은 글, 목록, 인용, 기울임, 소제목, 구분선을 기호 없이 보이기): 혼자 쓰는 연습용 웹 서비스라 기본으로는 만들지 않습니다. 답은 받은 글자 그대로 보여 줍니다("화면 안전").
+- 2번 탭 배지 "대조 기록 확인 실패"와 2번 탭 상태 답의 `link_error`: 혼자 쓰는 연습용 웹 서비스라 기본으로는 만들지 않습니다.
+- 2번 탭 배지 "검토 필요(이전 버전)": 혼자 쓰는 연습용 웹 서비스라 기본으로는 만들지 않습니다. 그때는 "다시 판독 필요"를 보여 줍니다.
+- 2번 탭 배지 "확인하는 중"(불러오는 동안): 혼자 쓰는 연습용 웹 서비스라 기본으로는 만들지 않습니다.
+- 판독 중이거나 상태를 불러오기 전에 "근거 확인"을 끄고 "판독이 끝나면 누를 수 있다"고 안내하기, 3번 탭 상태 답(`GET /api/inspections/(검사번호)/evidence`)의 `running`: 혼자 쓰는 연습용 웹 서비스라 기본으로는 만들지 않습니다.
 
 끝 표시: `5회차-종이노트-` 뒤에 "NotebookLM 도구 부르기"의 도구 버전을 붙입니다.
