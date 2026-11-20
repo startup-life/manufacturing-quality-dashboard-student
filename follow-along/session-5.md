@@ -16,10 +16,10 @@
 
 ## 시작 전에
 
-**5-1은 Cline Desktop에서 진행합니다. 5-2~5-3은 Antigravity, 5-4~5-18은 Cline Desktop을 사용합니다.** 도구를 바꿔도 같은 앱 폴더를 사용합니다. 실행 중인 서버 창과 ego 브라우저는 그대로 열어 둡니다.
+**5-1은 Cline Desktop에서 진행합니다. 5-2~5-3은 Antigravity, 5-4~5-18은 Cline Desktop을 사용합니다.** 도구를 바꿔도 같은 웹 서비스 폴더를 사용합니다. 실행 중인 서버 창과 ego 브라우저는 그대로 열어 둡니다.
 
-- 시작 상태: 4회차를 끝낸 앱 폴더 `C:\ai-class\tumbler-factory`에서 시작합니다. 5-1에서 AI가 수업 저장소의 `milestone-4` 브랜치에서 프로젝트 규칙(`AGENTS.md`)과 5회차 보충 문서를 가져옵니다.
-- 준비물: NotebookLM에 로그인할 Google 계정(3회차부터 쓴 수업 계정이면 됩니다), AI 도구에서 연 앱 폴더, 명령 창, ego 브라우저, Chrome(NotebookLM 로그인 도구가 씁니다), 인터넷.
+- 시작 상태: 4회차를 끝낸 웹 서비스 폴더 `C:\ai-class\tumbler-factory`에서 시작합니다. 5-1에서 AI가 수업 저장소의 `milestone-4` 브랜치에서 프로젝트 규칙(`AGENTS.md`)과 5회차 보충 문서를 가져옵니다.
+- 준비물: NotebookLM에 로그인할 Google 계정(3회차부터 쓴 수업 계정이면 됩니다), AI 도구에서 연 웹 서비스 폴더, 명령 창, ego 브라우저, Chrome(NotebookLM 로그인 도구가 씁니다), 인터넷.
 - 5-2~5-3의 NotebookLM 준비가 막히면 그 번호의 "막히면"대로 AI에게 맡겨 봅니다. 오늘 안에 안 되면 맨 아래 「참고」의 "NotebookLM을 오늘 연결하지 못했으면"대로 AI에게 `.env` 한 줄을 바꿔 달라고 한 뒤 5-4부터 이어 갑니다.
 - `uv`, `nlm`은 NotebookLM 도구를 설치하고 쓰는 프로그램입니다.
 - 이 회차에 새로 나오는 말: **NotebookLM**은 내가 올린 문서 안에서 답을 찾아 주는 Google 서비스입니다(화면에는 Gemini Notebook으로 보일 수 있습니다). 문서를 모아 두는 곳이 **노트북**(노트북마다 긴 번호인 노트북 ID가 있습니다), 노트북에 올린 문서가 **소스**입니다. **근거 확인**은 판독 결과에 쓴 검사기준을 NotebookLM에 물어 답을 받는 일, **출처 대조**는 그 답을 내가 검사기준 원문과 비교해 "일치"나 "검토 필요"로 남기는 일입니다. **3번 탭**은 검사 상세의 "③ 검사기준과 비교하기" 탭입니다.
@@ -33,7 +33,7 @@
 아래를 차례로 합니다.
 
 1. 명령 창 열기: PowerShell을 열고 `cd C:\ai-class\tumbler-factory`를 칩니다. 이 창이 명령 창입니다.
-2. Cline Desktop에서 앱 폴더를 열고 새 대화를 시작합니다.
+2. Cline Desktop에서 웹 서비스 폴더를 열고 새 대화를 시작합니다.
 3. 서버 켜기: 서버 창이 없거나 서버가 꺼져 있으면 5-1(지침 세팅)을 보낸 뒤 AI 도구에 "화면 서버를 켜 주세요."라고 보냅니다. 그다음 ego 브라우저에서 http://127.0.0.1:4185 를 열어 `writer` / `writer1234!`로 로그인합니다. 홈에서 검사 카드 하나를 눌러 2번 탭에 4회차 판독 결과가 보이는지 봅니다.
 
 ## 5-1. 지침 세팅 (Cline Desktop)
@@ -43,14 +43,14 @@
 그다음 AGENTS.md를 작업 지침으로 삼아 주세요. 프롬프트에 없는 상세 구현은 docs/guide의 회차 문서와 그 회차 완료 브랜치 코드(class/milestone-5)에서 확인합니다.
 지금은 AGENTS.md와 docs/guide의 session-1.md부터 session-5.md까지를 읽기만 하고, 읽은 문서의 끝 표시를 모두 한 줄로 이어서 알려 주세요.
 ```
-- 하는 일: 앱 폴더에 5회차 보충 문서가 들어오고, AI가 1~5회차 문서를 읽었다는 끝 표시를 알려 줍니다.
+- 하는 일: 웹 서비스 폴더에 5회차 보충 문서가 들어오고, AI가 1~5회차 문서를 읽었다는 끝 표시를 알려 줍니다.
 - 목표: AI가 이번 회차의 세부 조건을 보충 문서와 완료 코드에서 찾아 따르게 합니다. 5-1은 Cline Desktop에서 한 번 진행합니다. 이후 도구를 바꿀 때는 해당 단계의 상자 전체를 한 번에 보냅니다.
 - 완료 기준: 탐색기의 `docs\guide` 폴더에 `session-5.md`가 새로 생깁니다(`files` 폴더가 함께 있어도 맞습니다). AI 답의 마지막 줄에 `1회차-은색컵-4185 2회차-저울눈금-354 3회차-초록시트-Asia/Seoul 4회차-노란배지-gemini-3.8-flash 5회차-종이노트-0.15.6`이 한 줄로 이어 보입니다. 끝 표시의 숫자는 서버 번호와 상관없습니다.
 - 막히면: 보이지 않거나 글자가 다르면 한 번 더 보냅니다. 그래도 같으면 AI에게 "지침을 다시 맞추기 위해, `class/milestone-4`의 `AGENTS.md`와 `docs/guide`를 다시 가져와(지금 브랜치는 그대로 둡니다) `AGENTS.md`와 `docs/guide`의 `session-1.md`부터 `session-5.md`까지를 처음부터 다시 읽고, 읽은 문서의 끝 표시를 모두 한 줄로 이어서 알려 주세요."라고 보냅니다.
 
 ## 5-2. NotebookLM 도구 설치와 로그인 (할 일) (Antigravity)
 
-Antigravity에서 같은 앱 폴더를 열고 새 대화를 시작합니다. **Gemini 3.8 Flash**와 추론 단계 **Low**를 고릅니다. 화면을 공유 중이면 먼저 공유를 멈춥니다. 5-3까지 끝낸 뒤 다시 공유합니다. 그다음 아래 상자를 구분선 아래까지 한 번에 보냅니다.
+Antigravity에서 같은 웹 서비스 폴더를 열고 새 대화를 시작합니다. **Gemini 3.8 Flash**와 추론 단계 **Low**를 고릅니다. 화면을 공유 중이면 먼저 공유를 멈춥니다. 5-3까지 끝낸 뒤 다시 공유합니다. 그다음 아래 상자를 구분선 아래까지 한 번에 보냅니다.
 
 ```text
 NotebookLM에 질문할 도구를 쓰기 위해, NotebookLM 도구(notebooklm-mcp-cli 0.15.6)를 설치하고 수업 계정으로 로그인할 창을 열어 주세요.
@@ -58,8 +58,8 @@ NotebookLM에 질문할 도구를 쓰기 위해, NotebookLM 도구(notebooklm-mc
 자세한 내용은 docs/guide/session-5.md의 "NotebookLM 도구 설치와 로그인"을 참고해 주세요.
 
 ---
-Cline Desktop에서 5-1까지 이번 회차 지침과 보충 문서를 앱 폴더로 가져왔습니다.
-같은 앱 폴더의 AGENTS.md와 docs/guide/session-5.md를 참고해 주세요. 지금은 따라하기 교재의 5-2입니다. https://github.com/startup-life/manufacturing-quality-dashboard-student/blob/main/follow-along/session-5.md
+Cline Desktop에서 5-1까지 이번 회차 지침과 보충 문서를 웹 서비스 폴더로 가져왔습니다.
+같은 웹 서비스 폴더의 AGENTS.md와 docs/guide/session-5.md를 참고해 주세요. 지금은 따라하기 교재의 5-2입니다. https://github.com/startup-life/manufacturing-quality-dashboard-student/blob/main/follow-along/session-5.md
 ```
 
 - 하는 일: 이 PC에 NotebookLM 도구(`nlm`)가 설치되고 수업 계정으로 로그인됩니다.
@@ -101,7 +101,7 @@ Cline Desktop에서 5-1까지 이번 회차 지침과 보충 문서를 앱 폴�
 
 **여기서 Cline Desktop으로 돌아갑니다. 5-18까지 이 대화에서 진행합니다.**
 
-5-1에서 사용한 Cline Desktop 대화를 다시 열고, 같은 앱 폴더에서 아래 상자 전체를 한 번에 보냅니다. Antigravity 대화는 닫지 않고 둡니다(5-12에서 다시 쓸 수 있습니다).
+5-1에서 사용한 Cline Desktop 대화를 다시 열고, 같은 웹 서비스 폴더에서 아래 상자 전체를 한 번에 보냅니다. Antigravity 대화는 닫지 않고 둡니다(5-12에서 다시 쓸 수 있습니다).
 
 ```text
 근거 확인을 끄거나 연습용으로 돌리도록, 서버에 근거 확인 방식 스위치와 서버 창의 "연동 상태" 줄을 추가해 주세요.
