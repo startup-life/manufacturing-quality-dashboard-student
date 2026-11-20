@@ -6,6 +6,12 @@
 - 앞 회차 문서와 다르면 번호가 큰 문서를 따릅니다. 이 회차가 바꾸는 앞 회차 약속: 보고서 검토 대기 기준(4회차 문서 "다시 판독 필요와 검토 대기"의 "검토 대기")은 이 문서 "홈과 2번 탭 배지"의 기준으로 바꿉니다. 2번 탭 배지(4회차에 만든 배지)는 이 문서 "홈과 2번 탭 배지"의 순서를 따릅니다. Google 쪽 일 목록(3회차 문서의 "Google 쪽 일 여섯 가지", 4회차 문서의 "Google 쪽에 더할 일")에 이 문서 "Google 쪽 코드"의 네 가지를 더합니다. 시트의 탭 목록(3회차 문서의 "Google 쪽 일 여섯 가지"와 "서버가 Google을 쓰는 법", 4회차 문서의 "판독 결과와 저장")에 이 문서 "근거 답과 대조 기록 저장"의 두 탭을 더합니다. 지시문 주소와 수정본 파일(4회차 문서의 "원문 파일과 수정본")은 이 문서 "근거 질문 저장"의 종류 이름을 받습니다. 2번 탭 상태 답(4회차 문서 "진행 상태와 잠금"의 `GET /api/inspections/(검사번호)/gemini`)과 판독 시작의 답에는 이 문서 "홈과 2번 탭 배지"의 `link` 항목을 더합니다. 4회차까지 안내 글만 있던 3번 탭은 이 문서 "3번 탭: 근거 확인"과 "3번 탭: 출처 대조"대로 채웁니다. Google 쪽 계산(4회차 문서의 "다시 판독 필요와 검토 대기")은 이 문서 "Google 쪽 코드"의 "다른 일"을 따릅니다.
 - 맨 끝의 끝 표시를 만들어 `AGENTS.md`가 말한 대로 답의 마지막 줄에 적습니다.
 
+## 따라하기 단계와 도구 전환
+
+단계 번호는 [5회차 따라하기 교재](https://github.com/startup-life/manufacturing-quality-dashboard-student/blob/main/follow-along/session-5.md)를 기준으로 합니다. 5-1은 Cline Desktop에서 지침과 문서를 가져오고, 5-2~5-3은 Antigravity에서 NotebookLM 도구 설치·로그인과 노트북 준비를 하고, 5-4~5-18은 다시 Cline Desktop에서 같은 앱 폴더를 사용합니다.
+
+5-2와 5-4의 프롬프트에서 `---` 아래 두 줄은 앞 도구에서 마친 일과 현재 교재 위치입니다. 해당 파일과 설정을 이어 쓰고 구분선 위의 요청을 진행합니다. 5-4에서는 `.env`의 `NOTEBOOKLM_MODE`, 노트북 ID, 도구 경로를 지금 값 그대로 씁니다. `NOTEBOOKLM_MODE=off`이면 노트북 ID와 도구 경로가 비어 있어도 채우지 않습니다.
+
 ## 이번 회차가 끝나면 되는 것
 
 검사 상세 3번 탭에서 "근거 확인"을 누르면 내 NotebookLM 노트북(교육용 검사기준 Rev.A·Rev.B)에 질문하고, 답과 검사기준 원문을 함께 보여 줍니다. 답을 원문과 대조해 "일치" 또는 "검토 필요"로 저장하면 2번 탭 배지와 홈 "보고서 검토 대기"가 그 기록을 따릅니다. 설정 화면에서 근거 질문(v1~v3)을 고쳐 저장합니다.
@@ -44,12 +50,27 @@ NotebookLM 근거 대조 스위치는 `.env`의 `NOTEBOOKLM_MODE`입니다. 서�
 | NotebookLM | `mock` | 모의 응답 |
 | NotebookLM | `live` | 실제 질의 |
 
+## NotebookLM 도구 설치와 로그인
+
+| 항목 | 약속 |
+|---|---|
+| 설치 | `uv --version`으로 uv가 있는지 보고, 없으면 표 아래 상자의 명령으로 설치합니다. 그다음 `uv tool install notebooklm-mcp-cli==0.15.6`으로 NotebookLM 도구를 설치하고 `nlm --version`이 `nlm version 0.15.6`인지 봅니다. 다른 버전이 이미 있으면 `uv tool install --force notebooklm-mcp-cli==0.15.6`으로 바꿉니다. `Update available`이나 `uv tool upgrade` 안내가 나와도 올리지 않습니다 |
+| 명령을 찾지 못할 때 | 설치 뒤 `uv`나 `nlm`을 찾지 못하면 1회차 문서 "화면 서버 켜기"의 경로 다시 읽기 한 줄(`$env:Path = …`)을 실행한 뒤 다시 부릅니다. `nlm`을 그래도 찾지 못하면 `uv tool update-shell`을 실행하고 그 한 줄을 다시 실행합니다. 그래도 찾지 못하면 실행 파일 전체 경로(보통 `$env:USERPROFILE\.local\bin` 아래)로 부릅니다 |
+| 로그인 | `nlm login --storage protected`를 실행합니다. 이 명령은 NotebookLM 로그인용 Chrome 창을 띄우고 로그인이 끝날 때까지 최대 5분 기다립니다. 그 창은 AI 도구로 누를 수 없으니 사용자에게 그 창에서 수업 계정으로 로그인해 달라고 알립니다. 사용자가 마쳤다고 하면 `nlm login --check`가 `Authentication valid!`를 보이는지 봅니다. 이 출력에는 메일 주소가 들어 있으니 답에는 확인한 결과만 적습니다 |
+| 다시 로그인 | 5분이 지나 로그인 명령이 끝났거나 `nlm login --check`가 `Authentication failed`를 보이면 로그인 명령을 다시 실행합니다 |
+| 서버 다시 켜기 | 설치와 로그인을 마치면 1회차 문서 "화면 서버 켜기"의 "프로그램을 새로 설치한 뒤"대로 서버를 끄고 새 창에서 켭니다. 새로 설치한 프로그램을 서버가 찾게 하려는 것입니다 |
+
+```powershell
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
 ## NotebookLM 도구 부르기
 
 | 항목 | 약속 |
 |---|---|
 | 도구와 버전 | `notebooklm-mcp-cli` 0.15.6으로 고정합니다 |
-| 노트북 ID와 경로 받기 | 사용자가 채팅으로 준 노트북 ID와 도구 실행 파일 경로는 `.env`의 아래 두 줄에 넣습니다. 앞뒤에 공백이나 따옴표를 넣지 않습니다. 상자의 괄호 자리가 비었거나 안내 글 그대로면 AI가 찾아 넣습니다. 노트북 ID는 `nlm notebook list`에서 Title이 "텀블러 품질 기준(교육용)"이고 소스(Src)가 2인 줄의 ID이고(여럿이면 맨 위), 경로는 `Join-Path (uv tool dir --bin) notebooklm-mcp.exe`가 보여 주는 값입니다 |
+| 노트북 만들기 | 프롬프트가 노트북을 만들어 달라고 하면 `nlm notebook create "텀블러 품질 기준(교육용)"`로 만들고, 나온 `notebook_id` 값으로 `nlm source add (노트북 ID) --file standards\notebooklm-Rev.A.md --wait`와 `nlm source add (노트북 ID) --file standards\notebooklm-Rev.B.md --wait`를 하나씩 실행합니다. 같은 제목의 노트북이 이미 있어도 새로 만들어지니 방금 만든 노트북의 ID를 씁니다 |
+| 노트북 ID와 경로 받기 | 노트북 ID와 도구 실행 파일 경로는 `.env`의 아래 두 줄에 넣습니다. 앞뒤에 공백이나 따옴표를 넣지 않습니다. 노트북 ID는 방금 만든 노트북의 ID를 쓰고, 만들지 않았으면 사용자가 채팅으로 준 ID를, 그것도 없으면 `nlm notebook list`에서 Title이 "텀블러 품질 기준(교육용)"이고 소스(Src)가 2인 줄의 ID를 씁니다(여럿이면 맨 위). 경로는 `Join-Path (uv tool dir --bin) notebooklm-mcp.exe`가 보여 주는 값이고, 넣기 전에 `Test-Path`로 `True`인지 봅니다 |
 | 서버 창에 내지 않는 값 | 노트북 ID, 도구 실행 파일 경로, `nlm` 출력은 서버 창과 앱 화면에 옮겨 적지 않습니다 |
 | 노트북 ID | `.env`의 `NOTEBOOKLM_NOTEBOOK_ID` |
 | 도구 실행 파일 | `.env`의 `NOTEBOOKLM_MCP_COMMAND`(`notebooklm-mcp.exe` 전체 경로) |
