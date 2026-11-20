@@ -2,7 +2,7 @@
 
 ## 3회차 완성 화면
 
-이번 회차가 끝나면 대시보드에서 등록한 검사를 **Google Apps Script(GAS) 웹앱**이 받아 저장합니다. 검사 기록은 Google 시트에 한 줄로 남고, 사진 두 장은 Google 드라이브에 저장됩니다. 대시보드에서 같은 검사를 다시 열면 저장한 중량과 사진을 볼 수 있습니다.
+이번 회차가 끝나면 대시보드에서 등록한 검사를 **Google Apps Script(GAS) 웹앱**이 받아 저장합니다. 검사 기록은 Google 시트(내 Google 계정의 표 문서)에 한 줄로 남고, 사진 두 장은 Google 드라이브(내 Google 계정의 파일 보관함)에 저장됩니다. 대시보드에서 같은 검사를 다시 열면 저장한 중량과 사진을 볼 수 있습니다.
 
 ### Apps Script 프로젝트와 대시보드의 저장 설정
 
@@ -42,11 +42,11 @@ Google 드라이브의 검사 사진 폴더에 저장된 검정 텀블러 사진
 
 - 시작 상태: 2회차를 끝낸 웹 서비스 폴더 `C:\ai-class\tumbler-factory`에서 시작합니다.
 - 준비물: AI 도구에서 연 웹 서비스 폴더, 수업에 쓸 개인 Google 계정(이 글에서 "수업 계정"이라고 부릅니다. 이 회차의 Google 화면에서는 모두 이 계정을 고릅니다)으로 로그인한 ego 브라우저, 인터넷, 2회차에 받은 사진 저장소(`C:\ai-class\manufacturing-quality-student-images`).
-- 꼭 지킬 것: 웹앱 주소는 서버가 Google 쪽 코드에 일을 시킬 때 쓰는 주소입니다. 이 주소를 아는 사람은 누구나 내 시트와 사진을 읽고 쓸 수 있습니다. 주소는 `.env`에만 두고 화면 공유, 메신저, 문서에 옮기지 않습니다.
-- 이 회차에 새로 나오는 말: **Google 쪽 코드(Apps Script)**는 내 컴퓨터가 아니라 Google에서 돌아가는 코드입니다. 웹 서비스 폴더의 `gas` 폴더에 만들고 명령으로 Google에 올립니다. **`.env`**는 웹 서비스 폴더에 두는 설정 파일로, 웹앱 주소 같은 비밀 값이 들어갑니다. 고쳐야 하면 AI에게 맡깁니다.
+- 꼭 지킬 것: Apps Script 웹앱 주소는 서버가 Apps Script 코드에 일을 시킬 때 쓰는 주소입니다. 이 주소를 아는 사람은 누구나 내 시트와 사진을 읽고 쓸 수 있습니다. 주소는 `.env`에만 두고 화면 공유, 메신저, 문서에 옮기지 않습니다.
+- 이 회차에 새로 나오는 말: **Apps Script 코드**는 내 컴퓨터가 아니라 Google에서 돌아가는 코드입니다. 웹 서비스 폴더의 `gas` 폴더에 만들고 명령으로 Google에 올립니다. **`.env`**는 웹 서비스 폴더에 두는 설정 파일로, 웹앱 주소 같은 비밀 값이 들어갑니다. 고쳐야 하면 AI에게 맡깁니다.
 - Google에 저장하면 홈을 여는 데 5~10초, 저장 한 번에 10초쯤 걸립니다. 내 컴퓨터에 저장할 때보다 느린 것이 정상입니다.
 
-2회차를 마친 웹 서비스는 3-1~3-5에서 저장 방식과 Google 명령을 먼저 준비합니다. 이 준비를 이미 마친 웹 서비스는 3-6부터 이어갑니다.
+2회차를 마친 웹 서비스는 3-1~3-5에서 저장 방식과 Apps Script 명령(npm.cmd run gas:로 시작하는 명령)을 먼저 준비합니다. 이 준비를 이미 마친 웹 서비스는 3-6부터 이어갑니다.
 
 1. Cline Desktop에서 2회차 웹 서비스 폴더를 열고 새 대화를 시작합니다.
 2. 서버가 꺼져 있으면 3-1의 지침을 보낸 뒤 AI에게 “화면 서버를 켜 주세요.”라고 보냅니다. ego 브라우저에서 [대시보드](http://127.0.0.1:4185)를 열고 `writer` / `writer1234!`로 로그인합니다. 2회차 홈의 숫자 카드와 검사 카드가 보이면 됩니다.
@@ -54,14 +54,14 @@ Google 드라이브의 검사 사진 폴더에 저장된 검정 텀블러 사진
 ## 3-1. 지침 세팅 (Cline Desktop)
 
 ```text
-이번 회차 문서를 이 프로젝트로 가져오기 위해, 수업 저장소(class)를 다시 받아 class/milestone-2의 AGENTS.md와 docs/guide를 이 프로젝트로 가져와 주세요(지금 브랜치는 그대로 두고 그 파일과 폴더만 가져옵니다).
-그다음 AGENTS.md를 작업 지침으로 삼아 주세요. 프롬프트에 없는 상세 구현은 docs/guide의 회차 문서와 그 회차 완료 브랜치 코드(class/milestone-3)에서 확인합니다.
+이번 회차 문서를 이 프로젝트로 가져오기 위해, class(수업 저장소)를 다시 받아 class/milestone-2의 AGENTS.md와 docs/guide를 이 프로젝트로 가져와 주세요(지금 브랜치는 그대로 두고 그 파일과 폴더만 가져옵니다).
+그다음 AGENTS.md를 작업 지침으로 삼아 주세요. 프롬프트에 없는 상세 구현은 docs/guide의 회차 문서와 그 회차 class/milestone-3(완료 브랜치 코드)에서 확인합니다.
 지금은 AGENTS.md와 docs/guide의 session-1.md부터 session-3.md까지를 읽기만 하고, 읽은 문서의 끝 표시를 모두 한 줄로 이어서 알려 주세요.
 ```
 
 - 하는 일: 웹 서비스 폴더에 3회차 보충 문서가 들어오고, AI가 1~3회차 문서를 읽었다는 끝 표시를 알려 줍니다.
 - 목표: AI가 이번 회차의 세부 조건을 보충 문서와 완료 코드에서 찾아 따르게 합니다. 3-1은 Cline Desktop에서 한 번 진행합니다. 이후 도구를 바꿀 때는 해당 단계의 상자 전체를 한 번에 보냅니다.
-- 완료 기준: 탐색기의 `docs\guide` 폴더에 `session-3.md`가 새로 생깁니다(`files` 폴더가 함께 있어도 맞습니다). AI 답의 마지막 줄에 `1회차-은색컵-4185 2회차-저울눈금-354 3회차-초록시트-Asia/Seoul`이 한 줄로 이어 보입니다. 끝 표시의 숫자는 서버 번호와 상관없습니다.
+- 완료 기준: 파일 탐색기(폴더와 파일을 보는 Windows 프로그램)의 `docs\guide` 폴더에 `session-3.md`가 새로 생깁니다(`files` 폴더가 함께 있어도 맞습니다). AI 답의 마지막 줄에 `1회차-은색컵-4185 2회차-저울눈금-354 3회차-초록시트-Asia/Seoul`이 한 줄로 이어 보입니다. 끝 표시의 숫자는 서버 번호와 상관없습니다.
 
 <details>
 <summary>지침을 보냈는데 끝 표시가 없거나 글자가 다를 때</summary>
@@ -87,35 +87,35 @@ Google에 실제로 저장하는 기능은 뒤 번호에서 만듭니다.
 
 3-2 저장소: 내 컴퓨터(mock)가 보이는 설정 화면
 
-## 3-3. Google 명령 1: 로그인·만들기·올리기 (Cline Desktop)
+## 3-3. Apps Script 명령 1: 로그인·만들기·올리기 (Cline Desktop)
 
 ```text
-Google 쪽 코드를 명령 한 줄로 다루기 위해, 웹 서비스에 gas:login, gas:create, gas:push 명령을 추가해 주세요.
+Apps Script 코드를 명령 한 줄로 다루기 위해, 웹 서비스에 gas:login, gas:create, gas:push 명령을 추가해 주세요.
 지금은 만들기만 합니다.
-자세한 내용은 docs/guide/session-3.md의 "Google 명령"을 참고해 주세요.
+자세한 내용은 docs/guide/session-3.md의 "Apps Script 명령"을 참고해 주세요.
 ```
 
 - 하는 일: 웹 서비스에 `gas:login`, `gas:create`, `gas:push` 명령이 생깁니다. 아직 실행하지 않습니다.
-- 목표: 명령 창에서 Google에 로그인하고, Google 쪽 프로젝트를 만들고, 코드를 올리게 합니다.
+- 목표: 명령 창에서 Google에 로그인하고, Apps Script 프로젝트(Google에서 코드를 보관하고 실행하는 프로젝트)를 만들고, 코드를 올리게 합니다.
 - 완료 기준: 웹 서비스 폴더의 `package.json`에 `gas:login`, `gas:create`, `gas:push`가 등록되어 있습니다.
 
-## 3-4. Google 명령 2: 웹앱 배포 (Cline Desktop)
+## 3-4. Apps Script 명령 2: 웹앱 배포 (Cline Desktop)
 
 ```text
-서버가 Google 쪽 코드에 일을 시킬 주소를 만들기 위해, 웹 서비스에 gas:deploy, gas:redeploy 명령을 추가해 주세요.
+서버가 Apps Script 코드에 일을 시킬 주소를 만들기 위해, 웹 서비스에 gas:deploy, gas:redeploy 명령을 추가해 주세요.
 지금은 만들기만 합니다.
-자세한 내용은 docs/guide/session-3.md의 "Google 명령"을 참고해 주세요.
+자세한 내용은 docs/guide/session-3.md의 "Apps Script 명령"을 참고해 주세요.
 ```
 
 - 하는 일: 웹 서비스에 `gas:deploy`, `gas:redeploy` 명령이 생깁니다. 아직 실행하지 않습니다.
-- 목표: 서버가 Google 쪽 코드에 일을 시킬 웹앱 주소를 만들고, 코드를 고친 뒤 같은 주소를 새 버전으로 바꾸게 합니다.
+- 목표: 서버가 Apps Script 코드에 일을 시킬 웹앱 주소를 만들고, 코드를 고친 뒤 같은 주소를 새 버전으로 바꾸게 합니다.
 - 완료 기준: 웹 서비스 폴더의 `package.json`에 `gas:deploy`와 `gas:redeploy`가 등록되어 있습니다.
 
-## 3-5. Google 명령 3: 열기·시트 준비 (Cline Desktop)
+## 3-5. Apps Script 명령 3: 열기·시트 준비 (Cline Desktop)
 
 ```text
 권한 승인과 시트 준비를 명령 한 줄로 하기 위해, 웹 서비스에 gas:open, gas:init 명령을 추가해 주세요.
-자세한 내용은 docs/guide/session-3.md의 "Google 명령"을 참고해 주세요.
+자세한 내용은 docs/guide/session-3.md의 "Apps Script 명령"을 참고해 주세요.
 ```
 
 - 하는 일: 웹 서비스에 `gas:open`, `gas:init` 명령이 생깁니다. 웹앱 주소가 아직 없어 지금 치면 안내만 나옵니다.
@@ -153,12 +153,12 @@ clasp가 처음이면 npx로 수업 버전(3.4.1)을 받아 주세요. 이미 �
 그 상태에서 npm.cmd run gas:login을 실행하고, 로그인 주소를 알려 준 뒤 로그인이 끝날 때까지 기다려 주세요.
 
 ---
-Cline Desktop에서 3-5까지 Google 명령을 준비했고, 3-6은 Ego에서 수업 계정의 Apps Script API를 켰습니다.
+Cline Desktop에서 3-5까지 Apps Script 명령을 준비했고, 3-6은 Ego에서 수업 계정의 Apps Script API를 켰습니다.
 같은 웹 서비스 폴더의 AGENTS.md와 docs/guide/session-3.md를 참고해 주세요. 지금은 따라하기 교재의 3-7입니다. https://github.com/startup-life/manufacturing-quality-dashboard-student/blob/main/follow-along/session-3.md
 ```
 
-- 하는 일: 내 컴퓨터의 연결 도구(clasp)를 수업용 Google 계정에 연결합니다.
-- 목표: 다음 단계에서 이 계정에 Google 프로젝트를 만들 수 있게 합니다.
+- 하는 일: clasp(내 컴퓨터의 연결 도구)를 수업용 Google 계정에 연결합니다.
+- 목표: 다음 단계에서 이 계정에 Apps Script 프로젝트를 만들 수 있게 합니다.
 
 1. 열린 브라우저에서 **3-6에서 확인한 수업 계정**을 선택합니다. 브라우저가 열리지 않으면 AI가 알려 준 로그인 주소를 ego 브라우저에 붙여 넣습니다.
 
@@ -198,12 +198,12 @@ clasp 버전 3.4.1과 로그인 성공 메시지
 
 </details>
 
-## 3-8. Google 프로젝트 만들기 (할 일) (Antigravity)
+## 3-8. Apps Script 프로젝트 만들기 (할 일) (Antigravity)
 
 AI에게 아래 문장을 보냅니다.
 
 ```text
-Google 쪽 코드를 올릴 프로젝트를 만들기 위해 npm.cmd run gas:create를 실행해 주세요.
+Apps Script 코드를 올릴 프로젝트를 만들기 위해 npm.cmd run gas:create를 실행해 주세요.
 이미 프로젝트가 있으면 새로 만들지 말고 알려 주세요.
 ```
 
@@ -219,9 +219,9 @@ Google 쪽 코드를 올릴 프로젝트를 만들기 위해 npm.cmd run gas:cre
 
 - 완료 기준: 목록에 **tumbler-factory**가 보입니다. 같은 이름이 여럿이면 수정 시간이 가장 최근인 것을 봅니다.
 
-![Google 프로젝트가 생성된 뒤의 터미널 메시지](images/session-3/terminal-full-03.png)
+![Apps Script 프로젝트가 생성된 뒤의 터미널 메시지](images/session-3/terminal-full-03.png)
 
-Google 프로젝트가 생성된 뒤의 터미널 메시지
+Apps Script 프로젝트가 생성된 뒤의 터미널 메시지
 
 <details>
 <summary>프로젝트를 만들 때 invalid_grant 또는 Apps Script API 오류가 나올 때</summary>
@@ -237,16 +237,16 @@ Google 프로젝트가 생성된 뒤의 터미널 메시지
 
 </details>
 
-## 3-9. Google 쪽 코드와 설정 파일 만들기 (Cline Desktop)
+## 3-9. Apps Script 코드와 설정 파일 만들기 (Cline Desktop)
 
 **여기서 Cline Desktop으로 돌아갑니다. 3-12까지 이 대화에서 진행합니다.**
 
 3-5까지 사용한 Cline Desktop 대화를 다시 열고, 같은 웹 서비스 폴더에서 아래 상자 전체를 한 번에 보냅니다.
 
 ```text
-Google에서 돌아갈 코드를 만들기 위해, gas 폴더에 Google 쪽 코드의 틀과 설정 파일을 추가해 주세요.
+Apps Script 코드를 만들기 위해, gas 폴더에 Apps Script 코드의 틀과 설정 파일을 추가해 주세요.
 시트와 사진을 다루는 일은 다음 번호부터 더합니다.
-자세한 내용은 docs/guide/session-3.md의 "Google 쪽 코드의 틀"을 참고해 주세요.
+자세한 내용은 docs/guide/session-3.md의 "Apps Script 코드의 틀"을 참고해 주세요.
 
 ---
 Antigravity에서 3-8까지 수업 계정으로 로그인하고 Google에 tumbler-factory 프로젝트를 만들었습니다. 같은 웹 서비스 폴더에 .clasp.json이 있습니다.
@@ -256,7 +256,7 @@ Antigravity에서 3-8까지 수업 계정으로 로그인하고 Google에 tumble
 - 하는 일: 내 컴퓨터에 Google로 올릴 파일 두 개를 준비합니다.
 - 목표: Google이 할 일과, 시간대·필요한 권한을 서로 다른 파일에 적어 둡니다.
 
-AI가 마치면 Windows 탐색기에서 웹 서비스 폴더 안의 `gas` 폴더를 엽니다.
+AI가 마치면 파일 탐색기에서 웹 서비스 폴더 안의 `gas` 폴더를 엽니다.
 
 ![gas 폴더에 보이는 appsscript.json과 Code.js](images/session-3/08-gas-files.png)
 
@@ -269,8 +269,8 @@ gas 폴더에 보이는 appsscript.json과 Code.js
 AI에게 아래 문장을 보냅니다.
 
 ```text
-검사 기록을 담을 곳을 준비하기 위해, 내 드라이브에 시트와 사진 폴더를 만드는 일을 Google 쪽 코드에 추가해 주세요.
-자세한 내용은 docs/guide/session-3.md의 "Google 쪽 일 여섯 가지"를 참고해 주세요.
+검사 기록을 담을 곳을 준비하기 위해, 내 드라이브에 시트와 사진 폴더를 만드는 일을 Apps Script 코드에 추가해 주세요.
+자세한 내용은 docs/guide/session-3.md의 "Apps Script 코드의 일 여섯 가지"를 참고해 주세요.
 ```
 
 - 하는 일: 검사 기록용 시트와 사진용 폴더를 만드는 기능을 코드에 추가합니다.
@@ -282,9 +282,9 @@ AI에게 아래 문장을 보냅니다.
 AI에게 아래 문장을 보냅니다.
 
 ```text
-Google 쪽 코드에 시트에서 검사 기록을 읽는 기능과 새 기록을 한 줄 추가하는 기능을 넣어 주세요.
+Apps Script 코드에 시트에서 검사 기록을 읽는 기능과 새 기록을 한 줄 추가하는 기능을 넣어 주세요.
 기존 기록을 수정할 때는 해당 기록을 찾아 지정한 항목의 값만 바꿔 주세요.
-자세한 내용은 docs/guide/session-3.md의 "Google 쪽 일 여섯 가지"를 참고해 주세요.
+자세한 내용은 docs/guide/session-3.md의 "Apps Script 코드의 일 여섯 가지"를 참고해 주세요.
 ```
 
 - 하는 일: 시트에서 기존 검사 기록을 읽고 새 검사를 한 줄 추가하는 기능을 만듭니다.
@@ -296,23 +296,23 @@ Google 쪽 코드에 시트에서 검사 기록을 읽는 기능과 새 기록�
 AI에게 아래 문장을 보냅니다.
 
 ```text
-사진을 내 드라이브에 두기 위해, Google 쪽 코드에 사진을 저장하고 꺼내는 일을 추가해 주세요.
-끝나면 Google 쪽 일 여섯 가지가 모두 있는지 알려 주세요.
-자세한 내용은 docs/guide/session-3.md의 "Google 쪽 일 여섯 가지"를 참고해 주세요.
+사진을 내 드라이브에 두기 위해, Apps Script 코드에 사진을 저장하고 꺼내는 일을 추가해 주세요.
+끝나면 Apps Script 코드의 일 여섯 가지가 모두 있는지 알려 주세요.
+자세한 내용은 docs/guide/session-3.md의 "Apps Script 코드의 일 여섯 가지"를 참고해 주세요.
 ```
 
 - 하는 일: 검사 사진을 드라이브 폴더에 저장하고 꺼내는 기능을 추가합니다.
 - 목표: 나중에 같은 사진을 다시 불러올 수 있게 합니다.
 - 완료 기준: AI가 `setup`, `read`, `append`, `update`, `savePhoto`, `getPhoto` 여섯 기능이 모두 있다고 알려 주면 완료입니다.
 
-## 3-13. 서버에서 Google 웹앱으로 요청 보내기 (Antigravity)
+## 3-13. 서버에서 Apps Script 웹앱으로 요청 보내기 (Antigravity)
 
 **여기서 안티그래비티로 돌아갑니다. 3-20까지 안티그래비티를 사용합니다.**
 
 3-8까지 사용한 안티그래비티 대화를 다시 엽니다. 같은 웹 서비스 폴더가 열려 있고 모델이 **Gemini 3.8 Flash**, 추론 단계가 **Low**인지 확인한 뒤 아래 상자 전체를 한 번에 보냅니다.
 
 ```text
-Google 저장일 때 서버가 Google 쪽 코드에 일을 시키도록, 서버에 웹앱 주소로 요청을 보내는 기능을 추가해 주세요.
+Google 저장일 때 서버가 Apps Script 코드에 일을 시키도록, 서버에 웹앱 주소로 요청을 보내는 기능을 추가해 주세요.
 자세한 내용은 docs/guide/session-3.md의 "서버가 Google을 쓰는 법"을 참고해 주세요.
 
 ---
@@ -320,7 +320,7 @@ Cline Desktop에서 3-12까지 gas 폴더에 검사 기록을 시트에 쓰고 �
 같은 웹 서비스 폴더에서 이어 갑니다. 지금은 따라하기 교재의 3-13입니다. https://github.com/startup-life/manufacturing-quality-dashboard-student/blob/main/follow-along/session-3.md
 ```
 
-- 하는 일: 대시보드 서버가 앞에서 만든 Google 코드에 요청을 보내고 답을 받도록 연결합니다.
+- 하는 일: 대시보드 서버가 앞에서 만든 Apps Script 코드에 요청을 보내고 답을 받도록 연결합니다.
 - 목표: 나중에 Google에 저장할 때 이 연결을 씁니다. 지금은 내 컴퓨터에 저장하므로 설정 화면은 그대로입니다.
 
 AI가 오류 없이 마쳤다고 알려 주면, 대시보드 오른쪽 위에서 **설정**을 누릅니다.
@@ -418,7 +418,7 @@ AI에게 아래 문장을 보냅니다.
 웹앱 주소가 .env에 저장됐는지 확인하고, 주소는 보여 주지 말고 결과만 알려 주세요.
 ```
 
-- 하는 일: 지금까지 내 컴퓨터에서 만든 코드를 3-8에서 만든 Google 프로젝트에 올립니다.
+- 하는 일: 지금까지 내 컴퓨터에서 만든 코드를 3-8에서 만든 Apps Script 프로젝트에 올립니다.
 - 목표: 대시보드가 Google에 검사 기록이나 사진을 요청할 주소를 만들어 웹 서비스 설정 파일에 저장합니다.
 - 완료 기준: 먼저 “Google에 코드를 올렸습니다.”가 나오고, 배포가 끝나면 “.env에 웹앱 주소를 적었습니다.”와 “다음: npm.cmd run gas:open”이 차례로 보이면 완료입니다.
 
@@ -436,18 +436,18 @@ AI에게 아래 문장을 보냅니다.
 <details>
 <summary>이미 웹앱 주소가 있다고 나올 때</summary>
 
-AI에게 `npm.cmd run gas:redeploy`로 같은 주소에 다시 배포해 달라고 합니다. Google 쪽 코드를 고쳤다면 `gas:push`가 성공한 뒤 `gas:redeploy`를 실행합니다.
+AI에게 `npm.cmd run gas:redeploy`로 같은 주소에 다시 배포해 달라고 합니다. Apps Script 코드를 고쳤다면 `gas:push`가 성공한 뒤 `gas:redeploy`를 실행합니다.
 
 </details>
 
 <details>
-<summary>clasp 오류가 계속돼 Google 편집기에서 배포해야 할 때</summary>
+<summary>clasp 오류가 계속돼 Apps Script 편집기에서 배포해야 할 때</summary>
 
 1. 3-9~3-16의 코드를 준비한 뒤 [Apps Script](https://script.google.com/home)를 엽니다. 3-8에서 만든 **tumbler-factory**를 선택합니다. 프로젝트를 만들지 못했다면 새로 만듭니다.
 2. 편집기의 기본 코드를 웹 서비스 폴더의 `gas/Code.js` 내용으로 바꿔 저장합니다. 프로젝트 설정에서 **편집기에 appsscript.json 매니페스트 파일 표시**를 켜고, 편집기의 `appsscript.json`도 `gas/appsscript.json`과 같게 저장합니다.
 3. 화면을 공유 중이면 공유를 멈춥니다. **배포**에서 **새 배포**를 누르고 유형을 **웹 앱**으로 선택합니다. 실행 사용자는 **나**, 액세스 권한은 **모든 사용자**로 골라 배포합니다.
 4. `/exec`로 끝나는 웹앱 주소를 복사해 웹 서비스 폴더의 `.env`에 `GAS_WEBAPP_URL` 값으로 저장하고 `STORAGE_MODE=live`를 설정합니다. 3-18에서 권한 승인을 확인한 뒤 3-19를 진행합니다.
-5. 나중에 Google 코드를 다시 올릴 때 `.clasp.json`이 없다면 AI에게 방금 배포한 프로젝트와 웹 서비스 폴더를 연결해 달라고 합니다.
+5. 나중에 Apps Script 코드를 다시 올릴 때 `.clasp.json`이 없다면 AI에게 방금 배포한 프로젝트와 웹 서비스 폴더를 연결해 달라고 합니다.
 
 </details>
 

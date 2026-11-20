@@ -42,13 +42,13 @@ git clone https://github.com/startup-life/manufacturing-quality-student-images.g
 ## 2-1. 지침 세팅
 
 ```text
-이번 회차 문서를 이 프로젝트로 가져오기 위해, 수업 저장소(class)를 다시 받아 class/milestone-1의 AGENTS.md와 docs/guide를 이 프로젝트로 가져와 주세요(지금 브랜치는 그대로 두고 그 파일과 폴더만 가져옵니다).
-그다음 AGENTS.md를 작업 지침으로 삼아 주세요. 프롬프트에 없는 상세 구현은 docs/guide의 회차 문서와 그 회차 완료 브랜치 코드(class/milestone-2)에서 확인합니다.
+이번 회차 문서를 이 프로젝트로 가져오기 위해, class(수업 저장소)를 다시 받아 class/milestone-1의 AGENTS.md와 docs/guide를 이 프로젝트로 가져와 주세요(지금 브랜치는 그대로 두고 그 파일과 폴더만 가져옵니다).
+그다음 AGENTS.md를 작업 지침으로 삼아 주세요. 프롬프트에 없는 상세 구현은 docs/guide의 회차 문서와 그 회차 class/milestone-2(완료 브랜치 코드)에서 확인합니다.
 지금은 AGENTS.md와 docs/guide의 session-1.md부터 session-2.md까지를 읽기만 하고, 읽은 문서의 끝 표시를 모두 한 줄로 이어서 알려 주세요.
 ```
 - 하는 일: 웹 서비스 폴더에 2회차 보충 문서가 들어오고, AI가 1~2회차 문서를 읽었다는 끝 표시를 알려 줍니다.
 - 목표: AI가 이번 회차의 세부 조건을 보충 문서와 완료 코드에서 찾아 따르게 합니다. 새 대화를 열 때마다 이 프롬프트를 먼저 보냅니다.
-- 완료 기준: 탐색기의 `docs\guide` 폴더에 `session-2.md`가 새로 생깁니다(`files` 폴더가 함께 있어도 맞습니다). AI 답의 마지막 줄에 `1회차-은색컵-4185 2회차-저울눈금-354`가 한 줄로 이어 보입니다. 끝 표시는 AI가 문서를 읽었는지 보는 글자라서, 숫자가 서버 주소의 숫자와 같아도 서버와는 상관없습니다.
+- 완료 기준: 파일 탐색기(폴더와 파일을 보는 Windows 프로그램)의 `docs\guide` 폴더에 `session-2.md`가 새로 생깁니다(`files` 폴더가 함께 있어도 맞습니다). AI 답의 마지막 줄에 `1회차-은색컵-4185 2회차-저울눈금-354`가 한 줄로 이어 보입니다. 끝 표시는 AI가 문서를 읽었는지 보는 글자라서, 숫자가 서버 주소의 숫자와 같아도 서버와는 상관없습니다.
 - 막히면: 보이지 않거나 글자가 다르면 한 번 더 보냅니다. 그래도 같으면 AI에게 "지침을 다시 맞추기 위해, `class/milestone-1`의 `AGENTS.md`와 `docs/guide`를 다시 가져와(지금 브랜치는 그대로 둡니다) `AGENTS.md`와 `docs/guide`의 `session-1.md`부터 `session-2.md`까지를 처음부터 다시 읽고, 읽은 문서의 끝 표시를 모두 한 줄로 이어서 알려 주세요."라고 보냅니다.
 
 ## 2-2. 제품과 검사기준
@@ -76,7 +76,7 @@ git clone https://github.com/startup-life/manufacturing-quality-student-images.g
 ```
 - 하는 일: 서버가 검사를 웹 서비스 폴더의 `runtime` 폴더에 저장하고, 등록·보기·고치기 요청을 받습니다. 웹 서비스 화면은 아직 그대로입니다.
 - 목표: 서버를 껐다 켜도 검사 기록이 남게 합니다.
-- 완료 기준: AI가 다시 켠 서버 창에 `저장소: 내 컴퓨터(runtime/local-state.json)` 줄이 나오고, 탐색기로 웹 서비스 폴더를 열면 `runtime` 폴더가 생겼습니다. `local-state.json` 파일은 첫 등록 때 생길 수 있어 아직 없어도 정상입니다.
+- 완료 기준: AI가 다시 켠 서버 창에 `저장소: 내 컴퓨터(runtime/local-state.json)` 줄이 나오고, 파일 탐색기로 웹 서비스 폴더를 열면 `runtime` 폴더가 생겼습니다. `local-state.json` 파일은 첫 등록 때 생길 수 있어 아직 없어도 정상입니다.
 
 ## 2-4. 검사 등록 화면
 
@@ -121,7 +121,7 @@ git clone https://github.com/startup-life/manufacturing-quality-student-images.g
 - 하는 일: 검사 등록 화면 맨 아래에 "검사 등록" 버튼이 생기고, 누르면 검사와 사진이 저장된 뒤 주소가 그 검사의 상세 화면 주소로 바뀝니다.
 - 목표: 입력한 검사를 저장합니다. 상세 화면의 내용은 다음 번호부터 만듭니다.
 - 할 일: 검사 등록 화면에서 "검정 텀블러"를 고르고 중량 `550`, 메모 `첫 등록`을 적습니다. 2-5처럼 사진 두 장(`TUM-PRC-001`, `TUM-PRC-002`)을 고르고 "검사 등록"을 누릅니다.
-- 완료 기준: 주소가 `/inspections/INSP-…`로 바뀌고, 탐색기로 웹 서비스 폴더의 `runtime\uploads` 폴더를 열면 사진 두 장이 생겼습니다. 상세 화면은 아직 비어 있어도 정상입니다.
+- 완료 기준: 주소가 `/inspections/INSP-…`로 바뀌고, 파일 탐색기로 웹 서비스 폴더의 `runtime\uploads` 폴더를 열면 사진 두 장이 생겼습니다. 상세 화면은 아직 비어 있어도 정상입니다.
 
 ![2-6 등록 직후 비어 있는 상세 화면](images/session-2/08-419394a4-2-6.png)
 
