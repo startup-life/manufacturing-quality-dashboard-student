@@ -38,10 +38,10 @@ Google 드라이브의 검사 사진 폴더에 저장된 검정 텀블러 사진
 
 ## 시작 전에
 
-**3-1~3-5는 Cline Desktop에서 진행합니다. 3-6에서는 Ego에서 Apps Script API를 켭니다. 3-7~3-8은 Antigravity, 3-9~3-12는 Cline Desktop, 3-13~3-20은 Antigravity를 사용합니다.** 도구를 바꿔도 같은 웹 서비스 폴더를 사용합니다. 실행 중인 서버 창과 Ego 브라우저는 그대로 열어 둡니다.
+**3-1~3-5는 Cline Desktop에서 진행합니다. 3-6에서는 ego (lite) 브라우저에서 Apps Script API를 켭니다. 3-7~3-8은 Antigravity, 3-9~3-12는 Cline Desktop, 3-13~3-20은 Antigravity를 사용합니다.** 도구를 바꿔도 같은 웹 서비스 폴더를 사용합니다. 실행 중인 서버 창과 ego (lite) 브라우저는 그대로 열어 둡니다.
 
 - 시작 상태: 2회차를 끝낸 웹 서비스 폴더 `C:\ai-class\tumbler-factory`에서 시작합니다.
-- 준비물: AI 도구에서 연 웹 서비스 폴더, 수업에 쓸 개인 Google 계정(이 글에서 "수업 계정"이라고 부릅니다. 이 회차의 Google 화면에서는 모두 이 계정을 고릅니다)으로 로그인한 ego 브라우저, 인터넷, 2회차에 받은 사진 저장소(`C:\ai-class\manufacturing-quality-student-images`).
+- 준비물: AI 도구에서 연 웹 서비스 폴더, 수업에 쓸 개인 Google 계정(이 글에서 "수업 계정"이라고 부릅니다. 이 회차의 Google 화면에서는 모두 이 계정을 고릅니다)으로 로그인한 ego (lite) 브라우저, 인터넷, 2회차에 받은 사진 저장소(`C:\ai-class\manufacturing-quality-student-images`).
 - 꼭 지킬 것: Apps Script 웹앱 주소는 서버가 Apps Script 코드에 일을 시킬 때 쓰는 주소입니다. 이 주소를 아는 사람은 누구나 내 시트와 사진을 읽고 쓸 수 있습니다. 주소는 `.env`에만 두고 화면 공유, 메신저, 문서에 옮기지 않습니다.
 - 이 회차에 새로 나오는 말: **Apps Script 코드**는 내 컴퓨터가 아니라 Google에서 돌아가는 코드입니다. 웹 서비스 폴더의 `gas` 폴더에 만들고 명령으로 Google에 올립니다. **`.env`**는 웹 서비스 폴더에 두는 설정 파일로, 웹앱 주소 같은 비밀 값이 들어갑니다. 고쳐야 하면 AI에게 맡깁니다.
 - Google에 저장하면 홈을 여는 데 5~10초, 저장 한 번에 10초쯤 걸립니다. 내 컴퓨터에 저장할 때보다 느린 것이 정상입니다.
@@ -49,7 +49,7 @@ Google 드라이브의 검사 사진 폴더에 저장된 검정 텀블러 사진
 2회차를 마친 웹 서비스는 3-1~3-5에서 저장 방식과 Apps Script 명령(npm.cmd run gas:로 시작하는 명령)을 먼저 준비합니다. 이 준비를 이미 마친 웹 서비스는 3-6부터 이어갑니다.
 
 1. Cline Desktop에서 2회차 웹 서비스 폴더를 열고 새 대화를 시작합니다.
-2. 서버가 꺼져 있으면 3-1의 지침을 보낸 뒤 AI에게 “화면 서버를 켜 주세요.”라고 보냅니다. ego 브라우저에서 [대시보드](http://127.0.0.1:4185)를 열고 `writer` / `writer1234!`로 로그인합니다. 2회차 홈의 숫자 카드와 검사 카드가 보이면 됩니다.
+2. 서버가 꺼져 있으면 3-1의 지침을 보낸 뒤 AI에게 “화면 서버를 켜 주세요.”라고 보냅니다. ego (lite) 브라우저에서 [대시보드](http://127.0.0.1:4185)를 열고 `writer` / `writer1234!`로 로그인합니다. 2회차 홈의 숫자 카드와 검사 카드가 보이면 됩니다.
 
 ## 3-1. 지침 세팅 (Cline Desktop)
 
@@ -122,11 +122,11 @@ Apps Script 코드를 명령 한 줄로 다루기 위해, 웹 서비스에 gas:l
 - 목표: 권한 승인과 시트 준비를 명령 한 줄로 하게 합니다.
 - 완료 기준: 웹 서비스 폴더의 `package.json`에 `gas:open`과 `gas:init`이 등록되어 있습니다. 첫 실행은 웹앱을 배포한 뒤 3-18과 3-19에서 합니다.
 
-## 3-6. Apps Script API 켜기 (Ego)
+## 3-6. Apps Script API 켜기 (ego (lite) 브라우저)
 
 2회차에서 만든 웹 서비스를 Google 시트와 드라이브에 연결하려면 수업 계정에서 Apps Script API를 켭니다.
 
-1. Ego에서 [Apps Script 설정](https://script.google.com/home/usersettings)을 엽니다. 오른쪽 위 계정이 수업에 사용할 Google 계정인지 확인합니다.
+1. ego (lite) 브라우저에서 [Apps Script 설정](https://script.google.com/home/usersettings)을 엽니다. 오른쪽 위 계정이 수업에 사용할 Google 계정인지 확인합니다.
 2. **Google Apps Script API**를 누릅니다.
 
    ![Apps Script 설정에서 Google Apps Script API 선택](images/session-3/01-settings.png)
@@ -153,14 +153,14 @@ clasp가 처음이면 npx로 수업 버전(3.4.1)을 받아 주세요. 이미 �
 그 상태에서 npm.cmd run gas:login을 실행하고, 로그인 주소를 알려 준 뒤 로그인이 끝날 때까지 기다려 주세요.
 
 ---
-Cline Desktop에서 3-5까지 Apps Script 명령을 준비했고, 3-6은 Ego에서 수업 계정의 Apps Script API를 켰습니다.
+Cline Desktop에서 3-5까지 Apps Script 명령을 준비했고, 3-6은 ego (lite) 브라우저에서 수업 계정의 Apps Script API를 켰습니다.
 같은 웹 서비스 폴더의 AGENTS.md와 docs/guide/session-3.md를 참고해 주세요. 지금은 따라하기 교재의 3-7입니다. https://github.com/startup-life/manufacturing-quality-dashboard-student/blob/main/follow-along/session-3.md
 ```
 
 - 하는 일: clasp(내 컴퓨터의 연결 도구)를 수업용 Google 계정에 연결합니다.
 - 목표: 다음 단계에서 이 계정에 Apps Script 프로젝트를 만들 수 있게 합니다.
 
-1. 열린 브라우저에서 **3-6에서 확인한 수업 계정**을 선택합니다. 브라우저가 열리지 않으면 AI가 알려 준 로그인 주소를 ego 브라우저에 붙여 넣습니다.
+1. 열린 브라우저에서 **3-6에서 확인한 수업 계정**을 선택합니다. 브라우저가 열리지 않으면 AI가 알려 준 로그인 주소를 ego (lite) 브라우저에 붙여 넣습니다.
 
    ![Google 계정 선택 화면. 계정 이름과 이메일은 가렸습니다.](images/session-3/3-7-account-selection.png)
 
@@ -503,7 +503,7 @@ gas:open 실행 후 입력 줄로 돌아온 터미널 창
 <details>
 <summary>“액세스 권한 필요”가 뜨거나 승인 직후 화면이 멈출 때</summary>
 
-권한이 필요하다고 나오면 열린 주소를 복사합니다. Ego에서 `Ctrl+Shift+N`으로 시크릿 창을 열고 주소를 붙여 넣어 수업 계정으로 로그인합니다. 3-19나 3-20에서 다른 계정으로 열릴 때도 이 창을 씁니다. 승인 직후 화면이 멈췄다면 AI에게 `gas:open`을 한 번 더 실행해 달라고 합니다.
+권한이 필요하다고 나오면 열린 주소를 복사합니다. ego (lite) 브라우저에서 `Ctrl+Shift+N`으로 시크릿 창을 열고 주소를 붙여 넣어 수업 계정으로 로그인합니다. 3-19나 3-20에서 다른 계정으로 열릴 때도 이 창을 씁니다. 승인 직후 화면이 멈췄다면 AI에게 `gas:open`을 한 번 더 실행해 달라고 합니다.
 
 </details>
 

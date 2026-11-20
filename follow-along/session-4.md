@@ -17,7 +17,7 @@
 ## 시작 전에
 
 - 시작 상태: 3회차를 끝낸 웹 서비스 폴더 `C:\ai-class\tumbler-factory`에서 이어서 합니다.
-- 준비물: 3회차까지 만든 웹 서비스, 명령 창, 3회차에 쓴 Google 계정(수업 계정)으로 로그인한 ego 브라우저, 인터넷, 학습 사진 저장소(`C:\ai-class\manufacturing-quality-student-images`), 수업 전에 받아 둔 내 OnePort 키.
+- 준비물: 3회차까지 만든 웹 서비스, 명령 창, 3회차에 쓴 Google 계정(수업 계정)으로 로그인한 ego (lite) 브라우저, 인터넷, 학습 사진 저장소(`C:\ai-class\manufacturing-quality-student-images`), 수업 전에 받아 둔 내 OnePort 키.
 - 꼭 지킬 것: OnePort 키(Apps Script 코드(Google에서 돌아가는 코드)가 OnePort를 거쳐 Gemini를 부를 때 쓰는 비밀 값)와 Apps Script 웹앱 주소(서버가 Apps Script 코드를 부를 때 쓰는 주소)는 비밀번호와 같습니다. `.env`에만 두고 화면 공유, 메신저, 문서에 옮기지 않습니다. 키는 4-20에서 AI에게 주면 AI가 `.env`에 넣습니다.
 - 3회차에서 Google 저장을 연결하지 못했으면 4-15까지 하고 끝 확인으로 갑니다.
 - 이 회차에 새로 나오는 말: **판독**은 AI가 사진을 보고 정상·불량·보류를 제안하는 일이고, 한 번 더 하는 것은 "재판독"입니다. 검사 상세의 1번 탭은 "① 사진·측정값", 2번 탭은 "② AI 결과 확인"입니다.
@@ -26,7 +26,7 @@
 아래를 차례로 합니다.
 
 1. AI 도구에서 웹 서비스 폴더 `C:\ai-class\tumbler-factory`를 열고 새 대화를 시작합니다.
-2. 명령 창(PowerShell 창을 열고 `cd C:\ai-class\tumbler-factory`)을 열어 둡니다. 서버 창이 없거나 서버가 꺼져 있으면 4-1(지침 세팅)을 보낸 뒤 AI 도구에 "화면 서버를 켜 주세요."라고 보냅니다. 그다음 ego 브라우저에서 http://127.0.0.1:4185 를 열고 `writer` / `writer1234!`로 로그인해 3회차 홈이 보이는지 봅니다.
+2. 명령 창(PowerShell 창을 열고 `cd C:\ai-class\tumbler-factory`)을 열어 둡니다. 서버 창이 없거나 서버가 꺼져 있으면 4-1(지침 세팅)을 보낸 뒤 AI 도구에 "화면 서버를 켜 주세요."라고 보냅니다. 그다음 ego (lite) 브라우저에서 http://127.0.0.1:4185 를 열고 `writer` / `writer1234!`로 로그인해 3회차 홈이 보이는지 봅니다.
 3. 파일 탐색기(폴더와 파일을 보는 Windows 프로그램)에서 `C:\ai-class\manufacturing-quality-student-images` 폴더가 있는지 봅니다. 없으면 2회차 글 「시작 전에」의 사진 저장소 받기대로 받습니다. 휴대폰으로 찍은 큰 사진은 판독하지 못할 수 있으니 이 폴더의 사진으로 연습합니다.
 4. 내 OnePort 키를 적어 둔 곳을 알아 둡니다. 지금 열거나 복사하지는 않습니다. 키가 없으면 4-15까지 하고 끝 확인으로 갑니다.
 
