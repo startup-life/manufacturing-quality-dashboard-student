@@ -51,12 +51,6 @@
 Start-Process powershell -ArgumentList '-NoExit','-Command','$env:Path = [Environment]::GetEnvironmentVariable(''Path'',''Machine'') + '';'' + [Environment]::GetEnvironmentVariable(''Path'',''User''); cd C:\ai-class\tumbler-factory; npm.cmd start'
 ```
 
-프로그램 경로만 다시 읽을 때(AI 터미널에서 새로 설치한 명령을 찾지 못할 때)는 아래 한 줄을 실행합니다.
-
-```powershell
-$env:Path = [Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [Environment]::GetEnvironmentVariable('Path','User')
-```
-
 - 다시 켜기: "다시 켜 주세요"라는 요청이면 이미 켜져 있어도 "이미 켜져 있습니다"로 끝내지 않고 다시 켭니다. `npm.cmd run build`만 실행하면 됩니다. 사용자가 "끄고 새 창에서 켜 달라"고 하면 아래 "프로그램을 새로 설치한 뒤"처럼 끄고 새 창에서 켭니다. 빌드로 `dist` 폴더의 파일이 다시 써지면 서버가 같은 창에서 알아서 다시 켜집니다. 서버 창에 `Restarting`으로 시작하는 줄이 나온 뒤 `품질 대시보드 서버 실행 중: …`이 다시 나옵니다. 빌드하기 전에 포트를 듣는 프로세스 번호를 봐 두고, 빌드 뒤 몇 초 기다렸다가 그 번호가 바뀌었는지 봅니다. 바뀌었으면 다시 켜진 것이고, 포트가 비어 있으면 아래 "오류 보기"대로 AI가 오류를 찾아 고칩니다. 거기서도 원인이 보이지 않을 때만 서버 창의 빨간 줄을 붙여 넣어 달라고 합니다. 포트를 듣는 프로세스도 감시 확인에 나오는 프로세스도 없으면 서버가 꺼진 것이니 빌드 뒤 "켜기"로 켭니다.
 - 프로그램을 새로 설치한 뒤: 프로그램(5회차의 NotebookLM 도구 등)을 새로 설치한 뒤 다시 켜 달라고 하면, 빌드로는 새 프로그램 경로를 읽지 못합니다. 이때는 감시 확인에 나온 프로세스와 포트를 듣는 프로세스를 끄고(사용자가 서버 창을 닫아도 됩니다), 포트와 감시 확인이 모두 빈 것을 확인한 뒤 "켜기"로 새 창에서 켭니다.
 - 예전 방식으로 켠 서버: 포트를 듣는 서버는 있는데 "감시 확인"에 아무것도 나오지 않으면 `--watch` 없이 켠 서버라 알아서 다시 켜지지 않습니다. 이때는 "시작 명령 확인"대로 `package.json`을 고치고, 포트를 듣는 그 서버 프로세스를 끈 뒤(사용자가 서버 창을 닫아도 됩니다) 포트가 빈 것을 확인하고 "켜기"로 새 창에서 켭니다.
@@ -66,14 +60,143 @@ $env:Path = [Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [Env
 - 오류 보기: 서버 창의 오류는 AI가 먼저 찾습니다. AI가 명령을 실행하는 터미널에서 `npm.cmd run build`로 빌드 오류를 봅니다. 빌드 오류가 없고 빌드 뒤 10초 기다려도 포트가 비어 있으면, 서버를 켤 때의 오류를 15초 뒤 저절로 끝나게 실행해 봅니다: `$p = Start-Process node -ArgumentList '--env-file-if-exists=.env','dist/main.js' -NoNewWindow -PassThru; Start-Sleep 15; if (!$p.HasExited) { Stop-Process -Id $p.Id }`. 그사이 포트가 열렸으면 그 프로세스는 이미 끈 것이니, 서버 창에서 다시 켜지도록 `npm.cmd run build`를 합니다.
 - `EADDRINUSE`: 다른 프로세스가 이미 그 포트를 쓰는 것입니다. 사용자가 이 글을 붙여 넣으면 그 포트의 프로세스가 이 웹 서비스의 서버인지 봅니다. 이 웹 서비스의 서버면 먼저 켠 서버 창이 따로 있는 것이니, 그 창을 그대로 쓰고 `EADDRINUSE`가 나온 창은 닫아도 된다고 알립니다. 사용자가 맡기면, 명령 줄에 `npm.cmd start`가 든 powershell.exe 가운데 포트를 듣는 서버를 띄우지 않은 쪽(`EADDRINUSE`가 나온 창)을 `taskkill /PID (번호) /T /F`로 끕니다. 창과 그 안의 프로세스가 함께 꺼집니다. 아니면 무엇이 그 포트를 쓰는지 사용자에게 알리고 끌지 물어봅니다. 사용자가 끄라고 하면(그 프로그램을 끄라고 이미 말했으면 묻지 않고) 끄고 4185 포트로 켭니다.
 - 끄기: 사용자가 서버 창을 닫거나 그 창에서 Ctrl+C를 누르면 꺼집니다. "일괄 작업을 끝내시겠습니까 (Y/N)?"가 나오면 `Y`를 칩니다. AI가 끌 때는 명령 줄에 `npm.cmd start`가 든 powershell.exe(서버 창)를 `taskkill /PID (번호) /T /F`로 끕니다. 창과 그 안의 프로세스가 함께 꺼집니다. 그다음 포트와 감시 확인이 모두 빈 것을 보고, 남은 것이 있으면 `Stop-Process -Id (번호)`로 끕니다.
-- 설치나 빌드처럼 끝나는 명령은 새 창을 열지 않고 AI가 명령을 실행하는 터미널에서 합니다. 명령을 30초에 끊는 AI 도구(Cline Desktop 등)에서 로그인을 기다리는 명령이나 30초를 넘길 수 있는 명령은 아래 "오래 걸리는 명령"대로 새 창에서 합니다.
-- 오래 걸리는 명령: 아래 명령의 `<명령>` 자리에 그 명령을 넣어(꺾쇠도 지웁니다) PowerShell로 실행합니다. 이전 출력 파일을 지운 뒤 새 창을 열고 그 창의 프로세스 번호를 보여 준 다음 바로 끝나므로, 이 명령에는 기다리기나 확인을 붙이지 않습니다. 그 명령에 있는 따옴표는 큰따옴표든 작은따옴표든 모두 작은따옴표 두 개(`''`)로 바꿔 씁니다. 큰따옴표를 그대로 두면 새 창에 닿기 전에 사라집니다. 예: uv 설치는 `powershell -ExecutionPolicy ByPass -c ''irm https://astral.sh/uv/install.ps1 | iex''`입니다. 환경 변수가 필요하면(예: 3회차 문서 "Google 명령"의 `npm_config_cache`) 같은 줄의 `Start-Process` 앞에 `$env:이름='값';`으로 둡니다. 새 창은 명령이 끝나면 저절로 닫히고, 출력은 `$env:TEMP\ai-cmd.log`에 남습니다.
+
+## 오래 걸리는 명령
+
+AI 도구에 따라서는 AI가 실행하는 명령에 아래 제한이 있습니다. 이 절의 방법은 어느 AI 도구에서나 그대로 씁니다.
+
+- 명령 하나가 30초를 넘으면 그 명령과 그 명령이 띄운 프로그램을 함께 강제로 끝냅니다. 그때까지 나온 글은 AI에게 가지 않고 시간 초과 오류만 갑니다.
+- 명령마다 새 PowerShell이 뜹니다. 앞 명령의 `cd`, `$env:Path`, 변수는 다음 명령에 남지 않습니다. 한 번에 여러 명령을 보내면 동시에 실행됩니다.
+- 명령에는 입력을 넣을 수 없습니다. y/n이나 값을 묻는 질문에 답하지 못합니다.
+- 프로그램 경로는 AI 도구를 켤 때 정해집니다. 그 뒤에 설치한 프로그램은 경로를 다시 읽어야 찾을 수 있습니다.
+- AI에게는 명령 결과 하나마다 앞뒤를 합쳐 8,000자쯤(앞 4,000자, 뒤 4,000자쯤)만 가고 가운데는 빠집니다.
+- `Start-Process`로 새 창을 띄우고 바로 끝나는 명령은 30초 제한에 걸리지 않고, 새 창은 그대로 남습니다. 같은 명령 안에서 새 창을 기다리면 30초에 새 창까지 함께 꺼집니다. 서버를 켜는 명령(이 문서의 서버 켜기 절)이 새 창을 띄우고 바로 끝나는 것도 이 때문입니다.
+- 실행 중인 명령을 떼어 계속 돌리는 단추가 AI 도구에 있어도 사용자에게 누르라고 하지 않고, 이 절의 새 창 방식으로 합니다.
+
+### 한 명령에 담기
+
+- 명령은 한 번에 하나씩 보냅니다. 순서가 있는 명령은 한 명령 안에 `;`로 잇습니다. `&&`는 PowerShell 판에 따라 문법 오류가 나므로 쓰지 않습니다. 이어 쓴 명령이 합쳐서 30초를 넘길 수 있으면 하나씩 따로 보내거나 아래 "새 창에서 실행하기"로 합니다.
+- `;`로 이은 뒤 명령은 앞 명령이 실패해도 실행됩니다. 앞 명령이 성공해야 하는 명령(올리기 뒤 배포 등)은 잇지 않고 따로 보내, 결과를 본 뒤 다음을 보냅니다.
+- 다른 폴더에서 할 명령은 그 명령 앞에 `cd '(폴더 전체 경로)';`를 둡니다. 따로 보낸 `cd`는 다음 명령에 남지 않습니다.
+- 경로 다시 읽기: `ego-browser`를 부르는 명령과 이 대화에서 설치한 프로그램을 부르는 명령에는 늘 맨 앞에 아래 줄을 붙이고 `<명령>` 자리에 부를 명령을 넣습니다. 그 밖의 명령도 찾지 못하면 이 줄을 붙여 다시 실행합니다. 이 줄만 따로 실행하면 다음 명령에 남지 않습니다. 그래도 찾지 못하면 그 프로그램 실행 파일의 전체 경로로 부릅니다.
 
 ```powershell
-Remove-Item $env:TEMP\ai-cmd.log -ErrorAction SilentlyContinue; (Start-Process powershell -PassThru -ArgumentList '-Command','$env:Path = [Environment]::GetEnvironmentVariable(''Path'',''Machine'') + '';'' + [Environment]::GetEnvironmentVariable(''Path'',''User''); [Console]::OutputEncoding = [Text.Encoding]::UTF8; cd C:\ai-class\tumbler-factory; & { <명령> 2>&1; ''AI-CMD-END:'' + $LASTEXITCODE } | ForEach-Object ToString | Tee-Object -FilePath $env:TEMP\ai-cmd.log').Id
+$env:Path = [Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [Environment]::GetEnvironmentVariable('Path','User'); <명령>
 ```
 
-끝났는지는 20초 이하 간격으로 `Get-Content $env:TEMP\ai-cmd.log -ErrorAction SilentlyContinue`를 실행해 봅니다. 마지막 줄이 `AI-CMD-END:0`이면 명령이 끝난 것이고, 성공인지는 그 위 끝 글을 그 명령의 성공 기준(`gas:` 명령은 3회차 문서 "Google 명령" 표)과 맞춰 봅니다. `AI-CMD-END:` 뒤가 0이 아니면 실패이니 그 위 글로 원인을 봅니다. 그 줄이 없으면 새 창을 열 때 나온 번호로 `Get-Process -Id (번호) -ErrorAction SilentlyContinue`를 실행합니다. 새 창이 남아 있으면 아직 실행 중이고(파일이 아직 없어도 첫 출력 전입니다), 없으면 창이 중간에 닫힌 것이니 그 위 글을 보고 다시 실행합니다. 로그인 명령은 사용자가 마쳤다고 하면 이 파일의 끝 줄이나 확인 명령(`nlm login --check`)으로 봅니다.
+- 외부 프로그램에 넘기는 글: `curl.exe`, `git`, `ego-browser` 같은 외부 프로그램의 인자 안에 큰따옴표를 넣지 않습니다. PowerShell 판에 따라 큰따옴표가 사라집니다. 외부 프로그램에 파이프(`|`)로 한글을 넘기지도 않습니다. 판에 따라 `?`로 바뀝니다. 큰따옴표가 든 글(JSON 본문 등)과 브라우저 스크립트는 AI 도구의 파일 쓰기로 파일에 저장한 뒤 파일로 넘깁니다. 예: `curl.exe`의 본문은 `--data-binary '@(파일 전체 경로)'`, 브라우저 스크립트는 아래 "ego 브라우저"의 꼴. `npm.cmd`처럼 `.cmd`로 설치된 명령도 같습니다. 작은따옴표로 감싼 인자 속 한글(예: `git commit -m '고친 내용'`)은 이 규칙에 들지 않습니다.
+- 묻는 명령: 묻지 않게 하는 옵션을 붙입니다. 예: `npx --yes`, `Remove-Item -Force`, `winget install (이름) --accept-source-agreements --accept-package-agreements`.
+- `2>&1`: `git`, `npm.cmd` 같은 프로그램의 출력에 `2>&1`이나 `2>(파일)`을 붙이면 경고 한 줄에도 명령이 멈출 수 있습니다. 붙여야 하면 같은 명령 맨 앞에 `$ErrorActionPreference='Continue';`를 둡니다.
+- 출력 줄이기: 출력이 길 것 같으면 `| Select-Object -Last 40`이나 `| Select-String '(찾을 글)'`을 붙여 필요한 줄만 봅니다. 파일 전체를 봐야 하면 아래 "긴 출력 읽기"대로 합니다.
+
+### 새 창에서 실행하기
+
+아래 명령은 새 창에서 실행합니다. 빌드나 확인처럼 몇 초면 끝나는 명령만 AI가 명령을 실행하는 터미널에서 합니다. 서버를 켜는 일은 이 절이 아니라 이 문서의 서버 켜기 절을 따릅니다.
+
+- 설치: 프로그램 설치, `npm.cmd install`, `npx`로 패키지를 처음 내려받는 명령. 설치는 늘 새 창에서 합니다.
+- 30초를 넘길 수 있는 그 밖의 명령: 큰 저장소의 clone이나 첫 fetch, 회차 문서가 새 창에서 하라고 한 명령
+- 로그인이 끝날 때까지 기다리는 명령: `gas:login` 같은 로그인 명령, `git push`(처음 올릴 때 Git 로그인 창이 뜨고 기다립니다)
+- AI가 명령을 실행하는 터미널에서 30초에 끊긴 적이 있는 명령
+
+`<명령>` 자리에 그 명령을 넣어(꺾쇠도 지웁니다) 실행합니다.
+
+```powershell
+Remove-Item $env:TEMP\ai-cmd.log -ErrorAction SilentlyContinue; (Start-Process powershell -PassThru -WorkingDirectory (Get-Location).Path -ArgumentList '-Command','$env:Path = [Environment]::GetEnvironmentVariable(''Path'',''Machine'') + '';'' + [Environment]::GetEnvironmentVariable(''Path'',''User''); [Console]::OutputEncoding = [Text.Encoding]::UTF8; & { <명령> 2>&1; ''AI-CMD-END:'' + $LASTEXITCODE } | ForEach-Object ToString | Tee-Object -FilePath $env:TEMP\ai-cmd.log').Id
+```
+
+- 이 명령은 이전 출력 파일을 지우고 새 창을 연 뒤 그 창의 프로세스 번호만 보여 주고 바로 끝납니다. 그래서 이 명령에는 기다리기나 확인을 붙이지 않습니다. 보여 준 번호는 끝났는지 볼 때 씁니다.
+- 새 창은 경로를 다시 읽은 뒤 명령을 실행하므로, AI 도구를 연 뒤 설치한 프로그램도 찾습니다.
+- `<명령>`에 든 따옴표는 큰따옴표든 작은따옴표든 모두 작은따옴표 두 개(`''`)로 바꿔 씁니다. 큰따옴표를 그대로 두면 새 창에 닿기 전에 사라집니다. 예: uv 설치는 `powershell -ExecutionPolicy ByPass -c ''irm https://astral.sh/uv/install.ps1 | iex''`입니다.
+- `<명령>`에 `$env:…`를 넣지 말고, 그 값을 먼저 실행해 얻은 뒤 풀어 적습니다.
+- 새 창은 이 명령을 실행한 폴더에서 시작합니다. 다른 폴더에서 실행해야 하면 `(Get-Location).Path`를 `'(폴더 전체 경로)'`로 바꿉니다.
+- 환경 변수가 필요하면 같은 줄의 `Start-Process` 앞에 `$env:이름='값';`으로 둡니다.
+- 새 창은 명령이 끝나면 저절로 닫힙니다. 출력은 `$env:TEMP\ai-cmd.log`에 남고, 마지막 줄에 `AI-CMD-END:(종료 코드)` 줄이 찍힙니다.
+- 새 창에서 실행하는 명령은 한 번에 하나만 띄웁니다. 같은 출력 파일을 쓰므로, 앞 명령의 `AI-CMD-END` 줄을 본 뒤 다음 명령을 띄웁니다.
+
+### 끝났는지 보기
+
+아래 명령으로 15초 기다린 뒤 출력 파일의 끝 30줄을 봅니다. 한 번에 20초를 넘지 않으므로 `AI-CMD-END` 줄이 나올 때까지 이 명령을 되풀이합니다.
+
+```powershell
+Start-Sleep -Seconds 15; if (Test-Path $env:TEMP\ai-cmd.log) { Get-Content $env:TEMP\ai-cmd.log -Tail 30 } else { '아직 출력 파일이 없습니다' }
+```
+
+- `ai-cmd.log`는 AI 도구의 파일 읽기로 열지 않고 위 명령의 `Get-Content`로만 봅니다. 더 보려면 `-Tail` 숫자를 늘립니다.
+- 마지막 줄이 `AI-CMD-END:0`이면 명령이 끝난 것입니다. 성공했는지는 그 위 글을 그 명령의 성공 기준과 맞춰 봅니다. 회차 문서에 성공 기준이 있으면 그 기준을 씁니다.
+- `AI-CMD-END:` 뒤가 0이 아닌 숫자면 실패입니다. 그 위 글로 원인을 봅니다.
+- `AI-CMD-END:` 뒤가 비어 있으면 종료 코드를 남기지 않는 PowerShell 명령입니다. 그 위 글로 성공했는지 봅니다.
+- `AI-CMD-END` 줄이 없으면 새 창을 열 때 나온 번호로 아래 명령을 실행합니다. "실행 중"이면(출력 파일이 아직 없어도 첫 출력 전입니다) 새 창을 다시 띄우지 않고 위 확인을 되풀이합니다. "창이 닫혔습니다"면 창이 중간에 닫힌 것입니다. 그 위 글을 보고, 아래 "시간 초과로 끊겼을 때"처럼 결과가 이미 생겼는지 먼저 본 뒤 필요할 때만 다시 실행합니다.
+
+```powershell
+if (Get-Process -Id (번호) -ErrorAction SilentlyContinue) { '실행 중' } else { '창이 닫혔습니다' }
+```
+
+- 로그인을 기다리는 명령이 아닌데 10번(약 3분) 확인해도 로그 끝이 그대로면, 새 창이 무엇을 묻고 멈췄을 수 있습니다. 새 창에 보이는 글을 알려 달라고 하고 답을 끝냅니다.
+- 로그인을 기다리는 명령은 아래 "사용자에게 넘기는 일"대로 합니다.
+
+### 기다리기
+
+- 문서나 따라하기에 "1분 기다린다"처럼 긴 기다림이 있으면 `Start-Sleep -Seconds 20` 이하로 나눠 여러 번 실행합니다. 기다린 뒤 확인까지 한 명령에 담으면 합쳐서 20초 이하로 합니다. 예: `Start-Sleep -Seconds 15; (확인 명령)`.
+- 무엇이 생길 때까지 되풀이하는 고리(`while` 등)를 한 명령에 쓰지 않습니다. 확인 명령을 여러 번 보냅니다.
+
+### 시간 초과로 끊겼을 때
+
+- 30초에 끊긴 명령은 시간 초과 오류만 남고 출력은 오지 않습니다. 실패가 아니라 어디까지 됐는지 모르는 상태입니다.
+- 다시 실행하기 전에 그 명령의 결과가 이미 생겼는지 먼저 봅니다. 예: 만들어진 파일이나 폴더, 설치된 명령의 버전, Google 쪽 배포 목록, 시트의 끝 줄.
+- 결과가 생겼으면 다시 실행하지 않습니다. 생기지 않았으면 "새 창에서 실행하기"로 다시 실행합니다. 설치가 중간에 끊겼으면 새 창에서 같은 설치를 다시 실행합니다.
+- ego 브라우저에서 단추를 누르는 실행이 끊겼을 때도 같습니다. 같은 단추를 다시 누르기 전에 결과가 생겼는지 먼저 봅니다.
+
+### 긴 출력 읽기
+
+- 출력이 8,000자를 넘을 것 같으면(긴 파일을 `git --no-pager show`로 읽을 때 등) 파일로 저장합니다. 마지막 부분은 저장한 파일의 전체 경로를 보여 줍니다.
+
+```powershell
+[Console]::OutputEncoding = [Text.Encoding]::UTF8; <명령> | Out-File -Encoding utf8 -FilePath "$env:TEMP\ai-out.txt"; "$env:TEMP\ai-out.txt"
+```
+
+- 저장한 파일은 AI 도구의 파일 읽기로, 위 명령이 보여 준 전체 경로를 열어 읽습니다. 한 번에 다 나오지 않으면 나눠 읽습니다.
+- 파일 읽기로 열지 못하면 아래 명령으로 7,000자씩 읽습니다. 처음에는 `$s = 0`이고, 다음 조각은 `7000`, `14000`처럼 7,000씩 늘립니다.
+
+```powershell
+$s = 0; $t = Get-Content -Raw -Encoding UTF8 "$env:TEMP\ai-out.txt"; $t.Substring($s, [Math]::Min(7000, $t.Length - $s))
+```
+
+### ego 브라우저
+
+- 이 대화에서 ego 브라우저를 처음 쓸 때 아래 명령으로 사용법 안내를 파일로 저장하고, "긴 출력 읽기"대로 첫 줄부터 `[ego-browser:skill] end of guide`로 시작하는 끝 줄까지 읽습니다. 안내를 명령 출력으로 바로 보면 가운데가 빠져도 끝 줄은 남아서 다 읽은 것처럼 보이므로, 꼭 파일로 읽습니다. 이 대화에서 이미 읽었으면 다시 읽지 않습니다.
+
+```powershell
+$env:Path = [Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [Environment]::GetEnvironmentVariable('Path','User'); [Console]::OutputEncoding = [Text.Encoding]::UTF8; ego-browser skill | Out-File -Encoding utf8 -FilePath "$env:TEMP\ego-browser-skill.md"; "$env:TEMP\ego-browser-skill.md"
+```
+
+- 스크립트는 파일로 넘깁니다. `-e`로 인자에 넣거나 파이프(`|`)로 넘기지 않습니다. 먼저 `$env:TEMP`를 실행해 임시 폴더의 전체 경로를 보고, AI 도구의 파일 쓰기로 `(그 전체 경로)\ego-script.js`에 UTF-8로 저장합니다. 파일 쓰기에 `$env:TEMP`나 `%TEMP%`를 글자 그대로 쓰지 않습니다. 그 글자 이름의 폴더가 작업 폴더 안에 생깁니다.
+- 첫 실행은 아래처럼 작업 공간(TaskSpace)을 만들고 그 번호를 찍습니다. 다음 실행부터는 `taskSpace("(작업 이름)")` 대신 찍힌 번호로 `await taskSpace((번호))`를 씁니다. 다음 답에서 같은 일을 이어 갈 때는 사용법 안내의 "Starting and ending a reply"대로 그 번호로 잇습니다.
+
+```javascript
+const task = await taskSpace("(작업 이름)");
+const page = task.page("p1");
+await page.goto("(주소)", { timeout: 15000 });
+console.log({ taskSpaceId: task.spaceId });
+console.log(String(await page.snapshot()).slice(0, 7000));
+```
+
+- 그다음 아래 명령으로 실행합니다. 실행이 끝나면 스크립트 파일을 지우고 ego 브라우저의 종료 코드를 찍습니다. 스크립트를 바꿀 때마다 파일을 다시 저장하고 이 명령을 다시 실행합니다.
+
+```powershell
+$env:Path = [Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [Environment]::GetEnvironmentVariable('Path','User'); [Console]::OutputEncoding = [Text.Encoding]::UTF8; cmd /c "ego-browser nodejs < %TEMP%\ego-script.js"; $c = $LASTEXITCODE; Remove-Item $env:TEMP\ego-script.js; "ego-browser 종료 코드: $c"
+```
+
+- 한 번 실행은 20초 안에 끝나게 합니다. 한 실행에는 동작 하나와 짧은 확인만 담고, 한 실행 안의 `timeout`을 모두 더해 15초(15000) 이하로 줍니다.
+- 찍는 글도 8,000자를 넘으면 가운데가 빠집니다. 위 예처럼 `.slice(0, 7000)`으로 자르고, 더 봐야 하면 `.slice(7000, 14000)`처럼 다음 실행에서 이어서 찍습니다.
+- 몇 분 걸리는 일(처리 결과 기다리기, 학습 등)은 단추를 누르는 실행과 결과를 보는 실행을 나누고, 결과 보기를 20초 이하로 여러 번 합니다.
+- 사람이 브라우저에서 해야 하는 순간이 오면 `await task.handOff()` 뒤 그 실행을 끝내고, 무엇을 하면 되는지 한 줄로 알린 뒤 답을 끝냅니다. `waitForControl()`로 같은 실행 안에서 기다리지 않습니다. 사용자가 마쳤다고 하면 `const task = await takeOverTaskSpace((번호));`로 같은 작업 공간을 이어받고, `task.userPage()`로 사용자가 보던 페이지를 씁니다.
+
+### 사용자에게 넘기는 일
+
+- 사람이 해야 하는 순간의 예: 비밀번호와 본인 확인 같은 로그인 단계, 설치 승인 창(사용자 계정 컨트롤), Git 로그인 창이나 로그인 명령이 연 Chrome 창처럼 AI가 누를 수 없는 창.
+- 로그인 명령의 출력("끝났는지 보기" 명령으로 본 글)에 로그인 주소가 나오면 그 주소를 ego 브라우저에서 열어 AI가 할 수 있는 데까지 합니다. 비밀번호, 본인 확인, AI가 누를 수 없는 창에서만 할 일을 알리고 답을 끝냅니다.
+- 그 순간을 만드는 명령은 "새 창에서 실행하기"로 띄우고, 브라우저 안의 일은 `task.handOff()`로 넘깁니다. 그다음 무엇을 하면 되는지 한 줄로 알리고 답을 끝냅니다. 한 명령 안에서 사람이 마치기를 기다리지 않습니다.
+- 사용자가 마쳤다고 하면 "끝났는지 보기"나 그 일의 확인 명령으로 보고 이어서 합니다.
 
 ## 화면 주소
 
