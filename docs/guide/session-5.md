@@ -33,7 +33,7 @@ NotebookLM 근거 대조 스위치는 `.env`의 `NOTEBOOKLM_MODE`입니다. 서�
 | `STORAGE_MODE=live`에 `mock`을 적음 | `STORAGE_MODE=live`에서는 서버 코드가 `mock`을 받아들이지 않습니다(모의 근거가 실제 기록에 섞이지 않게). 서버는 시작하지 않고 서버 창에 고칠 방법을 한국어 한 줄로 보여 줍니다 |
 | `off`·`mock`·`live`가 아닌 값 | 서버는 시작하지 않고 서버 창에 고칠 방법을 한국어 한 줄로 보여 줍니다 |
 
-서버를 켤 때 서버 창에 아래 모양의 한 줄을 보여 줍니다. 이 줄은 이 절에서 새로 만듭니다. 저장소 줄은 그대로 둡니다. Gemini를 따로 알리는 줄이 있으면 그것도 그대로 둡니다.
+서버를 켤 때 서버 창에 아래 모양의 한 줄을 보여 줍니다. 이 줄은 이 절에서 새로 만듭니다. 저장소 줄은 그대로 둡니다. Gemini를 따로 알리는 줄이 있으면 그것도 그대로 둡니다. 이 줄은 1회차 문서 "화면 서버 켜기"의 "서버 창 글 확인"대로 4185 서버는 그대로 두고 4186으로 켜 보고, 답에 확인한 포트와 실제로 나온 이 줄을 적습니다. 4185로 두 번째 서버를 켜면 `EADDRINUSE`가 납니다.
 
 ```text
 연동 상태: 저장소=값(뜻) · Gemini=값(뜻) · NotebookLM=값(뜻)
@@ -56,12 +56,31 @@ NotebookLM 근거 대조 스위치는 `.env`의 `NOTEBOOKLM_MODE`입니다. 서�
 |---|---|
 | 설치 | `uv --version`으로 uv가 있는지 보고, 없으면 표 아래 상자의 명령으로 설치합니다. 그다음 `uv tool install notebooklm-mcp-cli==0.15.6`으로 notebooklm-mcp-cli 0.15.6(NotebookLM 도구)을 설치하고 `nlm --version`이 `nlm version 0.15.6`인지 봅니다. 다른 버전이 이미 있으면 `uv tool install --force notebooklm-mcp-cli==0.15.6`으로 바꿉니다. `Update available`이나 `uv tool upgrade` 안내가 나와도 올리지 않습니다 |
 | 명령을 찾지 못할 때 | 설치 뒤 `uv`나 `nlm`을 찾지 못하면 1회차 문서 "오래 걸리는 명령"의 경로 다시 읽기 줄을 같은 명령 맨 앞에 붙여 다시 부릅니다. `nlm`을 그래도 찾지 못하면 `uv tool update-shell`을 실행한 뒤, 경로 다시 읽기 줄을 붙여 `nlm`을 다시 부릅니다. 그래도 찾지 못하면 실행 파일 전체 경로(보통 `$env:USERPROFILE\.local\bin` 아래)로 부릅니다 |
-| 로그인 | `nlm login --storage protected`를 실행합니다. 이 명령은 NotebookLM 로그인용 Chrome 창을 띄우고 로그인이 끝날 때까지 최대 5분 기다립니다. 그 창은 AI 도구로 누를 수 없으니 사용자에게 그 창에서 수업 계정으로 로그인해 달라고 알립니다. 사용자가 마쳤다고 하면 `nlm login --check`가 `Authentication valid!`를 보이는지 봅니다. 이 출력에는 메일 주소가 들어 있으니 답에는 확인한 결과만 적습니다 |
-| 다시 로그인 | 5분이 지나 로그인 명령이 끝났거나 `nlm login --check`가 `Authentication failed`를 보이면 로그인 명령을 다시 실행합니다 |
-| 서버 다시 켜기 | 설치와 로그인을 마치면 1회차 문서 "화면 서버 켜기"의 "프로그램을 새로 설치한 뒤"대로 서버를 끄고 새 창에서 켭니다. 새로 설치한 프로그램을 서버가 찾게 하려는 것입니다 |
+| 로그인 시작 | 프롬프트의 "로그인할 창을 열어 주세요"는 로그인되어 있지 않을 때의 부탁입니다. 설치를 마치면 `nlm login --check`를 실행해 이번에 나온 결과로 봅니다. 앞에서 본 출력이나 버전 확인만으로 로그인 여부를 정하지 않습니다. `Authentication valid!`이면 이미 로그인된 것이니 로그인 창을 열지 않고 "서버 다시 켜기"로 갑니다. `Authentication failed`이면(처음 쓰면 `Profile not found: default`가 함께 나옵니다) `nlm login --storage protected`를 실행합니다. 이 명령은 로그인이 끝날 때까지 최대 5분 기다립니다 |
+| Chrome 창 확인 | `nlm`은 로그인에 쓸 브라우저를 스스로 고릅니다. 출력에 `Launching Google Chrome for authentication`이 보이면 Windows 기본 브라우저가 ego (lite) 브라우저여도 따로 뜬 Google Chrome 창에서 로그인합니다. 그 창은 AI 도구로 누를 수 없으니 사용자에게 그 Chrome 창에서 수업 계정으로 로그인해 달라고 알립니다 |
+| 창이 보이지 않을 때 | 사용자가 Chrome 창이 보이지 않는다고 하거나, 출력에 `Waiting for sign-in` 뒤 `Login timeout`이 나오면(로그인 대기 5분이 끝난 것입니다) 설치는 다시 하지 않습니다. 창은 보였는데 5분 안에 로그인을 끝내지 못한 것이면 로그인 명령을 다시 실행합니다. AI가 띄운 창이 사용자 화면에 보이지 않은 것이면, 앞 로그인 명령의 창이 아직 실행 중일 때 새 창에서 실행할 때 받은 그 창의 번호로 `taskkill /PID (번호) /T /F`를 실행해 끄고(프로그램 이름으로 한꺼번에 끄지 않습니다), 표 아래 "사용자 화면에서 창 열기"의 `notebooklm-login.bat`를 준비합니다 |
+| 로그인 완료 | 사용자가 로그인을 마쳤다고 하면 `nlm login --check`를 다시 실행해 `Authentication valid!`인지 보고 "서버 다시 켜기"로 갑니다. `Authentication failed`이면 "로그인 시작"부터 다시 합니다. 이 출력에는 메일 주소가 들어 있으니 답에는 `Authentication valid!`와 확인한 버전만 적고 메일 주소는 옮기지 않습니다. 이 계정이 사용자가 ego (lite) 브라우저에서 쓰는 Google 계정과 다르다는 것을 알게 되면 메일 주소 없이 다르다는 것만 알립니다 |
+| 서버 다시 켜기 | 설치와 로그인을 마치면 1회차 문서 "화면 서버 켜기"의 "프로그램을 새로 설치한 뒤"대로 서버를 끄고 새 창에서 켭니다. 새로 설치한 프로그램을 서버가 찾게 하려는 것입니다. 끄기 전과 켠 뒤에 4185를 듣는 Node 프로세스 번호와 서버 창(명령 줄에 `npm.cmd start`가 든 powershell.exe)의 프로세스 번호를 각각 봅니다. Node 번호만 바뀌고 서버 창 번호가 같으면 같은 창에서 다시 켜진 것이라 새 창에서 켠 것이 아니니, "프로그램을 새로 설치한 뒤"대로 다시 합니다. 새 창에서 켰다고 알린 뒤 사용자가 서버 창이 보이지 않는다고 하고 4185 포트와 "감시 확인"이 모두 비어 있으면, 표 아래 "사용자 화면에서 창 열기"의 `start-server.bat`를 준비합니다. 4185 포트가 열려 있는데 사용자가 서버 창이 보이지 않는다고 하면 1회차 문서 "끄기"대로 끈 뒤 준비합니다 |
 
 ```powershell
 powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
+**사용자 화면에서 창 열기.** AI가 띄운 창(로그인용 Chrome 창, 서버 창)이 사용자 화면에 보이지 않을 때 씁니다. AI가 웹 서비스 폴더에 아래 파일을 만들고 위치를 알려 준 뒤, 사용자에게 파일 탐색기(폴더와 파일을 보는 Windows 프로그램)에서 그 파일을 더블 클릭해 달라고 알립니다. 그러면 사용자 화면에서 명령이 실행되어 창이 뜹니다. 파일에는 영문 명령만 쓰고, BOM 없이 저장하고 Windows 줄바꿈(CRLF)을 씁니다.
+
+`notebooklm-login.bat`에는 로그인 명령을 담습니다. 아래 예문은 `nlm.exe`가 기본 위치에 설치된 경우입니다. 다른 위치면 `nlm --version` 확인에 성공한 실행 파일의 전체 경로를 씁니다. 사용자가 열린 Chrome 창에서 로그인을 마치면 위 표의 "로그인 완료"대로 합니다.
+
+```bat
+@echo off
+"%USERPROFILE%\.local\bin\nlm.exe" login --storage protected
+pause
+```
+
+`start-server.bat`에는 1회차 문서 "화면 서버 켜기"의 "켜기"와 같은 일(경로를 다시 읽고 웹 서비스 폴더에서 `npm.cmd start` 실행)을 담습니다. "켜기" 명령은 PowerShell 명령이라 그대로 넣으면 실행되지 않으니 아래 꼴로 씁니다. 이렇게 켠 창도 명령 줄에 `npm.cmd start`가 들어 있어 "끄기"와 위 표의 번호 비교를 그대로 씁니다. 사용자가 파일을 열었다고 하면 1회차 문서 "켜져 있는지 보기"로 4185 포트가 열렸는지 봅니다.
+
+```bat
+@echo off
+powershell -NoExit -Command "$env:Path = [Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [Environment]::GetEnvironmentVariable('Path','User'); cd C:\ai-class\tumbler-factory; npm.cmd start"
 ```
 
 ## nlm과 notebooklm-mcp 부르기
@@ -69,6 +88,7 @@ powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | ie
 | 항목 | 약속 |
 |---|---|
 | 도구와 버전 | `notebooklm-mcp-cli` 0.15.6으로 고정합니다 |
+| 계정 확인 | `nlm`의 로그인과 ego (lite) 브라우저의 Google 로그인은 따로라서 계정이 다를 수 있습니다. ego (lite) 브라우저의 NotebookLM에 노트북이 보이지 않으면 오른쪽 위 계정이 `nlm login --check`에서 확인한 계정과 같은지 보고, 노트북은 그 계정으로 엽니다. 같은 제목의 노트북이 여럿이면 주소에 든 노트북 ID가 `.env`의 `NOTEBOOKLM_NOTEBOOK_ID`와 같은 노트북을 엽니다. 창이 좁으면 채팅과 "소스 2개"만 보일 수 있으니 위쪽 "출처" 탭(영어 화면은 "Sources")을 눌러 `notebooklm-Rev.A.md`와 `notebooklm-Rev.B.md`를 봅니다. 사용자가 그 계정에 로그인하는 동안에는 `nlm source list (노트북 ID)`로 두 파일이 들어갔는지 먼저 볼 수 있습니다. 이때는 명령으로 확인한 것과 브라우저 화면에서 확인한 것을 답에 나눠 적습니다 |
 | 노트북 만들기 | 프롬프트가 노트북을 만들어 달라고 하면 `nlm notebook create "텀블러 품질 기준(교육용)"`로 만들고, 나온 `notebook_id` 값으로 `nlm source add (노트북 ID) --file standards\notebooklm-Rev.A.md --wait`와 `nlm source add (노트북 ID) --file standards\notebooklm-Rev.B.md --wait`를 하나씩 실행합니다. 같은 제목의 노트북이 이미 있어도 새로 만들어지니 방금 만든 노트북의 ID를 씁니다 |
 | 노트북 ID와 경로 받기 | 노트북 ID와 도구 실행 파일 경로는 `.env`의 아래 두 줄에 넣습니다. 앞뒤에 공백이나 따옴표를 넣지 않습니다. 노트북 ID는 방금 만든 노트북의 ID를 쓰고, 만들지 않았으면 사용자가 채팅으로 준 ID를, 그것도 없으면 `nlm notebook list`에서 Title이 "텀블러 품질 기준(교육용)"이고 소스(Src)가 2인 줄의 ID를 씁니다(여럿이면 맨 위). 경로는 `Join-Path (uv tool dir --bin) notebooklm-mcp.exe`가 보여 주는 값이고, 넣기 전에 `Test-Path`로 `True`인지 봅니다 |
 | 서버 창에 내지 않는 값 | 노트북 ID, 도구 실행 파일 경로, `nlm` 출력은 서버 창과 웹 서비스 화면에 옮겨 적지 않습니다 |
