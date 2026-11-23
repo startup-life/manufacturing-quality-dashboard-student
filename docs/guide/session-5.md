@@ -66,7 +66,7 @@ NotebookLM 근거 대조 스위치는 `.env`의 `NOTEBOOKLM_MODE`입니다. 서�
 powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
 ```
 
-**사용자 화면에서 창 열기.** AI가 띄운 창(로그인용 Chrome 창, 서버 창)이 사용자 화면에 보이지 않을 때 씁니다. AI가 웹 서비스 폴더에 아래 파일을 만들고 위치를 알려 준 뒤, 사용자에게 파일 탐색기(폴더와 파일을 보는 Windows 프로그램)에서 그 파일을 더블 클릭해 달라고 알립니다. 그러면 사용자 화면에서 명령이 실행되어 창이 뜹니다. 파일에는 영문 명령만 쓰고, BOM 없이 저장하고 Windows 줄바꿈(CRLF)을 씁니다.
+**사용자 화면에서 창 열기.** AI가 띄운 창(로그인용 Chrome 창, 서버 창)이 사용자 화면에 보이지 않을 때 씁니다. AI가 웹 서비스 폴더에 아래 파일을 만들고 위치를 알려 준 뒤, 사용자에게 파일 탐색기(폴더와 파일을 보는 Windows 프로그램)에서 그 파일을 더블 클릭해 달라고 알립니다. 그러면 사용자 화면에서 명령이 실행되어 창이 뜹니다. 파일은 1회차 문서 "새 창이 보이지 않을 때"대로 `[IO.File]::WriteAllLines` 꼴의 PowerShell 명령 하나로 만듭니다(영문 명령만, BOM 없이, Windows 줄바꿈 CRLF).
 
 `notebooklm-login.bat`에는 로그인 명령을 담습니다. 아래 예문은 `nlm.exe`가 기본 위치에 설치된 경우입니다. 다른 위치면 `nlm --version` 확인에 성공한 실행 파일의 전체 경로를 씁니다. 사용자가 열린 Chrome 창에서 로그인을 마치면 위 표의 "로그인 완료"대로 합니다.
 
@@ -76,11 +76,12 @@ powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | ie
 pause
 ```
 
-`start-server.bat`에는 1회차 문서 "화면 서버 켜기"의 "켜기"와 같은 일(경로를 다시 읽고 웹 서비스 폴더에서 `npm.cmd start` 실행)을 담습니다. "켜기" 명령은 PowerShell 명령이라 그대로 넣으면 실행되지 않으니 아래 꼴로 씁니다. 이렇게 켠 창도 명령 줄에 `npm.cmd start`가 들어 있어 "끄기"와 위 표의 번호 비교를 그대로 씁니다. 사용자가 파일을 열었다고 하면 1회차 문서 "켜져 있는지 보기"로 4185 포트가 열렸는지 봅니다.
+`start-server.bat`에는 1회차 문서 "화면 서버 켜기"의 "켜기"와 같은 일(경로를 다시 읽고 웹 서비스 폴더에서 `npm.cmd start` 실행)을 담습니다. "켜기" 명령은 PowerShell 명령이라 그대로 넣으면 실행되지 않으니 아래 꼴로 씁니다. 작업 폴더는 `%~dp0`(이 `.bat`이 있는 웹 서비스 폴더)으로 적습니다. 이렇게 켠 창도 명령 줄에 `npm.cmd start`가 들어 있어 "끄기"와 위 표의 번호 비교를 그대로 씁니다. 사용자가 파일을 열었다고 하면 1회차 문서 "켜져 있는지 보기"로 4185 포트가 열렸는지 봅니다.
 
 ```bat
 @echo off
-powershell -NoExit -Command "$env:Path = [Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [Environment]::GetEnvironmentVariable('Path','User'); cd C:\ai-class\tumbler-factory; npm.cmd start"
+cd /d "%~dp0"
+powershell -NoExit -Command "$env:Path = [Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [Environment]::GetEnvironmentVariable('Path','User'); npm.cmd start"
 ```
 
 ## nlm과 notebooklm-mcp 부르기
