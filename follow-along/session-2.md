@@ -26,18 +26,14 @@
 
 1. AI 도구에서 웹 서비스 폴더 `C:\ai-class\tumbler-factory`를 열고 새 대화를 시작합니다.
 2. 서버 켜기: 서버 창이 없거나 서버가 꺼져 있으면 2-1(지침 세팅)을 보낸 뒤 AI 도구에 "화면 서버를 켜 주세요."라고 보냅니다. 그다음 ego (lite) 브라우저에서 http://127.0.0.1:4185 를 엽니다. 1회차 로그인 화면이 보이면 됩니다.
-3. 사진 저장소 받기(AI에게 맡겨도 됩니다): `C:\ai-class` 안에 `manufacturing-quality-student-images` 폴더가 이미 있으면 건너뜁니다. 없으면 PowerShell 창을 하나 열고(이 창이 명령 창입니다) 아래 두 줄을 한 줄씩 칩니다. ZIP으로 받지 말고 꼭 이 명령으로 받고, 폴더 이름은 바꾸지 않습니다.
+3. 사진 저장소 받기: AI에게 아래 문장을 보냅니다.
 
-```powershell
-cd C:\ai-class
-git clone https://github.com/startup-life/manufacturing-quality-student-images.git
+```text
+검사를 등록할 때 쓸 연습 사진을 받기 위해, C:\ai-class 안에 manufacturing-quality-student-images 폴더가 없으면 C:\ai-class에서 git clone https://github.com/startup-life/manufacturing-quality-student-images.git 으로 받아 주세요. ZIP으로 받지 말고, 폴더 이름은 바꾸지 마세요.
+그다음 C:\ai-class\manufacturing-quality-student-images\assets\dataset\images 폴더의 jpg 사진 수를 세어 알려 주세요. 128이 아니면 그 폴더를 지운 뒤 같은 명령으로 다시 받고 다시 세어 주세요.
 ```
 
-4. 사진 수 확인(AI에게 맡겨도 됩니다): 명령 창에서 아래 한 줄을 칩니다. `128`이 나와야 합니다. 다른 숫자가 나오면 폴더를 지우고 다시 받은 뒤 셉니다. 그래도 다르면 AI에게 "C:\ai-class\manufacturing-quality-student-images\assets\dataset\images의 jpg 사진 수가 128이 아니에요. 원인을 찾고, 다시 받아야 하면 그 폴더를 지운 뒤 C:\ai-class에서 git clone https://github.com/startup-life/manufacturing-quality-student-images.git 으로 다시 받아 주세요."라고 보냅니다.
-
-```powershell
-(Get-ChildItem C:\ai-class\manufacturing-quality-student-images\assets\dataset\images -Filter *.jpg).Count
-```
+4. 사진 수 확인: AI가 `C:\ai-class\manufacturing-quality-student-images` 폴더를 받았거나 이미 있다고 알리고, jpg 사진이 `128`장이라고 알려 주면 됩니다. 다시 받아도 128장이 아니라고 하면 AI에게 "C:\ai-class\manufacturing-quality-student-images\assets\dataset\images의 jpg 사진 수가 128이 아니에요. 원인을 찾아 고쳐 주세요."라고 보냅니다.
 
 ## 2-1. 지침 세팅
 
