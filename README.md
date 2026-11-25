@@ -1,5 +1,13 @@
 # manufacturing-quality-dashboard-student
 
+## 간소화한 따라하기
+
+빈 폴더에서 AI와 함께 만들며 1회차부터 같은 폴더를 사용합니다. 회차별 프롬프트와 수업 자료로 진행합니다. 화면은 기존 완성 예제와 다를 수 있습니다.
+
+[1회차](follow-along/session-1.md) · [2회차](follow-along/session-2.md) · [3회차](follow-along/session-3.md) · [4회차](follow-along/session-4.md) · [5회차](follow-along/session-5.md) · [6회차](follow-along/session-6.md)
+
+아래는 이 저장소의 기존 완성 예제에 관한 안내입니다.
+
 텀블러 공장 품질관리 사이트를 6회차 수업에서 AI 도구와 함께 만듭니다.
 `milestone-0` 브랜치는 1회차를 시작하는 출발점입니다. 그 브랜치에는 코드가 없고, `AGENTS.md`(AI 도구가 읽을 규칙)와 `docs/guide/`(1회차 문서)만 있습니다.
 수강생은 빈 폴더에서 시작하고, 1회차 1-2에서 AI가 이 저장소를 `class`라는 이름으로 더해 필요한 파일만 가져옵니다.
