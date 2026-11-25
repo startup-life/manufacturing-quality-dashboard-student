@@ -2,6 +2,8 @@
 
 ## 간소화한 따라하기
 
+[전체 회차 프롬프트 한 파일로 보기](follow-along/promp.md)
+
 빈 폴더에서 AI와 함께 만들며 1회차부터 같은 폴더를 사용합니다. 회차별 프롬프트와 수업 자료로 진행합니다. 화면은 기존 완성 예제와 다를 수 있습니다.
 
 [1회차](follow-along/session-1.md) · [2회차](follow-along/session-2.md) · [3회차](follow-along/session-3.md) · [4회차](follow-along/session-4.md) · [5회차](follow-along/session-5.md) · [6회차](follow-along/session-6.md)
