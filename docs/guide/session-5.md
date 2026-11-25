@@ -8,7 +8,7 @@
 
 ## 따라하기 단계와 도구 전환
 
-단계 번호는 [5회차 따라하기 교재](https://github.com/startup-life/manufacturing-quality-dashboard-student/blob/main/follow-along/session-5.md)를 기준으로 합니다. 5-1은 Cline Desktop에서 지침과 문서를 가져오고, 5-2~5-3은 Antigravity에서 nlm(NotebookLM을 부르는 도구) 설치·로그인과 NotebookLM 노트북(문서를 모아 두는 곳) 준비를 하고, 5-4~5-18은 다시 Cline Desktop에서 같은 웹 서비스 폴더를 사용합니다.
+단계 번호는 [5회차 따라하기 교재](https://github.com/startup-life/manufacturing-quality-dashboard-student/blob/main/follow-along/session-5.md)를 기준으로 합니다. 5-1은 Cline Desktop에서 지침과 문서를 가져오고, 5-2~5-3은 Antigravity에서 nlm(NotebookLM을 부르는 도구) 설치·로그인과 NotebookLM 노트북(문서를 모아 두는 곳) 준비를 하고, 5-4~5-18은 다시 Cline Desktop에서 같은 웹 서비스 폴더를 사용합니다. 다만 5-9(Apps Script 코드 다시 올리기)는 Antigravity에서 합니다.
 
 5-2와 5-4의 프롬프트에서 `---` 아래 두 줄은 앞 도구에서 마친 일과 현재 교재 위치입니다. 해당 파일과 설정을 이어 쓰고 구분선 위의 요청을 진행합니다. 5-4에서는 `.env`의 `NOTEBOOKLM_MODE`, 노트북 ID, notebooklm-mcp 실행 파일 경로를 지금 값 그대로 씁니다. `NOTEBOOKLM_MODE=off`이면 노트북 ID와 도구 경로가 비어 있어도 채우지 않습니다.
 
