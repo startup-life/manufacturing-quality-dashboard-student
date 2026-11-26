@@ -33,7 +33,7 @@
 그다음 C:\ai-class\manufacturing-quality-student-images\assets\dataset\images 폴더의 jpg 사진 수를 세어 알려 주세요. 128이 아니면 그 폴더를 지운 뒤 같은 명령으로 다시 받고 다시 세어 주세요.
 ```
 
-4. 사진 수 확인: AI가 `C:\ai-class\manufacturing-quality-student-images` 폴더를 받았거나 이미 있다고 알리고, jpg 사진이 `128`장이라고 알려 주면 됩니다. 다시 받아도 128장이 아니라고 하면 AI에게 "C:\ai-class\manufacturing-quality-student-images\assets\dataset\images의 jpg 사진 수가 128이 아니에요. 원인을 찾아 고쳐 주세요."라고 보냅니다.
+4. 사진 수 확인: AI가 `C:\ai-class\manufacturing-quality-student-images` 폴더를 새로 받았는지, 이미 있었는지 알려 줍니다. AI가 알려 준 jpg 사진 수가 `128`장이면 됩니다. 다시 받아도 128장이 아니라고 하면 AI에게 "C:\ai-class\manufacturing-quality-student-images\assets\dataset\images의 jpg 사진 수가 128이 아니에요. 원인을 찾아 고쳐 주세요."라고 보냅니다.
 
 ## 2-1. 지침 세팅
 
