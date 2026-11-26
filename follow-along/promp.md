@@ -55,7 +55,7 @@ https://github.com/startup-life/manufacturing-quality-dashboard-student 의 stan
 ```
 
 ```text
-수업용 사진은 https://github.com/startup-life/manufacturing-quality-student-images 에서 가져와줘.
+수업용 사진은 https://github.com/startup-life/manufacturing-quality-student-images 저장소의 ZIP을 받아 프로젝트의 assets/quality-photos에 풀어줘.
 ```
 
 ```text
