@@ -17,6 +17,7 @@
 ### 따라하기
 
 ```text
+웹사이트는 내가 보내는 프롬프트에 따라 만들어줘. 다른 저장소의 제작 가이드나 완성 코드는 읽지 말아줘.
 이 폴더에서 웹 서비스를 만들 수 있게 Node.js와 Git이 있는지 확인해줘. 없으면 설치 방법을 알려줘. 로그인이나 설치 승인처럼 내가 해야 할 일은 알려줘.
 ```
 
@@ -50,7 +51,7 @@
 ### 따라하기
 
 ```text
-https://github.com/startup-life/manufacturing-quality-dashboard-student 에서 standards 폴더를 가져와줘. 검사기준 원문은 바꾸지 말아줘. 수업용 사진은 https://github.com/startup-life/manufacturing-quality-student-images 에서 가져와줘.
+https://github.com/startup-life/manufacturing-quality-dashboard-student 의 standards에서 Rev.A.json, Rev.B.json, notebooklm-Rev.A.md, notebooklm-Rev.B.md만 같은 경로로 가져와줘. 검사기준 원문은 바꾸지 말아줘. 수업용 사진은 https://github.com/startup-life/manufacturing-quality-student-images 에서 가져와줘.
 ```
 
 ```text
@@ -116,7 +117,7 @@ Google 로그인, Apps Script 프로젝트 생성과 배포를 도와줘. 로그
 ### 따라하기
 
 ```text
-https://github.com/startup-life/manufacturing-quality-dashboard-student 에서 prompts 폴더를 가져와줘. standards의 검사기준과 사진 판독 지시문을 수업용 원문으로 사용해줘.
+https://github.com/startup-life/manufacturing-quality-dashboard-student 에서 prompts/gemini-v1.md만 같은 경로로 가져와줘. 사진 판독 때 이 문구와 standards의 검사기준을 사용해줘.
 ```
 
 ```text
