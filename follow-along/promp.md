@@ -129,7 +129,7 @@ https://github.com/startup-life/manufacturing-quality-dashboard-student 에서 p
 ```
 
 ```text
-OnePort를 통해 Gemini로 사진을 판독하게 연결해줘. API 키는 내가 직접 비공개 설정에 넣게 하고 화면과 Git에 노출하지 마. 실제 연결이 실패하면 이유를 표시해줘.
+OnePort 주소 https://oneport.kr/v1 과 모델 gemini-3.8-flash로 Gemini 사진 판독을 연결해줘. API 키는 내가 직접 비공개 설정에 넣게 하고 화면과 Git에 노출하지 마. 실제 연결이 실패하면 이유를 표시해줘.
 ```
 
 ```text
