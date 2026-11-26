@@ -51,7 +51,11 @@
 ### 따라하기
 
 ```text
-https://github.com/startup-life/manufacturing-quality-dashboard-student 의 standards에서 Rev.A.json, Rev.B.json, notebooklm-Rev.A.md, notebooklm-Rev.B.md만 같은 경로로 가져와줘. 검사기준 원문은 바꾸지 말아줘. 수업용 사진은 https://github.com/startup-life/manufacturing-quality-student-images 에서 가져와줘.
+https://github.com/startup-life/manufacturing-quality-dashboard-student 의 standards에서 Rev.A.json, Rev.B.json, notebooklm-Rev.A.md, notebooklm-Rev.B.md만 같은 경로로 가져와줘. 검사기준 원문은 바꾸지 말아줘.
+```
+
+```text
+수업용 사진은 https://github.com/startup-life/manufacturing-quality-student-images 에서 가져와줘.
 ```
 
 ```text
